@@ -16,13 +16,12 @@ function App() {
             <AuthProvider>
               <BrowserRouter>
                 <Routes>
-                  <Route path='/' element={<Auth/>}/>
-                  {/* <Route path='/auth' element={<Auth/>}/> */}
+                  <Route path='/' element={<Main/>}/>
+                  <Route path='/auth' element={<Auth/>}/>
                   <Route path='/admin' element={<PrivateMasterRoute component={<Admin />}/>}/>
                   </Routes>
               </BrowserRouter>  
             </AuthProvider>
-          
           </div>
       </div>
    
