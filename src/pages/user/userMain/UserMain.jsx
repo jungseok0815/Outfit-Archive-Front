@@ -171,11 +171,13 @@ function App() {
         </form>
       </div>
 
+
+      <div className="shopping-container">
+
+      </div>
+
       {/* 피드 리스트 영역 */}
       <div className="feed-container">
-        {/* 더보기 버튼 */}
-        <button className="view-more-button">더보기</button>
-
         <div className="feed-navigation-wrapper">
           {/* 좌측 버튼 */}
           <button

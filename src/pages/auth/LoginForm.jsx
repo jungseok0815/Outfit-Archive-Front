@@ -34,48 +34,33 @@ function LoginForm() {
     <div className="auth-form">
       <form onSubmit={handleSubmit}>
       <div className="form-group">
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email">이메일</label>
           <input
             type="email"
             id="userId"
             name="userId"
             value={loginForm.userId}
             onChange={handleInputChange}
-            placeholder="Enter your email"
+            placeholder="이메일을 입력하세요"
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">비밀번호</label>
           <input
             type="password"
             id="userPwd"
             name="userPwd"
             value={loginForm.userPwd}
             onChange={handleInputChange}
-            placeholder="Enter your password"
+            placeholder="비밀번호를 입력하세요"
             required
           />
         </div>
         <button type="submit" className="submit-button">
-                Login
+                로그인
         </button>
       </form>
-
-      <div className="social-login-divider">
-        <span>or continue with</span>
-      </div>
-
-      <div className="social-login-buttons">
-        <button type="button" className="social-button kakao-button">
-          <span className="social-icon">💬</span>
-          Kakao
-        </button>
-        <button type="button" className="social-button naver-button">
-          <span className="social-icon">N</span>
-          Naver
-        </button>
-      </div>
     </div>
   );
 }

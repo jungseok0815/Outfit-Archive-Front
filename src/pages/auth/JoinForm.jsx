@@ -26,57 +26,57 @@ function JoinForm(){
     return (
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="username">사용자 이름</label>
             <input
             type="text"
             id="username"
             name="username"
             value={joinForm.username}
             onChange={handleInputChange}
-            placeholder="Enter your username"
+            placeholder="사용자 이름을 입력하세요"
             required
             />
         </div>
         <div className="form-group">
-            <label htmlFor="age">Age</label>
+            <label htmlFor="age">나이</label>
             <input
             type="number"
             id="age"
             name="age"
             value={joinForm.age}
             onChange={handleInputChange}
-            placeholder="Enter your age"
+            placeholder="나이를 입력하세요"
             required
             min="1"
             max="120"
             />
         </div>
         <div className="form-group">
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email">이메일</label>
           <input
             type="email"
             id="email"
             name="email"
             value={joinForm.email}
             onChange={handleInputChange}
-            placeholder="Enter your email"
+            placeholder="이메일을 입력하세요"
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">비밀번호</label>
           <input
             type="password"
             id="password"
             name="password"
             value={joinForm.password}
             onChange={handleInputChange}
-            placeholder="Enter your password"
+            placeholder="비밀번호를 입력하세요"
             required
           />
         </div>
         <button type="submit" className="submit-button">
-            Sign Up
+            회원가입
         </button>
       </form>
     );
