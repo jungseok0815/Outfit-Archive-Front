@@ -1,13 +1,11 @@
 import api from './api';
 
 export const postLogin = (loginForm) => {
-    return api.post("/api/auth/login", null,{
-        params : loginForm
-    })
+    console.log(loginForm)
+    return api.post("/api/auth/login", loginForm)
 }
 
 export const postJoin = (joinForm) =>{
-    return api.post("/api/auth/join", null,{
-        params : joinForm
-    })    
+    console.log(joinForm)
+    return api.post("/api/usr/insert", joinForm)    
 }

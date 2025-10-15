@@ -19,6 +19,7 @@ function LoginForm() {
 
   const handleSubmit = (e) => {
       e.preventDefault();
+      console.log(loginForm)
       postLogin(loginForm).then(res =>{
         const userInfo = res.data.data;   
         login(userInfo)

@@ -17,7 +17,8 @@ function JoinForm(){
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    postJoin.then(res =>{
+    console.log(joinForm)
+    postJoin(joinForm).then(res =>{
         if(res.status === 200 && res.data.success) alert("회원가입이 완료되었습니다!")
     }).catch(error => {
         console.log(error.reponse)
