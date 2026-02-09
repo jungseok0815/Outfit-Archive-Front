@@ -2,19 +2,19 @@ import {React} from "react";
 import { Link } from "react-router-dom";
 import "../../../styles/user/Navbar.css";
 import { useAuth } from "../../../store/context/UserContext";
-function Navbar() {
+
+function Navbar({ onLoginClick }) {
    const { user, logout } = useAuth();
-   console.log(user)
   return (
     <nav className="navbar">
-      <div className="logo">Outfit-Archive</div>
+      <div className="logo">Outfit Archive</div>
       <ul className="nav-links">
-        <li><Link to={"/"}><a>Shop</a></Link></li>
-        <li><Link to={"/"}><a>Style</a></Link></li>
-        <li><Link to={"/"}><a>About</a></Link></li>
-        <li><Link to={"/"}><a>마이페이지</a></Link></li>
-        <li>{!user && <Link to={"/auth"}><a>Login</a></Link>}
-            {user && < a onClick={logout}>Logout</a>}
+        <li><Link to={"/"}>Shop</Link></li>
+        <li><Link to={"/"}>Style</Link></li>
+        <li><Link to={"/"}>About</Link></li>
+        <li><Link to={"/"}>마이페이지</Link></li>
+        <li>{!user && <span onClick={onLoginClick}>Login</span>}
+            {user && <span onClick={logout}>Logout</span>}
         </li>
       </ul>
     </nav>

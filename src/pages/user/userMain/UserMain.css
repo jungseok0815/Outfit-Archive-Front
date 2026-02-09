@@ -1,58 +1,86 @@
 .app {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: #ffffff;
 }
 
+/* 검색바 영역 */
 .search-container {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 40px 20px;
+  padding: 32px 20px;
+  background-color: #ffffff;
 }
 
 .search-form {
   display: flex;
   width: 100%;
-  max-width: 900px;
-  gap: 10px;
+  max-width: 560px;
+  gap: 0;
 }
 
 .search-input {
   flex: 1;
-  padding: 15px 20px;
-  font-size: 16px;
-  background-color: white;
-  border: 2px solid #e0e0e0;
+  padding: 13px 16px;
+  font-size: 15px;
+  background-color: #f4f4f4;
+  border: none;
   border-radius: 8px;
   outline: none;
-  transition: all 0.3s ease;
+  color: #222222;
+  transition: all 0.2s ease;
+}
+
+.search-input::placeholder {
+  color: #bcbcbc;
+  font-size: 0.9em;
 }
 
 .search-input:focus {
-  border-color: #4a90e2;
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  background-color: #efefef;
+  box-shadow: 0 0 0 1px #d5d5d5;
 }
 
 .search-button {
-  padding: 15px 30px;
-  font-size: 16px;
+  padding: 13px 24px;
+  font-size: 14px;
   font-weight: 600;
-  background-color: #4a90e2;
-  color: white;
+  background-color: #222222;
+  color: #ffffff;
   border: none;
   border-radius: 8px;
+  margin-left: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease;
 }
 
 .search-button:hover {
-  background-color: #357abd;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  background-color: #000000;
 }
 
 .search-button:active {
   transform: translateY(0);
+}
+
+/* 피드 섹션 타이틀 */
+.feed-section-title {
+  text-align: center;
+  padding: 48px 20px 16px;
+}
+
+.feed-section-title h2 {
+  font-size: 1.3em;
+  font-weight: 700;
+  color: #222222;
+  letter-spacing: 0.5px;
+  margin-bottom: 0;
+}
+
+.feed-section-line {
+  width: 40px;
+  height: 2px;
+  background-color: #222222;
+  margin: 12px auto 0;
 }
 
 /* 피드 리스트 스타일 */
@@ -62,122 +90,36 @@
   padding: 20px;
 }
 
-.feed-navigation-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-  justify-content: center;
-}
-
-.feed-grid-wrapper {
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-  max-width: 1100px;
-  min-height: 350px;
-}
-
-.feed-grid {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
+.feed-static-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  will-change: transform;
+  gap: 16px;
 }
 
-.feed-grid.slide-out-left {
-  animation: slideOutLeft 0.6s ease-in-out forwards;
-  z-index: 1;
-  pointer-events: none;
+.feed-more {
+  text-align: center;
+  padding-top: 32px;
 }
 
-.feed-grid.slide-out-right {
-  animation: slideOutRight 0.6s ease-in-out forwards;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.feed-grid.slide-in-left {
-  animation: slideInLeft 0.6s ease-in-out forwards;
-  z-index: 2;
-}
-
-.feed-grid.slide-in-right {
-  animation: slideInRight 0.6s ease-in-out forwards;
-  z-index: 2;
-}
-
-.feed-grid:not(.slide-out-left):not(.slide-out-right):not(.slide-in-left):not(.slide-in-right) {
-  position: relative;
-  z-index: 3;
-}
-
-@keyframes slideOutLeft {
-  0% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(-25%);
-    opacity: 0;
-  }
-}
-
-@keyframes slideOutRight {
-  0% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(25%);
-    opacity: 0;
-  }
-}
-
-@keyframes slideInLeft {
-  0% {
-    transform: translateX(-25%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slideInRight {
-  0% {
-    transform: translateX(25%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
+/* 피드 카드 - KREAM 스타일 */
 .feed-item {
-  background-color: white;
-  border-radius: 10px;
+  background-color: #ffffff;
+  border: 1px solid #ebebeb;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: box-shadow 0.2s ease;
   cursor: pointer;
 }
 
 .feed-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .feed-image {
   width: 100%;
   height: 220px;
   overflow: hidden;
-  background-color: #f0f0f0;
+  background-color: #f5f5f5;
 }
 
 .feed-image img {
@@ -188,30 +130,31 @@
 }
 
 .feed-item:hover .feed-image img {
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
 .feed-content {
-  padding: 12px;
+  padding: 14px;
 }
 
 .feed-user {
   font-size: 12px;
-  color: #666;
+  color: #999999;
   margin-bottom: 6px;
   font-weight: 500;
 }
 
 .feed-title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
-  color: #333;
-  margin: 0 0 6px 0;
+  color: #222222;
+  margin: 0 0 4px 0;
+  line-height: 1.3;
 }
 
 .feed-description {
   font-size: 13px;
-  color: #777;
+  color: #999999;
   margin: 0 0 10px 0;
   line-height: 1.4;
 }
@@ -220,7 +163,7 @@
   display: flex;
   gap: 12px;
   font-size: 13px;
-  color: #999;
+  color: #bcbcbc;
 }
 
 .feed-likes,
@@ -230,55 +173,148 @@
   gap: 4px;
 }
 
-/* 네비게이션 버튼 스타일 */
-.nav-button {
-  width: 60px;
-  height: 60px;
-  background-color: white;
-  border: 2px solid #e0e0e0;
-  border-radius: 50%;
-  font-size: 36px;
-  color: #666;
+/* 인기 상품 섹션 */
+.popular-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 20px 60px;
+}
+
+.popular-header {
+  text-align: center;
+  padding: 48px 0 32px;
+  border-top: 1px solid #ebebeb;
+}
+
+.popular-title {
+  font-size: 1.3em;
+  font-weight: 700;
+  color: #222222;
+  letter-spacing: 0.5px;
+  margin: 0 0 0 0;
+}
+
+.popular-line {
+  width: 40px;
+  height: 2px;
+  background-color: #222222;
+  margin: 12px auto;
+}
+
+.popular-subtitle {
+  font-size: 0.85em;
+  color: #999999;
+  margin: 0;
+}
+
+.popular-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* 상품 카드 */
+.product-card {
+  background-color: #ffffff;
+  border: 1px solid #ebebeb;
+  border-radius: 12px;
+  overflow: hidden;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: box-shadow 0.2s ease;
+  position: relative;
+}
+
+.product-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.product-rank {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 28px;
+  height: 28px;
+  background-color: #222222;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
-  animation: fadeIn 0.3s ease-in;
+  z-index: 1;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.product-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.nav-button:hover:not(:disabled) {
-  background-color: #4a90e2;
-  border-color: #4a90e2;
-  color: white;
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
 }
 
-.nav-button:active:not(:disabled) {
-  transform: scale(1.05);
+.product-card:hover .product-image img {
+  transform: scale(1.03);
 }
 
-.nav-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.product-info {
+  padding: 14px;
 }
 
-.nav-button-hidden {
-  opacity: 0;
-  pointer-events: none;
-  visibility: hidden;
+.product-brand {
+  font-size: 13px;
+  font-weight: 700;
+  color: #222222;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.product-name {
+  font-size: 13px;
+  color: #999999;
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: #222222;
+}
+
+/* 더보기 버튼 */
+.popular-more {
+  text-align: center;
+  padding-top: 32px;
+}
+
+.more-button {
+  padding: 14px 80px;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #222222;
+  background-color: #ffffff;
+  border: 1px solid #d5d5d5;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.3px;
+}
+
+.more-button:hover {
+  background-color: #f5f5f5;
+  border-color: #222222;
 }

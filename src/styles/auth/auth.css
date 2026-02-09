@@ -1,83 +1,125 @@
-.loginMain {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #0a0a0a;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-                      url('https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1600');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    position: relative;
-  }
-
-  .loginMain::before {
-    content: '';
-    position: absolute;
+/* 모달 오버레이 */
+.auth-overlay {
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: 0;
-  }
-
-  .auth-container {
     background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    padding: 35px 40px;
-    width: 450px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: overlayFadeIn 0.2s ease;
+}
+
+@keyframes overlayFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* 모달 컨테이너 */
+.auth-container {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    padding: 40px 36px 32px;
+    width: 400px;
     max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
     text-align: center;
     position: relative;
-    z-index: 1;
-    animation: slideUp 0.5s ease-out;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
+    animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-  @keyframes slideUp {
+@keyframes modalSlideUp {
     from {
-      opacity: 0;
-      transform: translateY(30px);
+        opacity: 0;
+        transform: translateY(20px);
     }
     to {
-      opacity: 1;
-      transform: translateY(0);
+        opacity: 1;
+        transform: translateY(0);
     }
-  }
+}
 
-  .auth-brand {
-    margin-bottom: 25px;
-  }
+/* 닫기 버튼 */
+.auth-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #999999;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
 
-  .auth-title {
-    font-size: 2em;
-    font-weight: 800;
-    margin-bottom: 8px;
-    color: #ffffff;
-    letter-spacing: -1px;
-  }
+.auth-close:hover {
+    background-color: #f5f5f5;
+    color: #222222;
+}
 
-  .auth-subtitle {
-    font-size: 0.95em;
-    color: #d1d5db;
+/* 브랜드 영역 */
+.auth-brand {
+    margin-bottom: 28px;
+}
+
+.auth-brand-line {
+    width: 40px;
+    height: 2px;
+    background-color: #222222;
+    margin: 0 auto 14px;
+}
+
+.auth-title {
+    font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+    font-size: 1.6em;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #222222;
+    letter-spacing: 1px;
+}
+
+.auth-subtitle {
+    font-size: 0.8em;
+    color: #999999;
     font-weight: 400;
     letter-spacing: 0.5px;
-  }
+}
 
-  .auth-footer {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid #e5e7eb;
-  }
+.form-content {
+    animation: formFadeIn 0.25s ease-out;
+}
 
-  .auth-footer p {
-    color: #d1d5db;
-    font-size: 0.9em;
-    font-weight: 300;
-  }
-  
+@keyframes formFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-footer {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #ebebeb;
+}
+
+.auth-footer p {
+    color: #bcbcbc;
+    font-size: 0.75em;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}

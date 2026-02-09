@@ -22,7 +22,7 @@ export const DeleteBrand = (productNo) =>{
     return api.delete(`/api/brand/delete?id=${productNo}`)
 }
 
-export const ListBrand =  (keyword) =>{   
-    if(keyword === null) return api.get(`/api/product/list`)    
-    return api.get(`/api/brand/list?keyword=${keyword}`)  
+export const ListBrand =  (keyword) =>{
+    if(keyword === null) return api.get(`/api/brand/list`)
+    return api.get(`/api/brand/list?keyword=${keyword}`)
     }

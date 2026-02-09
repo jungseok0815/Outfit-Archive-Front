@@ -39,8 +39,9 @@
 
 /* UserMain styles */
 .app {
-  font-family: 'Arial', sans-serif;
-  background-color: #f8f8f8;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #ffffff;
+  color: #222222;
   padding: 0;
   margin: 0;
 }

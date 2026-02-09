@@ -1,13 +1,13 @@
 import React,{useState} from "react";
-import "../../styles/auth/auth.css"
+import "../../styles/auth/loginForm.css"
 import {postJoin} from '../../api/auth';
 function JoinForm(){
   const [joinForm, setJoinForm] = useState({
-    email: "",
-    password: "",
-    username: "",
-    age: "",
-    AuthName : "USER"
+    userId: "",
+    userPwd: "",
+    userNm: "",
+    userAge: "",
+    authName: "USER"
   });
 
   const handleInputChange = (e) => {
@@ -21,30 +21,30 @@ function JoinForm(){
     postJoin(joinForm).then(res =>{
         if(res.status === 200 && res.data.success) alert("회원가입이 완료되었습니다!")
     }).catch(error => {
-        console.log(error.reponse)
+        console.log(error.response)
     })
   };
     return (
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-            <label htmlFor="username">사용자 이름</label>
+            <label htmlFor="userNm">사용자 이름</label>
             <input
             type="text"
-            id="username"
-            name="username"
-            value={joinForm.username}
+            id="userNm"
+            name="userNm"
+            value={joinForm.userNm}
             onChange={handleInputChange}
             placeholder="사용자 이름을 입력하세요"
             required
             />
         </div>
         <div className="form-group">
-            <label htmlFor="age">나이</label>
+            <label htmlFor="userAge">나이</label>
             <input
             type="number"
-            id="age"
-            name="age"
-            value={joinForm.age}
+            id="userAge"
+            name="userAge"
+            value={joinForm.userAge}
             onChange={handleInputChange}
             placeholder="나이를 입력하세요"
             required
@@ -53,24 +53,24 @@ function JoinForm(){
             />
         </div>
         <div className="form-group">
-          <label htmlFor="email">이메일</label>
+          <label htmlFor="userId">이메일</label>
           <input
             type="email"
-            id="email"
-            name="email"
-            value={joinForm.email}
+            id="userId"
+            name="userId"
+            value={joinForm.userId}
             onChange={handleInputChange}
             placeholder="이메일을 입력하세요"
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="password">비밀번호</label>
+          <label htmlFor="userPwd">비밀번호</label>
           <input
             type="password"
-            id="password"
-            name="password"
-            value={joinForm.password}
+            id="userPwd"
+            name="userPwd"
+            value={joinForm.userPwd}
             onChange={handleInputChange}
             placeholder="비밀번호를 입력하세요"
             required
