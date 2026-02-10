@@ -9,10 +9,10 @@ function Navbar({ onLoginClick }) {
     <nav className="navbar">
       <div className="logo">Outfit Archive</div>
       <ul className="nav-links">
-        <li><Link to={"/"}>Shop</Link></li>
-        <li><Link to={"/"}>Style</Link></li>
+        <li><Link to={"/shop"}>Shop</Link></li>
+        <li><Link to={"/style"}>Style</Link></li>
         <li><Link to={"/"}>About</Link></li>
-        <li><Link to={"/"}>마이페이지</Link></li>
+        <li><Link to={"/mypage"}>마이페이지</Link></li>
         <li>{!user && <span onClick={onLoginClick}>Login</span>}
             {user && <span onClick={logout}>Logout</span>}
         </li>

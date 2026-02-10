@@ -1,0 +1,127 @@
+/* 페이지 헤더 */
+.shop-header {
+  text-align: center;
+  padding: 48px 20px 24px;
+}
+
+.shop-title {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #222222;
+  margin: 0 0 6px 0;
+  letter-spacing: 0.5px;
+}
+
+.shop-subtitle {
+  font-size: 0.85em;
+  color: #999999;
+  margin: 0;
+}
+
+/* 검색바 */
+.shop-search-container {
+  display: flex;
+  justify-content: center;
+  padding: 0 20px 24px;
+}
+
+.shop-search-form {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+}
+
+.shop-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.shop-search-input {
+  width: 100%;
+  padding: 13px 16px 13px 42px;
+  font-size: 14px;
+  background-color: #f4f4f4;
+  border: none;
+  border-radius: 10px;
+  outline: none;
+  color: #222222;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.shop-search-input::placeholder {
+  color: #bcbcbc;
+}
+
+.shop-search-input:focus {
+  background-color: #efefef;
+  box-shadow: 0 0 0 1px #d5d5d5;
+}
+
+/* 카테고리 탭 */
+.shop-categories {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 20px 24px;
+  flex-wrap: wrap;
+}
+
+.category-tab {
+  padding: 8px 20px;
+  font-size: 0.85em;
+  font-weight: 500;
+  color: #999999;
+  background-color: #ffffff;
+  border: 1px solid #ebebeb;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-tab:hover {
+  color: #222222;
+  border-color: #d5d5d5;
+}
+
+.category-tab.active {
+  background-color: #222222;
+  color: #ffffff;
+  border-color: #222222;
+}
+
+/* 상품 수 + 정렬 바 */
+.shop-toolbar {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px 16px;
+}
+
+.shop-count {
+  font-size: 13px;
+  color: #999999;
+}
+
+/* 상품 그리드 */
+.shop-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* 검색 결과 없음 */
+.shop-empty {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.shop-empty p {
+  font-size: 0.95em;
+  color: #999999;
+}

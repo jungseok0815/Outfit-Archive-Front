@@ -1,0 +1,72 @@
+/* 페이지 헤더 */
+.style-header {
+  text-align: center;
+  padding: 48px 20px 24px;
+}
+
+.style-page-title {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #222222;
+  margin: 0 0 6px 0;
+  letter-spacing: 0.5px;
+}
+
+.style-page-subtitle {
+  font-size: 0.85em;
+  color: #999999;
+  margin: 0;
+}
+
+/* 태그 필터 */
+.style-tags {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 20px 32px;
+  flex-wrap: wrap;
+}
+
+.style-tag {
+  padding: 8px 20px;
+  font-size: 0.85em;
+  font-weight: 500;
+  color: #999999;
+  background-color: #ffffff;
+  border: 1px solid #ebebeb;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.style-tag:hover {
+  color: #222222;
+  border-color: #d5d5d5;
+}
+
+.style-tag.active {
+  background-color: #222222;
+  color: #ffffff;
+  border-color: #222222;
+}
+
+/* 스타일 카드 그리드 - 4열 (상품과 동일) */
+.style-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* 결과 없음 */
+.style-empty {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.style-empty p {
+  font-size: 0.95em;
+  color: #999999;
+}
