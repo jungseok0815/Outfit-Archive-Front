@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Navbar from "../../../components/user/header/Header";
-import AuthModal from "../../auth/AuthPage";
+import AuthModal from "../auth/AuthPage";
 import ProductCard from "../../../components/user/card/ProductCard";
 import { useAuth } from "../../../store/context/UserContext";
 import "../../../App.css";

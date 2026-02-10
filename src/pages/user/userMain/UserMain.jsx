@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import Navbar from '../../../components/user/header/Header';
-import AuthModal from '../../auth/AuthPage';
+import AuthModal from '../auth/AuthPage';
 import StyleCard from '../../../components/user/card/StyleCard';
 import ProductCard from '../../../components/user/card/ProductCard';
 import "../../../App.css";

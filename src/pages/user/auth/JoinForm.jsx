@@ -1,6 +1,6 @@
 import React,{useState} from "react";
-import "../../styles/auth/loginForm.css"
-import {postJoin} from '../../api/auth';
+import "../auth/loginForm.css"
+import {postJoin} from '../../../api/auth';
 function JoinForm(){
   const [joinForm, setJoinForm] = useState({
     userId: "",

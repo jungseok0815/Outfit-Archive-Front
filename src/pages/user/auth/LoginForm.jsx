@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "../../styles/auth/loginForm.css"
-import { useAuth } from "../../store/context/UserContext";
-import { postLogin} from "../../api/auth"
+import "../auth/loginForm.css"
+import { useAuth } from "../../../store/context/UserContext";
+import { postLogin} from "../../../api/auth"
 function LoginForm({ onClose }) {
   const { login } = useAuth()
 
