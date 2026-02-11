@@ -1,0 +1,389 @@
+/* 오버레이 배경 */
+.detail-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    animation: overlayFadeIn 0.2s ease;
+}
+
+/* 슬라이드 패널 */
+.detail-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 420px;
+    height: 100vh;
+    background-color: #ffffff;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
+    overflow-y: auto;
+    z-index: 1001;
+    animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 닫기 버튼 */
+.detail-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #999999;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    z-index: 2;
+}
+
+.detail-close:hover {
+    background-color: #f5f5f5;
+    color: #222222;
+}
+
+/* ===== 이미지 캐러셀 ===== */
+.detail-carousel {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: #f5f5f5;
+    overflow: hidden;
+}
+
+.detail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* 좌우 화살표 */
+.detail-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    background-color: rgba(255, 255, 255, 0.85);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #222222;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    z-index: 1;
+}
+
+.detail-arrow:hover {
+    background-color: #ffffff;
+    transform: translateY(-50%) scale(1.08);
+}
+
+.detail-arrow-left {
+    left: 10px;
+}
+
+.detail-arrow-right {
+    right: 10px;
+}
+
+/* 인디케이터 점 */
+.detail-dots {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+}
+
+.detail-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.detail-dot.active {
+    background-color: #ffffff;
+    transform: scale(1.25);
+}
+
+.detail-dot:hover {
+    background-color: rgba(255, 255, 255, 0.85);
+}
+
+/* ===== 통계 (좋아요, 댓글) ===== */
+.detail-stats {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #ebebeb;
+}
+
+.detail-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #222222;
+}
+
+.detail-stat-item svg {
+    color: #999999;
+}
+
+/* 댓글 버튼 스타일 */
+.detail-stat-btn {
+    background: none;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.detail-stat-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.detail-stat-btn.active {
+    background-color: #f0f0f0;
+}
+
+.detail-stat-btn.active svg {
+    color: #222222;
+}
+
+/* ===== 댓글 섹션 ===== */
+.detail-comments {
+    padding: 16px 20px;
+    border-bottom: 1px solid #ebebeb;
+    animation: commentsFadeIn 0.25s ease;
+}
+
+.detail-comments-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #222222;
+    margin: 0 0 12px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 220px;
+    overflow-y: auto;
+    margin-bottom: 12px;
+}
+
+.detail-comment {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
+    line-height: 1.5;
+}
+
+.detail-comment-user {
+    font-size: 13px;
+    font-weight: 700;
+    color: #222222;
+    flex-shrink: 0;
+}
+
+.detail-comment-text {
+    font-size: 13px;
+    color: #222222;
+    word-break: break-word;
+}
+
+.detail-comment-time {
+    font-size: 11px;
+    color: #bcbcbc;
+    flex-shrink: 0;
+}
+
+/* 댓글 입력 */
+.detail-comment-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-top: 1px solid #f5f5f5;
+    padding-top: 12px;
+}
+
+.detail-comment-input {
+    flex: 1;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-family: inherit;
+    color: #222222;
+    background-color: #f8f8f8;
+    border: 1px solid #ebebeb;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.detail-comment-input::placeholder {
+    color: #bcbcbc;
+}
+
+.detail-comment-input:focus {
+    border-color: #222222;
+    background-color: #ffffff;
+}
+
+.detail-comment-submit {
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    color: #ffffff;
+    background-color: #222222;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 0.2s ease;
+}
+
+.detail-comment-submit:hover {
+    background-color: #444444;
+}
+
+/* ===== 태그 상품 영역 ===== */
+.detail-products {
+    padding: 16px 20px;
+    border-bottom: 1px solid #ebebeb;
+}
+
+.detail-products-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #222222;
+    margin: 0 0 12px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-product-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+}
+
+.detail-product-item + .detail-product-item {
+    border-top: 1px solid #f5f5f5;
+}
+
+.detail-product-thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+    background-color: #f0f0f0;
+    flex-shrink: 0;
+}
+
+.detail-product-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.detail-product-brand {
+    font-size: 11px;
+    font-weight: 600;
+    color: #999999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-product-name {
+    font-size: 13px;
+    color: #222222;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.detail-product-price {
+    font-size: 13px;
+    font-weight: 700;
+    color: #222222;
+}
+
+/* ===== 캡션/설명 영역 ===== */
+.detail-caption {
+    padding: 16px 20px 32px;
+}
+
+.detail-caption p {
+    font-size: 14px;
+    color: #222222;
+    line-height: 1.6;
+    margin: 0;
+    word-break: break-word;
+}
+
+/* ===== 애니메이션 ===== */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes overlayFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes commentsFadeIn {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 400px;
+    }
+}
+
+/* ===== 반응형 ===== */
+@media (max-width: 480px) {
+    .detail-panel {
+        width: 100%;
+    }
+}

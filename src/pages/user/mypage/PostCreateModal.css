@@ -18,8 +18,8 @@
     background-color: #ffffff;
     border-radius: 16px;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-    padding: 40px 36px 32px;
-    width: 480px;
+    padding: 36px 36px 32px;
+    width: 500px;
     max-width: 90%;
     max-height: 90vh;
     overflow-y: auto;
@@ -56,33 +56,36 @@
     font-size: 18px;
     font-weight: 700;
     color: #222222;
-    margin: 0 0 24px 0;
+    margin: 0 0 16px 0;
     text-align: center;
 }
 
-/* 이미지 업로드 영역 */
+/* 이미지 영역 (고정 높이) */
+.post-image-area {
+    height: 160px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* 이미지 업로드 플레이스홀더 */
 .post-upload-zone {
     border: 2px dashed #d5d5d5;
     border-radius: 12px;
-    padding: 32px;
+    height: 100%;
     text-align: center;
     cursor: pointer;
     transition: border-color 0.2s ease, background-color 0.2s ease;
-    margin-bottom: 20px;
-    min-height: 200px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    box-sizing: border-box;
 }
 
 .post-upload-zone:hover {
     border-color: #999999;
     background-color: #fafafa;
-}
-
-.post-upload-zone input[type="file"] {
-    display: none;
 }
 
 .post-upload-icon {
@@ -106,17 +109,21 @@
 
 /* 이미지 미리보기 그리드 */
 .post-preview-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
     gap: 8px;
-    margin-bottom: 20px;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    align-items: stretch;
 }
 
 .post-preview-item {
     position: relative;
+    height: 100%;
     aspect-ratio: 1 / 1;
     border-radius: 8px;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .post-preview-image {
@@ -150,6 +157,7 @@
 
 /* 추가 업로드 버튼 (그리드 내) */
 .post-preview-add {
+    height: 100%;
     aspect-ratio: 1 / 1;
     border: 2px dashed #d5d5d5;
     border-radius: 8px;
@@ -159,6 +167,7 @@
     align-items: center;
     justify-content: center;
     color: #bcbcbc;
+    flex-shrink: 0;
     transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
@@ -166,6 +175,199 @@
     border-color: #999999;
     background-color: #fafafa;
     color: #999999;
+}
+
+/* 상품 검색 영역 */
+.post-product-search {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.post-search-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.post-search-icon {
+    position: absolute;
+    left: 12px;
+    color: #bcbcbc;
+    pointer-events: none;
+}
+
+.post-search-input {
+    width: 100%;
+    padding: 9px 14px 9px 36px;
+    font-size: 13px;
+    font-family: inherit;
+    color: #222222;
+    background-color: #f8f8f8;
+    border: 1px solid #ebebeb;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.post-search-input::placeholder {
+    color: #bcbcbc;
+}
+
+.post-search-input:focus {
+    border-color: #222222;
+    background-color: #ffffff;
+}
+
+/* 검색 결과 드롭다운 */
+.post-search-results {
+    list-style: none;
+    margin: 4px 0 0 0;
+    padding: 6px 0;
+    background-color: #ffffff;
+    border: 1px solid #ebebeb;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    max-height: 180px;
+    overflow-y: auto;
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 10;
+}
+
+.post-search-results li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.post-search-results li:hover {
+    background-color: #f5f5f5;
+}
+
+.post-search-results li img {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+    background-color: #f0f0f0;
+    flex-shrink: 0;
+}
+
+.post-search-result-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.post-search-result-brand {
+    font-size: 11px;
+    font-weight: 600;
+    color: #999999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.post-search-result-name {
+    font-size: 13px;
+    color: #222222;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 태그된 상품 목록 영역 */
+.post-tagged-area {
+    margin-top: 10px;
+    height: 200px;
+    border: 1px solid #ebebeb;
+    border-radius: 10px;
+    background-color: #fafafa;
+    padding: 10px 12px;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.post-tagged-empty {
+    font-size: 12px;
+    color: #bcbcbc;
+    text-align: center;
+    line-height: 32px;
+}
+
+.post-tagged-products {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.post-tagged-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #ebebeb;
+}
+
+.post-tagged-item img {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    object-fit: cover;
+    background-color: #ebebeb;
+    flex-shrink: 0;
+}
+
+.post-tagged-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    flex: 1;
+    min-width: 0;
+}
+
+.post-tagged-brand {
+    font-size: 11px;
+    font-weight: 600;
+    color: #999999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.post-tagged-name {
+    font-size: 13px;
+    color: #222222;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.post-tagged-remove {
+    width: 24px;
+    height: 24px;
+    background: none;
+    border: none;
+    color: #bcbcbc;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.post-tagged-remove:hover {
+    color: #222222;
+    background-color: #ebebeb;
 }
 
 /* 캡션 입력 */
@@ -182,7 +384,7 @@
     resize: vertical;
     outline: none;
     transition: border-color 0.2s ease;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     box-sizing: border-box;
 }
 

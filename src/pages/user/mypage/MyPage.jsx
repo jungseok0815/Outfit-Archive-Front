@@ -2,21 +2,22 @@ import React, { useState } from "react";
 import Navbar from "../../../components/user/header/Header";
 import AuthModal from "../auth/AuthPage";
 import PostCreateModal from "./PostCreateModal";
+import PostDetailPanel from "./PostDetailPanel";
 import ProductCard from "../../../components/user/card/ProductCard";
 import { useAuth } from "../../../store/context/UserContext";
 import "../../../App.css";
 import "./MyPage.css";
 
 const dummyPosts = [
-  { id: 1, image: "https://via.placeholder.com/400/FF6B6B/ffffff", likes: 124, comments: 8 },
-  { id: 2, image: "https://via.placeholder.com/400/4ECDC4/ffffff", likes: 89, comments: 5 },
-  { id: 3, image: "https://via.placeholder.com/400/45B7D1/ffffff", likes: 234, comments: 12 },
-  { id: 4, image: "https://via.placeholder.com/400/96CEB4/ffffff", likes: 56, comments: 3 },
-  { id: 5, image: "https://via.placeholder.com/400/FFEAA7/ffffff", likes: 178, comments: 9 },
-  { id: 6, image: "https://via.placeholder.com/400/DDA0DD/ffffff", likes: 67, comments: 4 },
-  { id: 7, image: "https://via.placeholder.com/400/98D8C8/ffffff", likes: 312, comments: 21 },
-  { id: 8, image: "https://via.placeholder.com/400/F7DC6F/ffffff", likes: 45, comments: 2 },
-  { id: 9, image: "https://via.placeholder.com/400/BB8FCE/ffffff", likes: 198, comments: 14 },
+  { id: 1, images: ["https://via.placeholder.com/400/FF6B6B/ffffff", "https://via.placeholder.com/400/E74C3C/ffffff", "https://via.placeholder.com/400/C0392B/ffffff"], likes: 124, comments: 8 },
+  { id: 2, images: ["https://via.placeholder.com/400/4ECDC4/ffffff"], likes: 89, comments: 5 },
+  { id: 3, images: ["https://via.placeholder.com/400/45B7D1/ffffff", "https://via.placeholder.com/400/2980B9/ffffff"], likes: 234, comments: 12 },
+  { id: 4, images: ["https://via.placeholder.com/400/96CEB4/ffffff"], likes: 56, comments: 3 },
+  { id: 5, images: ["https://via.placeholder.com/400/FFEAA7/ffffff", "https://via.placeholder.com/400/F39C12/ffffff", "https://via.placeholder.com/400/E67E22/ffffff"], likes: 178, comments: 9 },
+  { id: 6, images: ["https://via.placeholder.com/400/DDA0DD/ffffff"], likes: 67, comments: 4 },
+  { id: 7, images: ["https://via.placeholder.com/400/98D8C8/ffffff", "https://via.placeholder.com/400/1ABC9C/ffffff"], likes: 312, comments: 21 },
+  { id: 8, images: ["https://via.placeholder.com/400/F7DC6F/ffffff"], likes: 45, comments: 2 },
+  { id: 9, images: ["https://via.placeholder.com/400/BB8FCE/ffffff", "https://via.placeholder.com/400/8E44AD/ffffff"], likes: 198, comments: 14 },
 ];
 
 const dummySaved = [
@@ -33,6 +34,7 @@ function MyPage() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
   const [activeTab, setActiveTab] = useState("posts");
+  const [selectedPost, setSelectedPost] = useState(null);
 
   // TODO: 로그인 구현 후 아래 주석 해제
   // if (!user) {
@@ -58,6 +60,7 @@ function MyPage() {
       <Navbar onLoginClick={() => setShowAuthModal(true)} />
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
       {showPostModal && <PostCreateModal onClose={() => setShowPostModal(false)} />}
+      {selectedPost && <PostDetailPanel post={selectedPost} onClose={() => setSelectedPost(null)} />}
 
       {/* 프로필 헤더 */}
       <div className="mypage-profile">
@@ -121,8 +124,8 @@ function MyPage() {
             <span>새 게시물</span>
           </button>
           {dummyPosts.map((post) => (
-            <div key={post.id} className="mypage-grid-item">
-              <img src={post.image} alt={`게시물 ${post.id}`} />
+            <div key={post.id} className="mypage-grid-item" onClick={() => setSelectedPost(post)}>
+              <img src={post.images[0]} alt={`게시물 ${post.id}`} />
               <div className="mypage-grid-overlay">
                 <div className="mypage-grid-stat">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="#ffffff">
