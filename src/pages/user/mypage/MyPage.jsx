@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../../../components/user/header/Header";
 import AuthModal from "../auth/AuthPage";
+import PostCreateModal from "./PostCreateModal";
 import ProductCard from "../../../components/user/card/ProductCard";
 import { useAuth } from "../../../store/context/UserContext";
 import "../../../App.css";
@@ -30,6 +31,7 @@ const dummySaved = [
 function MyPage() {
   const { user } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showPostModal, setShowPostModal] = useState(false);
   const [activeTab, setActiveTab] = useState("posts");
 
   // TODO: 로그인 구현 후 아래 주석 해제
@@ -55,6 +57,7 @@ function MyPage() {
     <div className="app">
       <Navbar onLoginClick={() => setShowAuthModal(true)} />
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+      {showPostModal && <PostCreateModal onClose={() => setShowPostModal(false)} />}
 
       {/* 프로필 헤더 */}
       <div className="mypage-profile">
@@ -64,7 +67,10 @@ function MyPage() {
           alt="프로필"
         />
         <div className="mypage-info">
-          <h2 className="mypage-username">{displayName}</h2>
+          <div className="mypage-info-header">
+            <h2 className="mypage-username">{displayName}</h2>
+            <button className="mypage-edit-btn">프로필 편집</button>
+          </div>
           <div className="mypage-stats">
             <div className="mypage-stat">
               <strong>12</strong> <span>게시물</span>
@@ -79,7 +85,6 @@ function MyPage() {
           <p className="mypage-bio">
             패션을 사랑하는 사람 | Outfit Archive
           </p>
-          <button className="mypage-edit-btn">프로필 편집</button>
         </div>
       </div>
 
@@ -108,6 +113,13 @@ function MyPage() {
       {/* 게시물 탭 */}
       {activeTab === "posts" && (
         <div className="mypage-grid">
+          <button className="mypage-add-post-btn" onClick={() => setShowPostModal(true)}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span>새 게시물</span>
+          </button>
           {dummyPosts.map((post) => (
             <div key={post.id} className="mypage-grid-item">
               <img src={post.image} alt={`게시물 ${post.id}`} />
