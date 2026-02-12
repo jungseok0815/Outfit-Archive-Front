@@ -181,73 +181,91 @@
   padding: 20px 20px 60px;
 }
 
-.mypage-points-summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #fafafa;
+/* 상단 2-카드 레이아웃 */
+.mypage-points-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.mypage-points-card {
+  background-color: #ffffff;
   border: 1px solid #ebebeb;
   border-radius: 12px;
-  padding: 24px 28px;
-  margin-bottom: 24px;
-}
-
-.mypage-points-balance {
+  padding: 20px 22px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-}
-
-.mypage-points-label {
-  font-size: 13px;
-  color: #999999;
-  font-weight: 600;
-}
-
-.mypage-points-value {
-  font-size: 28px;
-  font-weight: 700;
-  color: #222222;
-}
-
-.mypage-points-actions {
-  display: flex;
   gap: 16px;
 }
 
-.mypage-points-box {
+.mypage-points-card-title {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 12px 24px;
-  background-color: #ffffff;
-  border: 1px solid #ebebeb;
-  border-radius: 10px;
-  min-width: 90px;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #222222;
+  margin: 0;
+  letter-spacing: 0.3px;
 }
 
-.mypage-points-box-label {
+.mypage-points-card-title svg {
+  color: #999999;
+}
+
+.mypage-points-card-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.mypage-points-card-label {
   font-size: 12px;
   color: #999999;
   font-weight: 600;
 }
 
-.mypage-points-box-amount {
-  font-size: 16px;
+.mypage-points-card-value {
+  font-size: 26px;
   font-weight: 700;
+  color: #222222;
 }
 
-.mypage-points-box-amount.earn {
+.mypage-points-card-value.earn {
   color: #2e7d32;
 }
 
-.mypage-points-box-amount.spend {
-  color: #d32f2f;
+.mypage-points-card-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.mypage-points-box-amount.purchases {
-  color: #1565c0;
+.mypage-points-card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.mypage-points-card-row span {
+  color: #999999;
+}
+
+.mypage-points-card-row strong {
+  color: #222222;
+  font-weight: 600;
+}
+
+.mypage-points-card-row strong.earn {
+  color: #2e7d32;
+}
+
+.mypage-points-card-row strong.spend {
+  color: #d32f2f;
 }
 
 /* 게시물별 상품 현황 */
@@ -415,6 +433,77 @@
 .mypage-post-product-purchase span {
   font-size: 11px;
   color: #999999;
+}
+
+/* 포인트 사용현황 */
+.mypage-usage-section {
+  margin-top: 28px;
+}
+
+.mypage-usage-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #222222;
+  margin: 0 0 12px 0;
+}
+
+.mypage-usage-list {
+  background-color: #ffffff;
+  border: 1px solid #ebebeb;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.mypage-usage-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  transition: background-color 0.15s ease;
+}
+
+.mypage-usage-item + .mypage-usage-item {
+  border-top: 1px solid #f5f5f5;
+}
+
+.mypage-usage-item:hover {
+  background-color: #fafafa;
+}
+
+.mypage-usage-item-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.mypage-usage-category {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #999999;
+  padding: 2px 8px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.mypage-usage-desc {
+  font-size: 14px;
+  color: #222222;
+  font-weight: 500;
+}
+
+.mypage-usage-date {
+  font-size: 12px;
+  color: #bcbcbc;
+}
+
+.mypage-usage-amount {
+  font-size: 15px;
+  font-weight: 700;
+  color: #d32f2f;
+  flex-shrink: 0;
 }
 
 /* 빈 상태 */

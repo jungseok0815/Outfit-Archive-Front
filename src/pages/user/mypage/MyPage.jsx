@@ -67,6 +67,14 @@ const dummyPostProducts = [
   },
 ];
 
+const dummyPointUsage = [
+  { id: 1, date: "2025.02.09", description: "Nike Air Force 1 '07 할인 적용", amount: -1200, category: "상품 구매" },
+  { id: 2, date: "2025.02.04", description: "시즌 한정 이벤트 응모", amount: -300, category: "이벤트" },
+  { id: 3, date: "2025.01.30", description: "Adidas Samba OG 할인 적용", amount: -600, category: "상품 구매" },
+  { id: 4, date: "2025.01.22", description: "프리미엄 스타일링 리포트 열람", amount: -200, category: "콘텐츠" },
+  { id: 5, date: "2025.01.15", description: "럭키드로우 참여", amount: -200, category: "이벤트" },
+];
+
 const dummySaved = [
   { id: 1, image: "https://via.placeholder.com/300/222222", brand: "Nike", name: "Air Force 1 '07 Low White", price: "139,000" },
   { id: 2, image: "https://via.placeholder.com/300/333333", brand: "Adidas", name: "Samba OG Cloud White", price: "129,000" },
@@ -213,20 +221,61 @@ function MyPage() {
       {/* 포인트현황 탭 */}
       {activeTab === "points" && (
         <div className="mypage-points">
-          {/* 보유 포인트 요약 */}
-          <div className="mypage-points-summary">
-            <div className="mypage-points-balance">
-              <span className="mypage-points-label">보유 포인트</span>
-              <strong className="mypage-points-value">8,000 P</strong>
-            </div>
-            <div className="mypage-points-actions">
-              <div className="mypage-points-box">
-                <span className="mypage-points-box-label">총 적립</span>
-                <span className="mypage-points-box-amount earn">+8,000</span>
+          {/* 상단 요약 카드 2개 */}
+          <div className="mypage-points-cards">
+            {/* 게시물 포인트 현황 */}
+            <div className="mypage-points-card">
+              <h4 className="mypage-points-card-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 8h4v6H4v-6zm16 6h-4v-8h4v8z" />
+                </svg>
+                게시물 포인트 현황
+              </h4>
+              <div className="mypage-points-card-main">
+                <span className="mypage-points-card-label">총 적립 포인트</span>
+                <strong className="mypage-points-card-value earn">+8,000 P</strong>
               </div>
-              <div className="mypage-points-box">
-                <span className="mypage-points-box-label">총 구매 유도</span>
-                <span className="mypage-points-box-amount purchases">80건</span>
+              <div className="mypage-points-card-rows">
+                <div className="mypage-points-card-row">
+                  <span>구매 유도 건수</span>
+                  <strong>80건</strong>
+                </div>
+                <div className="mypage-points-card-row">
+                  <span>이번 달 적립</span>
+                  <strong className="earn">+2,100 P</strong>
+                </div>
+                <div className="mypage-points-card-row">
+                  <span>태그 상품 수</span>
+                  <strong>8개</strong>
+                </div>
+              </div>
+            </div>
+
+            {/* 포인트 사용현황 */}
+            <div className="mypage-points-card">
+              <h4 className="mypage-points-card-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H11.5v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.65c.1 1.7 1.36 2.66 2.85 2.97V19h1.72v-1.67c1.52-.29 2.72-1.16 2.72-2.74 0-2.22-1.86-2.97-3.63-3.45z" />
+                </svg>
+                포인트 사용현황
+              </h4>
+              <div className="mypage-points-card-main">
+                <span className="mypage-points-card-label">보유 포인트</span>
+                <strong className="mypage-points-card-value">5,500 P</strong>
+              </div>
+              <div className="mypage-points-card-rows">
+                <div className="mypage-points-card-row">
+                  <span>총 사용</span>
+                  <strong className="spend">-2,500 P</strong>
+                </div>
+                <div className="mypage-points-card-row">
+                  <span>상품 구매 사용</span>
+                  <strong className="spend">-1,800 P</strong>
+                </div>
+                <div className="mypage-points-card-row">
+                  <span>이벤트 사용</span>
+                  <strong className="spend">-700 P</strong>
+                </div>
               </div>
             </div>
           </div>
@@ -270,6 +319,23 @@ function MyPage() {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* 포인트 사용현황 */}
+          <div className="mypage-usage-section">
+            <h3 className="mypage-usage-title">포인트 사용현황</h3>
+            <div className="mypage-usage-list">
+              {dummyPointUsage.map((item) => (
+                <div key={item.id} className="mypage-usage-item">
+                  <div className="mypage-usage-item-left">
+                    <span className="mypage-usage-category">{item.category}</span>
+                    <span className="mypage-usage-desc">{item.description}</span>
+                    <span className="mypage-usage-date">{item.date}</span>
+                  </div>
+                  <span className="mypage-usage-amount">{item.amount.toLocaleString()} P</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
