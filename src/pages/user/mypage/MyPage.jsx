@@ -20,6 +20,53 @@ const dummyPosts = [
   { id: 9, images: ["https://via.placeholder.com/400/BB8FCE/ffffff", "https://via.placeholder.com/400/8E44AD/ffffff"], likes: 198, comments: 14 },
 ];
 
+const dummyPostProducts = [
+  {
+    postId: 1,
+    postImage: "https://via.placeholder.com/400/FF6B6B/ffffff",
+    date: "2025.02.10",
+    totalPurchases: 17,
+    earnedPoints: 1700,
+    products: [
+      { id: 1, image: "https://via.placeholder.com/100/222222", brand: "Nike", name: "Air Force 1 '07 Low White", price: "139,000", purchases: 12 },
+      { id: 2, image: "https://via.placeholder.com/100/333333", brand: "Levi's", name: "501 Original Fit Jeans", price: "89,000", purchases: 5 },
+    ],
+  },
+  {
+    postId: 3,
+    postImage: "https://via.placeholder.com/400/45B7D1/ffffff",
+    date: "2025.02.05",
+    totalPurchases: 24,
+    earnedPoints: 2400,
+    products: [
+      { id: 3, image: "https://via.placeholder.com/100/444444", brand: "New Balance", name: "993 Made in USA Grey", price: "259,000", purchases: 15 },
+      { id: 4, image: "https://via.placeholder.com/100/555555", brand: "Stussy", name: "Basic Logo Hoodie Black", price: "169,000", purchases: 6 },
+      { id: 5, image: "https://via.placeholder.com/100/666666", brand: "Carhartt WIP", name: "OG Active Jacket", price: "289,000", purchases: 3 },
+    ],
+  },
+  {
+    postId: 5,
+    postImage: "https://via.placeholder.com/400/FFEAA7/ffffff",
+    date: "2025.01.28",
+    totalPurchases: 8,
+    earnedPoints: 800,
+    products: [
+      { id: 6, image: "https://via.placeholder.com/100/777777", brand: "Acne Studios", name: "Face Patch Beanie", price: "180,000", purchases: 8 },
+    ],
+  },
+  {
+    postId: 7,
+    postImage: "https://via.placeholder.com/400/98D8C8/ffffff",
+    date: "2025.01.20",
+    totalPurchases: 31,
+    earnedPoints: 3100,
+    products: [
+      { id: 7, image: "https://via.placeholder.com/100/888888", brand: "Adidas", name: "Samba OG Cloud White", price: "129,000", purchases: 22 },
+      { id: 8, image: "https://via.placeholder.com/100/999999", brand: "Maison Kitsune", name: "Fox Head Patch T-Shirt", price: "145,000", purchases: 9 },
+    ],
+  },
+];
+
 const dummySaved = [
   { id: 1, image: "https://via.placeholder.com/300/222222", brand: "Nike", name: "Air Force 1 '07 Low White", price: "139,000" },
   { id: 2, image: "https://via.placeholder.com/300/333333", brand: "Adidas", name: "Samba OG Cloud White", price: "129,000" },
@@ -111,6 +158,15 @@ function MyPage() {
           </svg>
           저장됨
         </button>
+        <button
+          className={`mypage-tab ${activeTab === "points" ? "active" : ""}`}
+          onClick={() => setActiveTab("points")}
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H11.5v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.65c.1 1.7 1.36 2.66 2.85 2.97V19h1.72v-1.67c1.52-.29 2.72-1.16 2.72-2.74 0-2.22-1.86-2.97-3.63-3.45z" />
+          </svg>
+          포인트현황
+        </button>
       </div>
 
       {/* 게시물 탭 */}
@@ -151,6 +207,70 @@ function MyPage() {
           {dummySaved.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
+        </div>
+      )}
+
+      {/* 포인트현황 탭 */}
+      {activeTab === "points" && (
+        <div className="mypage-points">
+          {/* 보유 포인트 요약 */}
+          <div className="mypage-points-summary">
+            <div className="mypage-points-balance">
+              <span className="mypage-points-label">보유 포인트</span>
+              <strong className="mypage-points-value">8,000 P</strong>
+            </div>
+            <div className="mypage-points-actions">
+              <div className="mypage-points-box">
+                <span className="mypage-points-box-label">총 적립</span>
+                <span className="mypage-points-box-amount earn">+8,000</span>
+              </div>
+              <div className="mypage-points-box">
+                <span className="mypage-points-box-label">총 구매 유도</span>
+                <span className="mypage-points-box-amount purchases">80건</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 게시물별 상품 현황 */}
+          <div className="mypage-post-products">
+            <h3 className="mypage-post-products-title">내 게시물 상품 현황</h3>
+            {dummyPostProducts.map((post) => (
+              <div key={post.postId} className="mypage-post-card">
+                <div className="mypage-post-card-header">
+                  <img className="mypage-post-card-thumb" src={post.postImage} alt={`게시물 ${post.postId}`} />
+                  <div className="mypage-post-card-info">
+                    <span className="mypage-post-card-name">게시물 #{post.postId}</span>
+                    <span className="mypage-post-card-date">{post.date}</span>
+                  </div>
+                  <div className="mypage-post-card-stats">
+                    <span className="mypage-post-card-purchases">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 8h4v6H4v-6zm16 6h-4v-8h4v8z" />
+                      </svg>
+                      {post.totalPurchases}건 구매
+                    </span>
+                    <span className="mypage-post-card-earned">+{post.earnedPoints.toLocaleString()} P</span>
+                  </div>
+                </div>
+                <div className="mypage-post-card-products">
+                  {post.products.map((product) => (
+                    <div key={product.id} className="mypage-post-product-row">
+                      <img className="mypage-post-product-img" src={product.image} alt={product.name} />
+                      <div className="mypage-post-product-info">
+                        <span className="mypage-post-product-brand">{product.brand}</span>
+                        <span className="mypage-post-product-name">{product.name}</span>
+                        <span className="mypage-post-product-price">₩{product.price}</span>
+                      </div>
+                      <div className="mypage-post-product-purchase">
+                        <strong>{product.purchases}명</strong>
+                        <span>구매</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
