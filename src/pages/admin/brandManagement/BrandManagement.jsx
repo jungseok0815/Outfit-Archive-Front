@@ -1,17 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import BrandManagementSearchbar from "./BrandManagementSearchbar"
 import BrandManagementContent from './BrandManagementContent';
 
-const BrandManagement = ({ registerTrigger }) => {
-  const [insertOpen, setInsertOpen] = useState(false);
-
-  useEffect(() => {
-    if (registerTrigger > 0) setInsertOpen(true);
-  }, [registerTrigger]);
-
+const BrandManagement = () => {
   return <div>
       <BrandManagementSearchbar />
-      <BrandManagementContent insertOpen={insertOpen} onInsertClose={() => setInsertOpen(false)} />
+      <BrandManagementContent />
   </div>;
 };
 

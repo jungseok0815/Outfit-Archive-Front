@@ -1,22 +1,11 @@
 import { React, useState } from "react";
 import { useAuth } from "../../store/context/UserContext";
 import "../../styles/admin/AdminMainPage.css";
-import ProductManagement from "../admin/productManagement/ProductManagement";
 import BrandManagement from "../admin/brandManagement/BrandManagement";
 import OrderManagement from "../admin/orderManagement/OrderManagement";
 import SalesManagement from "../admin/saleManagement/SalesManagement";
 
 const menuItems = [
-  {
-    key: "상품 관리",
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
-        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-        <line x1="12" y1="22.08" x2="12" y2="12" />
-      </svg>
-    ),
-  },
   {
     key: "브랜드 관리",
     icon: (
@@ -49,21 +38,18 @@ const menuItems = [
 ];
 
 const registerLabels = {
-  "상품 관리": "상품 등록",
   "브랜드 관리": "브랜드 등록",
 };
 
 function Admin() {
   const { user, logout } = useAuth();
-  const [activePage, setActivePage] = useState("상품 관리");
+  const [activePage, setActivePage] = useState("브랜드 관리");
   const [registerTrigger, setRegisterTrigger] = useState(0);
 
   const handleRegisterClick = () => setRegisterTrigger((prev) => prev + 1);
 
   const renderContent = () => {
     switch (activePage) {
-      case "상품 관리":
-        return <ProductManagement registerTrigger={registerTrigger} />;
       case "브랜드 관리":
         return <BrandManagement registerTrigger={registerTrigger} />;
       case "주문 관리":
