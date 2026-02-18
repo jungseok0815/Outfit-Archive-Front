@@ -1,0 +1,338 @@
+/* ===== 매출 관리 ===== */
+.sales-management {
+  padding: 4px 0;
+}
+
+/* ===== 요약 카드 ===== */
+.sales-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.sales-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #ffffff;
+  border: 1px solid #ebebeb;
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.sales-stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sales-stat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.sales-stat-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #999999;
+  margin: 0;
+}
+
+.sales-stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #222222;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sales-stat-value.positive {
+  color: #27ae60;
+}
+
+.sales-stat-value.negative {
+  color: #e74c3c;
+}
+
+/* ===== 필터 ===== */
+.sales-filters {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.sales-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sales-filter-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666666;
+  white-space: nowrap;
+}
+
+.sales-filter-btns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sales-filter-btn {
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  color: #777777;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sales-filter-btn:hover {
+  color: #222222;
+  border-color: #cccccc;
+}
+
+.sales-filter-btn.active {
+  color: #ffffff;
+  background: #1a1a2e;
+  border-color: #1a1a2e;
+}
+
+/* ===== 차트 카드 ===== */
+.sales-chart-card {
+  background: #ffffff;
+  border: 1px solid #ebebeb;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.sales-chart-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 22px 24px 0;
+}
+
+.sales-chart-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #222222;
+  margin: 0;
+}
+
+.sales-chart-cat {
+  color: #6c5ce7;
+  font-weight: 600;
+}
+
+.sales-chart-subtitle {
+  font-size: 13px;
+  color: #999999;
+  margin: 4px 0 0;
+}
+
+.sales-chart-current {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.sales-chart-current-label {
+  font-size: 11px;
+  color: #999999;
+  font-weight: 500;
+}
+
+.sales-chart-current-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: #222222;
+}
+
+.sales-chart-body {
+  padding: 16px 16px 12px;
+}
+
+/* ===== 툴팁 ===== */
+.sales-tooltip {
+  background: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  min-width: 160px;
+}
+
+.sales-tooltip-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #222222;
+  margin: 0 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.sales-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.sales-tooltip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sales-tooltip-name {
+  font-size: 12px;
+  color: #666666;
+  flex: 1;
+}
+
+.sales-tooltip-value {
+  font-size: 12px;
+  font-weight: 700;
+  color: #222222;
+}
+
+/* ===== 카테고리별 매출 ===== */
+.sales-category-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+
+.sales-category-card {
+  background: #ffffff;
+  border: 1px solid #ebebeb;
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.sales-category-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.sales-category-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sales-category-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #222222;
+  flex: 1;
+}
+
+.sales-category-growth {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sales-category-growth.positive {
+  color: #27ae60;
+}
+
+.sales-category-growth.negative {
+  color: #e74c3c;
+}
+
+.sales-category-total {
+  font-size: 18px;
+  font-weight: 700;
+  color: #222222;
+  margin: 0 0 12px;
+}
+
+.sales-category-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: #f0f0f0;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.sales-category-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.sales-category-percent {
+  font-size: 12px;
+  color: #999999;
+  margin: 0;
+}
+
+/* ===== 반응형 ===== */
+@media (max-width: 1200px) {
+  .sales-summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sales-category-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .sales-filters {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sales-category-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .sales-summary-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .sales-category-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sales-chart-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sales-chart-current {
+    align-items: flex-start;
+  }
+}

@@ -528,6 +528,78 @@
   text-align: center;
 }
 
+/* ===== 페이징 ===== */
+.order-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 28px;
+  padding: 16px 20px;
+  background: #ffffff;
+  border: 1px solid #ebebeb;
+  border-radius: 12px;
+}
+
+.order-pagination-info {
+  font-size: 13px;
+  color: #999999;
+}
+
+.order-pagination-info strong {
+  color: #222222;
+  font-weight: 700;
+}
+
+.order-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.order-page-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 6px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  color: #666666;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.order-page-btn:hover:not(:disabled) {
+  color: #222222;
+  background: #f5f5f5;
+  border-color: #e0e0e0;
+}
+
+.order-page-btn.active {
+  color: #ffffff;
+  background: #1a1a2e;
+  border-color: #1a1a2e;
+  font-weight: 700;
+}
+
+.order-page-btn:disabled {
+  color: #d5d5d5;
+  cursor: not-allowed;
+}
+
+.order-page-arrow {
+  gap: 0;
+}
+
+.order-page-double {
+  margin-left: -10px;
+}
+
 /* ===== 반응형 ===== */
 @media (max-width: 1200px) {
   .order-summary-cards {

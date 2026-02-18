@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Package, Truck, CheckCircle, Clock, ChevronDown, Search, MapPin, Phone, User } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Package, Truck, CheckCircle, Clock, ChevronDown, ChevronLeft, ChevronRight, Search, MapPin, Phone, User } from 'lucide-react';
 import './OrderManagement.css';
 
 const STATUS_OPTIONS = [
@@ -9,6 +9,8 @@ const STATUS_OPTIONS = [
   { value: '배송완료', label: '배송완료', color: '#27ae60' },
   { value: '취소', label: '취소', color: '#e74c3c' },
 ];
+
+const PAGE_SIZE = 10;
 
 const dummyOrders = [
   {
@@ -57,6 +59,13 @@ const dummyOrders = [
         paymentMethod: '간편결제',
         shipping: { carrier: 'CJ대한통운', trackingNo: '640087654321', shippedAt: '2025-01-13 11:00', deliveredAt: '2025-01-14 14:20' },
       },
+      {
+        id: 'OA-20250114-003',
+        product: { name: '슬랙스', brand: '해칭룸', price: 89000, quantity: 1, image: null, category: '하의' },
+        buyer: { name: '김태형', phone: '010-7777-3333', address: '서울시 성동구 성수동 44-2' },
+        status: '결제완료',
+        paymentMethod: '카드결제',
+      },
     ],
   },
   {
@@ -87,6 +96,194 @@ const dummyOrders = [
       },
     ],
   },
+  {
+    date: '2025-01-12',
+    orders: [
+      {
+        id: 'OA-20250112-001',
+        product: { name: '나일론 백팩', brand: '999휴머니티', price: 65000, quantity: 1, image: null, category: '악세서리' },
+        buyer: { name: '윤서준', phone: '010-4444-6666', address: '서울시 강서구 화곡동 120-8' },
+        status: '배송완료',
+        paymentMethod: '카드결제',
+        shipping: { carrier: 'CJ대한통운', trackingNo: '640033334444', shippedAt: '2025-01-11 09:00', deliveredAt: '2025-01-12 15:20' },
+      },
+      {
+        id: 'OA-20250112-002',
+        product: { name: '드라이핏 반팔티', brand: '나이키', price: 45000, quantity: 2, image: null, category: '상의' },
+        buyer: { name: '장하늘', phone: '010-5555-7777', address: '경기도 수원시 영통구 매탄동 55-1' },
+        status: '배송완료',
+        paymentMethod: '간편결제',
+        shipping: { carrier: '한진택배', trackingNo: '550011223344', shippedAt: '2025-01-11 13:30', deliveredAt: '2025-01-12 10:15' },
+      },
+    ],
+  },
+  {
+    date: '2025-01-11',
+    orders: [
+      {
+        id: 'OA-20250111-001',
+        product: { name: '헤리티지 크로스백', brand: '나이키', price: 35000, quantity: 1, image: null, category: '악세서리' },
+        buyer: { name: '임수정', phone: '010-9999-1111', address: '서울시 관악구 신림동 333-7' },
+        status: '배송완료',
+        paymentMethod: '카드결제',
+        shipping: { carrier: '롯데택배', trackingNo: '770099887766', shippedAt: '2025-01-10 15:00', deliveredAt: '2025-01-11 11:40' },
+      },
+      {
+        id: 'OA-20250111-002',
+        product: { name: '오버핏 후디', brand: '999휴머니티', price: 89000, quantity: 1, image: null, category: '상의' },
+        buyer: { name: '강도윤', phone: '010-3333-5555', address: '부산시 해운대구 우동 1500-3' },
+        status: '상품준비중',
+        paymentMethod: '무통장입금',
+      },
+      {
+        id: 'OA-20250111-003',
+        product: { name: '캐시미어 니트', brand: '해칭룸', price: 128000, quantity: 1, image: null, category: '상의' },
+        buyer: { name: '문지원', phone: '010-2222-4444', address: '대전시 유성구 봉명동 88-12' },
+        status: '결제완료',
+        paymentMethod: '카드결제',
+      },
+    ],
+  },
+  {
+    date: '2025-01-10',
+    orders: [
+      {
+        id: 'OA-20250110-001',
+        product: { name: '윈드러너 자켓', brand: '나이키', price: 139000, quantity: 1, image: null, category: '아우터' },
+        buyer: { name: '배수빈', phone: '010-8888-6666', address: '대구시 수성구 범어동 22-5' },
+        status: '배송완료',
+        paymentMethod: '간편결제',
+        shipping: { carrier: 'CJ대한통운', trackingNo: '640055667788', shippedAt: '2025-01-09 10:20', deliveredAt: '2025-01-10 14:00' },
+      },
+      {
+        id: 'OA-20250110-002',
+        product: { name: '와이드 카고팬츠', brand: '999휴머니티', price: 79000, quantity: 2, image: null, category: '하의' },
+        buyer: { name: '서지호', phone: '010-1111-9999', address: '광주시 서구 치평동 900-4' },
+        status: '취소',
+        paymentMethod: '카드결제',
+      },
+      {
+        id: 'OA-20250110-003',
+        product: { name: '에어맥스 97', brand: '나이키', price: 189000, quantity: 1, image: null, category: '신발' },
+        buyer: { name: '조은서', phone: '010-6666-2222', address: '울산시 남구 삼산동 150-9' },
+        status: '배송중',
+        paymentMethod: '카드결제',
+        shipping: { carrier: '한진택배', trackingNo: '550077889900', shippedAt: '2025-01-10 08:45' },
+      },
+    ],
+  },
+  {
+    date: '2025-01-09',
+    orders: [
+      {
+        id: 'OA-20250109-001',
+        product: { name: '울 블렌드 코트', brand: '해칭룸', price: 198000, quantity: 1, image: null, category: '아우터' },
+        buyer: { name: '황예린', phone: '010-4444-8888', address: '제주시 연동 312-5' },
+        status: '배송완료',
+        paymentMethod: '카드결제',
+        shipping: { carrier: 'CJ대한통운', trackingNo: '640099001122', shippedAt: '2025-01-08 14:10', deliveredAt: '2025-01-09 17:30' },
+      },
+      {
+        id: 'OA-20250109-002',
+        product: { name: '테크 플리스 팬츠', brand: '나이키', price: 109000, quantity: 1, image: null, category: '하의' },
+        buyer: { name: '노현우', phone: '010-7777-1111', address: '세종시 보람동 55-3' },
+        status: '배송완료',
+        paymentMethod: '간편결제',
+        shipping: { carrier: '롯데택배', trackingNo: '770033445566', shippedAt: '2025-01-08 11:00', deliveredAt: '2025-01-09 13:25' },
+      },
+    ],
+  },
+  {
+    date: '2025-01-08',
+    orders: [
+      {
+        id: 'OA-20250108-001',
+        product: { name: '그래픽 반팔티', brand: '999휴머니티', price: 45000, quantity: 2, image: null, category: '상의' },
+        buyer: { name: '권유진', phone: '010-1234-9999', address: '서울시 동작구 사당동 77-3' },
+        status: '배송완료',
+        paymentMethod: '카드결제',
+        shipping: { carrier: 'CJ대한통운', trackingNo: '640044556677', shippedAt: '2025-01-07 09:30', deliveredAt: '2025-01-08 14:50' },
+      },
+      {
+        id: 'OA-20250108-002',
+        product: { name: '슬랙스', brand: '해칭룸', price: 89000, quantity: 1, image: null, category: '하의' },
+        buyer: { name: '이도현', phone: '010-5678-1234', address: '경기도 안양시 동안구 평촌동 200-1' },
+        status: '배송중',
+        paymentMethod: '간편결제',
+        shipping: { carrier: '한진택배', trackingNo: '550033221100', shippedAt: '2025-01-08 11:20' },
+      },
+      {
+        id: 'OA-20250108-003',
+        product: { name: '에어맥스 97', brand: '나이키', price: 189000, quantity: 1, image: null, category: '신발' },
+        buyer: { name: '송민아', phone: '010-8765-4321', address: '서울시 노원구 상계동 500-12' },
+        status: '결제완료',
+        paymentMethod: '카드결제',
+      },
+    ],
+  },
+  {
+    date: '2025-01-07',
+    orders: [
+      {
+        id: 'OA-20250107-001',
+        product: { name: '오버핏 후디', brand: '999휴머니티', price: 89000, quantity: 1, image: null, category: '상의' },
+        buyer: { name: '정승환', phone: '010-3456-7890', address: '인천시 연수구 송도동 88-15' },
+        status: '배송완료',
+        paymentMethod: '카드결제',
+        shipping: { carrier: 'CJ대한통운', trackingNo: '640077889911', shippedAt: '2025-01-06 10:00', deliveredAt: '2025-01-07 16:30' },
+      },
+      {
+        id: 'OA-20250107-002',
+        product: { name: '캐시미어 니트', brand: '해칭룸', price: 128000, quantity: 1, image: null, category: '상의' },
+        buyer: { name: '한소희', phone: '010-6543-2109', address: '서울시 중구 을지로 33-7' },
+        status: '취소',
+        paymentMethod: '무통장입금',
+      },
+      {
+        id: 'OA-20250107-003',
+        product: { name: '헤리티지 크로스백', brand: '나이키', price: 35000, quantity: 3, image: null, category: '악세서리' },
+        buyer: { name: '유재석', phone: '010-1111-2222', address: '경기도 용인시 수지구 죽전동 10-5' },
+        status: '배송완료',
+        paymentMethod: '간편결제',
+        shipping: { carrier: '롯데택배', trackingNo: '770011223344', shippedAt: '2025-01-06 14:00', deliveredAt: '2025-01-07 10:20' },
+      },
+    ],
+  },
+  {
+    date: '2025-01-06',
+    orders: [
+      {
+        id: 'OA-20250106-001',
+        product: { name: '윈드러너 자켓', brand: '나이키', price: 139000, quantity: 1, image: null, category: '아우터' },
+        buyer: { name: '김지수', phone: '010-9876-1234', address: '부산시 수영구 광안동 200-3' },
+        status: '배송완료',
+        paymentMethod: '카드결제',
+        shipping: { carrier: '한진택배', trackingNo: '550099887766', shippedAt: '2025-01-05 13:00', deliveredAt: '2025-01-06 15:40' },
+      },
+      {
+        id: 'OA-20250106-002',
+        product: { name: '와이드 카고팬츠', brand: '999휴머니티', price: 79000, quantity: 1, image: null, category: '하의' },
+        buyer: { name: '박보검', phone: '010-2345-6789', address: '서울시 강동구 천호동 120-9' },
+        status: '상품준비중',
+        paymentMethod: '카드결제',
+      },
+      {
+        id: 'OA-20250106-003',
+        product: { name: '울 블렌드 코트', brand: '해칭룸', price: 198000, quantity: 1, image: null, category: '아우터' },
+        buyer: { name: '이서진', phone: '010-4567-8901', address: '대전시 서구 둔산동 900-7' },
+        status: '배송중',
+        paymentMethod: '간편결제',
+        shipping: { carrier: 'CJ대한통운', trackingNo: '640022334455', shippedAt: '2025-01-06 09:45' },
+      },
+      {
+        id: 'OA-20250106-004',
+        product: { name: '나일론 백팩', brand: '999휴머니티', price: 65000, quantity: 1, image: null, category: '악세서리' },
+        buyer: { name: '최우식', phone: '010-7890-1234', address: '서울시 영등포구 여의도동 50-2' },
+        status: '결제완료',
+        paymentMethod: '카드결제',
+      },
+    ],
+  },
 ];
 
 const getStatusIcon = (status) => {
@@ -114,6 +311,7 @@ const OrderManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('전체');
   const [expandedOrder, setExpandedOrder] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const totalOrders = dummyOrders.reduce((sum, g) => sum + g.orders.length, 0);
   const statusCounts = dummyOrders.flatMap(g => g.orders).reduce((acc, o) => {
@@ -121,17 +319,62 @@ const OrderManagement = () => {
     return acc;
   }, {});
 
-  const filteredGroups = dummyOrders.map(group => ({
-    ...group,
-    orders: group.orders.filter(order => {
-      const matchSearch = searchTerm === '' ||
-        order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.product.name.includes(searchTerm) ||
-        order.buyer.name.includes(searchTerm);
-      const matchStatus = statusFilter === '전체' || order.status === statusFilter;
-      return matchSearch && matchStatus;
-    }),
-  })).filter(group => group.orders.length > 0);
+  // 필터링된 전체 주문 (플랫)
+  const filteredAllOrders = useMemo(() => {
+    return dummyOrders.flatMap(group =>
+      group.orders
+        .filter(order => {
+          const matchSearch = searchTerm === '' ||
+            order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            order.product.name.includes(searchTerm) ||
+            order.buyer.name.includes(searchTerm);
+          const matchStatus = statusFilter === '전체' || order.status === statusFilter;
+          return matchSearch && matchStatus;
+        })
+        .map(order => ({ ...order, date: group.date }))
+    );
+  }, [searchTerm, statusFilter]);
+
+  const totalFiltered = filteredAllOrders.length;
+  const totalPages = Math.max(1, Math.ceil(totalFiltered / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+
+  // 현재 페이지의 주문만 잘라냄
+  const pagedOrders = filteredAllOrders.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  // 페이징된 주문을 날짜별로 다시 그룹핑
+  const pagedGroups = useMemo(() => {
+    const map = new Map();
+    pagedOrders.forEach(order => {
+      if (!map.has(order.date)) map.set(order.date, []);
+      map.get(order.date).push(order);
+    });
+    return Array.from(map.entries()).map(([date, orders]) => ({ date, orders }));
+  }, [pagedOrders]);
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleFilterChange = (value) => {
+    setStatusFilter(value);
+    setCurrentPage(1);
+  };
+
+  // 페이지 번호 목록 생성
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    let start = Math.max(1, safePage - Math.floor(maxVisible / 2));
+    let end = start + maxVisible - 1;
+    if (end > totalPages) {
+      end = totalPages;
+      start = Math.max(1, end - maxVisible + 1);
+    }
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  };
 
   return (
     <div className="order-management">
@@ -157,20 +400,20 @@ const OrderManagement = () => {
             type="text"
             placeholder="주문번호, 상품명, 주문자명 검색"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearchChange}
             className="order-search-input"
           />
         </div>
         <div className="order-filter-btns">
           <button
             className={`order-filter-btn ${statusFilter === '전체' ? 'active' : ''}`}
-            onClick={() => setStatusFilter('전체')}
+            onClick={() => handleFilterChange('전체')}
           >전체</button>
           {STATUS_OPTIONS.map(s => (
             <button
               key={s.value}
               className={`order-filter-btn ${statusFilter === s.value ? 'active' : ''}`}
-              onClick={() => setStatusFilter(s.value)}
+              onClick={() => handleFilterChange(s.value)}
             >
               {s.label}
             </button>
@@ -180,10 +423,10 @@ const OrderManagement = () => {
 
       {/* 날짜별 주문 목록 */}
       <div className="order-list">
-        {filteredGroups.length === 0 ? (
+        {pagedGroups.length === 0 ? (
           <div className="order-empty">검색 결과가 없습니다.</div>
         ) : (
-          filteredGroups.map((group) => (
+          pagedGroups.map((group) => (
             <div className="order-date-group" key={group.date}>
               <div className="order-date-header">
                 <span className="order-date-text">{formatDate(group.date)}</span>
@@ -354,6 +597,63 @@ const OrderManagement = () => {
           ))
         )}
       </div>
+
+      {/* 페이징 */}
+      {totalFiltered > 0 && (
+        <div className="order-pagination">
+          <div className="order-pagination-info">
+            총 <strong>{totalFiltered}</strong>건 중{' '}
+            <strong>{(safePage - 1) * PAGE_SIZE + 1}-{Math.min(safePage * PAGE_SIZE, totalFiltered)}</strong>건
+          </div>
+          <div className="order-pagination-controls">
+            <button
+              className="order-page-btn order-page-arrow"
+              disabled={safePage <= 1}
+              onClick={() => setCurrentPage(1)}
+              title="첫 페이지"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4 order-page-double" />
+            </button>
+            <button
+              className="order-page-btn order-page-arrow"
+              disabled={safePage <= 1}
+              onClick={() => setCurrentPage(safePage - 1)}
+              title="이전"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            {getPageNumbers().map(num => (
+              <button
+                key={num}
+                className={`order-page-btn ${safePage === num ? 'active' : ''}`}
+                onClick={() => setCurrentPage(num)}
+              >
+                {num}
+              </button>
+            ))}
+
+            <button
+              className="order-page-btn order-page-arrow"
+              disabled={safePage >= totalPages}
+              onClick={() => setCurrentPage(safePage + 1)}
+              title="다음"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+            <button
+              className="order-page-btn order-page-arrow"
+              disabled={safePage >= totalPages}
+              onClick={() => setCurrentPage(totalPages)}
+              title="마지막 페이지"
+            >
+              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4 order-page-double" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
