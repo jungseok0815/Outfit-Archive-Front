@@ -1,7 +1,7 @@
 import React from "react";
 import BrandAccordion from "../../../components/admin/brand/BrandAccordion";
 import BrandInsertAccordion from "../../../components/admin/brand/BrandInsertAccordion";
-const BrandManagementContent = ({brandList}) => {
+const BrandManagementContent = ({brandList, insertOpen, onInsertClose}) => {
     const items = [
         {
           title: '999휴머니티',
@@ -25,7 +25,7 @@ const BrandManagementContent = ({brandList}) => {
       </div>
         <div className="grid">
         <div className="w-full mx-auto p-4 space-y-2">
-            <BrandInsertAccordion />
+            <BrandInsertAccordion forceOpen={insertOpen} onClose={onInsertClose} />
         {items.map((item, index) => (
             <BrandAccordion brand={item} id={index}/>
         ))}

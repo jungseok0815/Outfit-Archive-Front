@@ -1,16 +1,18 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
+import React, { useState } from "react";
 import { useAuth } from "../store/context/UserContext";
+import AdminLoginPage from "../pages/admin/AdminLoginPage";
 
 const PrivateMasterRoute = ({ component: Component }) => {
   const { user } = useAuth();
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
-  if(user === null){
-    return <Navigate to="/" {...alert("접근할 수 없는 페이지 입니다")}></Navigate>
+  const isAdmin = user && user.authName === "ROLE_ADMIN";
+
+  if (isAdmin || loginSuccess) {
+    return Component;
   }
-  return user.authName === "ROLE_ADMIN" 
-  ? Component 
-  : <Navigate to="/" {...alert("접근할 수 없는 페이지입니다.")} />;
+
+  return <AdminLoginPage onLoginSuccess={() => setLoginSuccess(true)} />;
 };
 
 export default PrivateMasterRoute;

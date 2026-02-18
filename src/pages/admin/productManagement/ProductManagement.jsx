@@ -8,7 +8,7 @@ import { ListProduct } from '../../../api/product';
 import useUpdateEffect from '../../../hooks/useDidMountEffect';
 
 
-const ProductManagement = () => {
+const ProductManagement = ({ registerTrigger }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [products, setProducts] = useState([]);
   const [updateProduct, setUpdateProduct] = useState(false)
@@ -38,6 +38,11 @@ const ProductManagement = () => {
   useUpdateEffect(()=>{
     console.log("tetete1111")
   },[page])
+
+  // 헤더 등록 버튼 클릭 시 모달 열기
+  useEffect(() => {
+    if (registerTrigger > 0) handleOpenModal(false);
+  }, [registerTrigger])
  
 
   //product list를 호출하는 api
@@ -70,10 +75,7 @@ const ProductManagement = () => {
 
   return <div>
       <SearchBar searchTerm={searchTerm} onChange={handleChangeSearchTerm}/>
-      <div className='productManagerInsert'>
-        <InsertButton onClick={() => handleOpenModal(false)} children={"상품 등록"}/>
-      </div>
-      <Content products={products} openModal={handleOpenModal}/> 
+      <Content products={products} openModal={handleOpenModal}/>
       <ProducttModal isOpen={isModalOpen} onClose={handleCloseModal} updateProduct={handleUpdateProduct} product={product}/>
     </div>;
 };
