@@ -1,5 +1,10 @@
 import api from '../api';
 
+export const ListBrand = (keyword) =>{
+    if(keyword === null || keyword === undefined || keyword === '') return api.get(`/api/admin/brand/list`)
+    return api.get(`/api/admin/brand/list?keyword=${keyword}`)
+}
+
 export const InsertBrand = (insertForm) => {
     return api.post("/api/admin/brand/insert", insertForm,{
         headers : {

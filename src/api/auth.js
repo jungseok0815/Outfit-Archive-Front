@@ -7,5 +7,9 @@ export const postLogin = (loginForm) => {
 
 export const postJoin = (joinForm) =>{
     console.log(joinForm)
-    return api.post("/api/usr/insert", joinForm)    
+    return api.post("/api/usr/insert", joinForm)
+}
+
+export const AdminJoin = (joinForm) =>{
+    return api.post("/api/admin/auth/join", joinForm)
 }

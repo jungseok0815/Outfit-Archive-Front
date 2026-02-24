@@ -1,6 +1,6 @@
 import {useState,useEffect } from "react";
 import Modal from "./Modal";
-import { InsertProuct, UpdateProduct, DelteProduct} from "../../../api/admin/product";
+import { InsertProduct, UpdateProduct, DeleteProduct} from "../../../api/admin/product";
 import { ImagePlus } from 'lucide-react'
 import { CancelButton, DeleteButton, SubmitButton } from "../Button/Button";
 
@@ -79,7 +79,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct,product }) => {
   
   const handleSubmit = (e) => {
     e.preventDefault();
-      InsertProuct(formData)
+      InsertProduct(formData)
       .then(res => {
         if (res.status === 200) {
           alert("상품등록 성공!")
@@ -110,7 +110,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct,product }) => {
   const handlerDeleteProduct = (e) => {
     e.preventDefault();
     if(window.confirm("해당 상품을 삭제 하시겠습니까?")){
-      DelteProduct(formData.id)
+      DeleteProduct(formData.id)
       .then(res => {
         if (res.status === 200) {
           alert("상품 삭제 성공!")
@@ -219,6 +219,9 @@ const ProductModal = ({ isOpen, onClose, updateProduct,product }) => {
                       <option value="TOP">상의</option>
                       <option value="BOTTOM">하의</option>
                       <option value="OUTER">아우터</option>
+                      <option value="DRESS">드레스</option>
+                      <option value="SHOES">신발</option>
+                      <option value="BAG">가방</option>
                     </select>
                   </div>
 
