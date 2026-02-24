@@ -2,7 +2,7 @@ import api from './api';
 
 export const postLogin = (loginForm) => {
     console.log(loginForm)
-    return api.post("/api/auth/login", loginForm)
+    return api.post("/api/admin/auth/login", loginForm)
 }
 
 export const postJoin = (joinForm) =>{

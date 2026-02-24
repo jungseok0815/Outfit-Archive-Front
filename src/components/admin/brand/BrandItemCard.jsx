@@ -1,7 +1,7 @@
 import {React, useState} from 'react';
 import { Phone, MapPin } from 'lucide-react';
 import { SubmitButton, DeleteButton } from '../../common/Button/Button';
-import { InsertBrand, UpdateBrand, DeleteBrand } from '../../../api/brand';
+import { InsertBrand, UpdateBrand, DeleteBrand } from '../../../api/admin/brand';
 
 const BrandItemCard = () => {
     const [formData, setFormData] = useState({

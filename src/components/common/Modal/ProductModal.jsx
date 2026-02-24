@@ -1,6 +1,6 @@
 import {useState,useEffect } from "react";
 import Modal from "./Modal";
-import { InsertProuct, UpdateProduct, DelteProduct} from "../../../api/product";
+import { InsertProuct, UpdateProduct, DelteProduct} from "../../../api/admin/product";
 import { ImagePlus } from 'lucide-react'
 import { CancelButton, DeleteButton, SubmitButton } from "../Button/Button";
 

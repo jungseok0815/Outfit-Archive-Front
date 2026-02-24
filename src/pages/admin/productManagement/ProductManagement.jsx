@@ -4,7 +4,7 @@ import Content from "./ProductManagementContent"
 import ProducttModal from "../../../components/common/Modal/ProductModal"
 import "../../../styles/admin/productManagement/ProductManagement.css"
 import { InsertButton } from '../../../components/common/Button/Button';
-import { ListProduct } from '../../../api/product';
+import { ListProduct } from '../../../api/user/product';
 import useUpdateEffect from '../../../hooks/useDidMountEffect';
 
 
