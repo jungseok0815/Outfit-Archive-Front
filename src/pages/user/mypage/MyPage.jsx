@@ -1,71 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../../../components/user/header/Header";
 import AuthModal from "../auth/AuthPage";
 import PostCreateModal from "./PostCreateModal";
 import PostDetailPanel from "./PostDetailPanel";
-import ProductCard from "../../../components/user/card/ProductCard";
 import { useAuth } from "../../../store/context/UserContext";
+import { ListPost } from '../../../api/user/post';
 import "../../../App.css";
 import "./MyPage.css";
 
-const dummyPosts = [
-  { id: 1, images: ["https://via.placeholder.com/400/FF6B6B/ffffff", "https://via.placeholder.com/400/E74C3C/ffffff", "https://via.placeholder.com/400/C0392B/ffffff"], likes: 124, comments: 8 },
-  { id: 2, images: ["https://via.placeholder.com/400/4ECDC4/ffffff"], likes: 89, comments: 5 },
-  { id: 3, images: ["https://via.placeholder.com/400/45B7D1/ffffff", "https://via.placeholder.com/400/2980B9/ffffff"], likes: 234, comments: 12 },
-  { id: 4, images: ["https://via.placeholder.com/400/96CEB4/ffffff"], likes: 56, comments: 3 },
-  { id: 5, images: ["https://via.placeholder.com/400/FFEAA7/ffffff", "https://via.placeholder.com/400/F39C12/ffffff", "https://via.placeholder.com/400/E67E22/ffffff"], likes: 178, comments: 9 },
-  { id: 6, images: ["https://via.placeholder.com/400/DDA0DD/ffffff"], likes: 67, comments: 4 },
-  { id: 7, images: ["https://via.placeholder.com/400/98D8C8/ffffff", "https://via.placeholder.com/400/1ABC9C/ffffff"], likes: 312, comments: 21 },
-  { id: 8, images: ["https://via.placeholder.com/400/F7DC6F/ffffff"], likes: 45, comments: 2 },
-  { id: 9, images: ["https://via.placeholder.com/400/BB8FCE/ffffff", "https://via.placeholder.com/400/8E44AD/ffffff"], likes: 198, comments: 14 },
-];
-
-const dummyPostProducts = [
-  {
-    postId: 1,
-    postImage: "https://via.placeholder.com/400/FF6B6B/ffffff",
-    date: "2025.02.10",
-    totalPurchases: 17,
-    earnedPoints: 1700,
-    products: [
-      { id: 1, image: "https://via.placeholder.com/100/222222", brand: "Nike", name: "Air Force 1 '07 Low White", price: "139,000", purchases: 12 },
-      { id: 2, image: "https://via.placeholder.com/100/333333", brand: "Levi's", name: "501 Original Fit Jeans", price: "89,000", purchases: 5 },
-    ],
-  },
-  {
-    postId: 3,
-    postImage: "https://via.placeholder.com/400/45B7D1/ffffff",
-    date: "2025.02.05",
-    totalPurchases: 24,
-    earnedPoints: 2400,
-    products: [
-      { id: 3, image: "https://via.placeholder.com/100/444444", brand: "New Balance", name: "993 Made in USA Grey", price: "259,000", purchases: 15 },
-      { id: 4, image: "https://via.placeholder.com/100/555555", brand: "Stussy", name: "Basic Logo Hoodie Black", price: "169,000", purchases: 6 },
-      { id: 5, image: "https://via.placeholder.com/100/666666", brand: "Carhartt WIP", name: "OG Active Jacket", price: "289,000", purchases: 3 },
-    ],
-  },
-  {
-    postId: 5,
-    postImage: "https://via.placeholder.com/400/FFEAA7/ffffff",
-    date: "2025.01.28",
-    totalPurchases: 8,
-    earnedPoints: 800,
-    products: [
-      { id: 6, image: "https://via.placeholder.com/100/777777", brand: "Acne Studios", name: "Face Patch Beanie", price: "180,000", purchases: 8 },
-    ],
-  },
-  {
-    postId: 7,
-    postImage: "https://via.placeholder.com/400/98D8C8/ffffff",
-    date: "2025.01.20",
-    totalPurchases: 31,
-    earnedPoints: 3100,
-    products: [
-      { id: 7, image: "https://via.placeholder.com/100/888888", brand: "Adidas", name: "Samba OG Cloud White", price: "129,000", purchases: 22 },
-      { id: 8, image: "https://via.placeholder.com/100/999999", brand: "Maison Kitsune", name: "Fox Head Patch T-Shirt", price: "145,000", purchases: 9 },
-    ],
-  },
-];
+const IMG_BASE = 'http://localhost:8080/api/img/get?imgNm=';
 
 const dummyPointUsage = [
   { id: 1, date: "2025.02.09", description: "Nike Air Force 1 '07 할인 적용", amount: -1200, category: "상품 구매" },
@@ -75,38 +18,40 @@ const dummyPointUsage = [
   { id: 5, date: "2025.01.15", description: "럭키드로우 참여", amount: -200, category: "이벤트" },
 ];
 
-const dummySaved = [
-  { id: 1, image: "https://via.placeholder.com/300/222222", brand: "Nike", name: "Air Force 1 '07 Low White", price: "139,000" },
-  { id: 2, image: "https://via.placeholder.com/300/333333", brand: "Adidas", name: "Samba OG Cloud White", price: "129,000" },
-  { id: 3, image: "https://via.placeholder.com/300/444444", brand: "New Balance", name: "993 Made in USA Grey", price: "259,000" },
-  { id: 4, image: "https://via.placeholder.com/300/555555", brand: "Stussy", name: "Basic Logo Hoodie Black", price: "169,000" },
-  { id: 5, image: "https://via.placeholder.com/300/666666", brand: "Carhartt WIP", name: "OG Active Jacket", price: "289,000" },
-  { id: 6, image: "https://via.placeholder.com/300/777777", brand: "Acne Studios", name: "Face Patch Beanie", price: "180,000" },
-];
-
 function MyPage() {
   const { user } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
   const [activeTab, setActiveTab] = useState("posts");
   const [selectedPost, setSelectedPost] = useState(null);
+  const [posts, setPosts] = useState([]);
 
-  // TODO: 로그인 구현 후 아래 주석 해제
-  // if (!user) {
-  //   return (
-  //     <div className="app">
-  //       <Navbar onLoginClick={() => setShowAuthModal(true)} />
-  //       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
-  //       <div className="mypage-login-prompt">
-  //         <h2>로그인이 필요합니다</h2>
-  //         <p>마이페이지를 이용하려면 로그인해주세요.</p>
-  //         <button className="mypage-login-btn" onClick={() => setShowAuthModal(true)}>
-  //           로그인
-  //         </button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  const loadPosts = () => {
+    ListPost('', 0, 100)
+      .then(res => {
+        const all = res.data.content || [];
+        // 현재 로그인 사용자의 게시물만 필터
+        const myPosts = user
+          ? all.filter(p => p.userNm === user.userNm)
+          : all;
+        setPosts(myPosts.map(p => ({
+          id: p.id,
+          images: p.images?.length > 0
+            ? p.images.map(img => `${IMG_BASE}${img.imgNm}`)
+            : [''],
+          likes: p.likeCount,
+          comments: p.commentCount,
+          title: p.title,
+          content: p.content,
+          userNm: p.userNm,
+        })));
+      })
+      .catch(e => console.error('게시물 조회 실패:', e));
+  };
+
+  useEffect(() => {
+    loadPosts();
+  }, [user]);
 
   const displayName = user ? user.userNm : "Guest";
 
@@ -114,7 +59,12 @@ function MyPage() {
     <div className="app">
       <Navbar onLoginClick={() => setShowAuthModal(true)} />
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
-      {showPostModal && <PostCreateModal onClose={() => setShowPostModal(false)} />}
+      {showPostModal && (
+        <PostCreateModal
+          onClose={() => setShowPostModal(false)}
+          onSuccess={loadPosts}
+        />
+      )}
       {selectedPost && <PostDetailPanel post={selectedPost} onClose={() => setSelectedPost(null)} />}
 
       {/* 프로필 헤더 */}
@@ -131,7 +81,7 @@ function MyPage() {
           </div>
           <div className="mypage-stats">
             <div className="mypage-stat">
-              <strong>12</strong> <span>게시물</span>
+              <strong>{posts.length}</strong> <span>게시물</span>
             </div>
             <div className="mypage-stat">
               <strong>234</strong> <span>팔로워</span>
@@ -140,36 +90,19 @@ function MyPage() {
               <strong>56</strong> <span>팔로잉</span>
             </div>
           </div>
-          <p className="mypage-bio">
-            패션을 사랑하는 사람 | Outfit Archive
-          </p>
+          <p className="mypage-bio">패션을 사랑하는 사람 | Outfit Archive</p>
         </div>
       </div>
 
       {/* 탭 네비게이션 */}
       <div className="mypage-tabs">
-        <button
-          className={`mypage-tab ${activeTab === "posts" ? "active" : ""}`}
-          onClick={() => setActiveTab("posts")}
-        >
+        <button className={`mypage-tab ${activeTab === "posts" ? "active" : ""}`} onClick={() => setActiveTab("posts")}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
             <path d="M3 3h7v7H3V3zm11 0h7v7h-7V3zM3 14h7v7H3v-7zm11 0h7v7h-7v-7z" />
           </svg>
           게시물
         </button>
-        <button
-          className={`mypage-tab ${activeTab === "saved" ? "active" : ""}`}
-          onClick={() => setActiveTab("saved")}
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M5 2h14a1 1 0 011 1v19.143a.5.5 0 01-.766.424L12 18.03l-7.234 4.536A.5.5 0 014 22.143V3a1 1 0 011-1z" />
-          </svg>
-          저장됨
-        </button>
-        <button
-          className={`mypage-tab ${activeTab === "points" ? "active" : ""}`}
-          onClick={() => setActiveTab("points")}
-        >
+        <button className={`mypage-tab ${activeTab === "points" ? "active" : ""}`} onClick={() => setActiveTab("points")}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H11.5v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.65c.1 1.7 1.36 2.66 2.85 2.97V19h1.72v-1.67c1.52-.29 2.72-1.16 2.72-2.74 0-2.22-1.86-2.97-3.63-3.45z" />
           </svg>
@@ -187,7 +120,7 @@ function MyPage() {
             </svg>
             <span>새 게시물</span>
           </button>
-          {dummyPosts.map((post) => (
+          {posts.map((post) => (
             <div key={post.id} className="mypage-grid-item" onClick={() => setSelectedPost(post)}>
               <img src={post.images[0]} alt={`게시물 ${post.id}`} />
               <div className="mypage-grid-overlay">
@@ -209,21 +142,10 @@ function MyPage() {
         </div>
       )}
 
-      {/* 저장됨 탭 */}
-      {activeTab === "saved" && (
-        <div className="mypage-saved-grid">
-          {dummySaved.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
-
       {/* 포인트현황 탭 */}
       {activeTab === "points" && (
         <div className="mypage-points">
-          {/* 상단 요약 카드 2개 */}
           <div className="mypage-points-cards">
-            {/* 게시물 포인트 현황 */}
             <div className="mypage-points-card">
               <h4 className="mypage-points-card-title">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -236,22 +158,11 @@ function MyPage() {
                 <strong className="mypage-points-card-value earn">+8,000 P</strong>
               </div>
               <div className="mypage-points-card-rows">
-                <div className="mypage-points-card-row">
-                  <span>구매 유도 건수</span>
-                  <strong>80건</strong>
-                </div>
-                <div className="mypage-points-card-row">
-                  <span>이번 달 적립</span>
-                  <strong className="earn">+2,100 P</strong>
-                </div>
-                <div className="mypage-points-card-row">
-                  <span>태그 상품 수</span>
-                  <strong>8개</strong>
-                </div>
+                <div className="mypage-points-card-row"><span>구매 유도 건수</span><strong>80건</strong></div>
+                <div className="mypage-points-card-row"><span>이번 달 적립</span><strong className="earn">+2,100 P</strong></div>
+                <div className="mypage-points-card-row"><span>태그 상품 수</span><strong>8개</strong></div>
               </div>
             </div>
-
-            {/* 포인트 사용현황 */}
             <div className="mypage-points-card">
               <h4 className="mypage-points-card-title">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -264,64 +175,13 @@ function MyPage() {
                 <strong className="mypage-points-card-value">5,500 P</strong>
               </div>
               <div className="mypage-points-card-rows">
-                <div className="mypage-points-card-row">
-                  <span>총 사용</span>
-                  <strong className="spend">-2,500 P</strong>
-                </div>
-                <div className="mypage-points-card-row">
-                  <span>상품 구매 사용</span>
-                  <strong className="spend">-1,800 P</strong>
-                </div>
-                <div className="mypage-points-card-row">
-                  <span>이벤트 사용</span>
-                  <strong className="spend">-700 P</strong>
-                </div>
+                <div className="mypage-points-card-row"><span>총 사용</span><strong className="spend">-2,500 P</strong></div>
+                <div className="mypage-points-card-row"><span>상품 구매 사용</span><strong className="spend">-1,800 P</strong></div>
+                <div className="mypage-points-card-row"><span>이벤트 사용</span><strong className="spend">-700 P</strong></div>
               </div>
             </div>
           </div>
 
-          {/* 게시물별 상품 현황 */}
-          <div className="mypage-post-products">
-            <h3 className="mypage-post-products-title">내 게시물 상품 현황</h3>
-            {dummyPostProducts.map((post) => (
-              <div key={post.postId} className="mypage-post-card">
-                <div className="mypage-post-card-header">
-                  <img className="mypage-post-card-thumb" src={post.postImage} alt={`게시물 ${post.postId}`} />
-                  <div className="mypage-post-card-info">
-                    <span className="mypage-post-card-name">게시물 #{post.postId}</span>
-                    <span className="mypage-post-card-date">{post.date}</span>
-                  </div>
-                  <div className="mypage-post-card-stats">
-                    <span className="mypage-post-card-purchases">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 8h4v6H4v-6zm16 6h-4v-8h4v8z" />
-                      </svg>
-                      {post.totalPurchases}건 구매
-                    </span>
-                    <span className="mypage-post-card-earned">+{post.earnedPoints.toLocaleString()} P</span>
-                  </div>
-                </div>
-                <div className="mypage-post-card-products">
-                  {post.products.map((product) => (
-                    <div key={product.id} className="mypage-post-product-row">
-                      <img className="mypage-post-product-img" src={product.image} alt={product.name} />
-                      <div className="mypage-post-product-info">
-                        <span className="mypage-post-product-brand">{product.brand}</span>
-                        <span className="mypage-post-product-name">{product.name}</span>
-                        <span className="mypage-post-product-price">₩{product.price}</span>
-                      </div>
-                      <div className="mypage-post-product-purchase">
-                        <strong>{product.purchases}명</strong>
-                        <span>구매</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* 포인트 사용현황 */}
           <div className="mypage-usage-section">
             <h3 className="mypage-usage-title">포인트 사용현황</h3>
             <div className="mypage-usage-list">

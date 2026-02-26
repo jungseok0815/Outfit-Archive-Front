@@ -1,42 +1,31 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import "./PostCreateModal.css";
+import { ListProduct } from '../../../api/user/product';
+import { InsertPost } from '../../../api/user/post';
 
-const dummyProducts = [
-    { id: 1, brand: "Nike", name: "Air Force 1 '07 Low White", image: "https://via.placeholder.com/60/222222" },
-    { id: 2, brand: "Adidas", name: "Samba OG Cloud White", image: "https://via.placeholder.com/60/333333" },
-    { id: 3, brand: "New Balance", name: "993 Made in USA Grey", image: "https://via.placeholder.com/60/444444" },
-    { id: 4, brand: "Nike", name: "Dunk Low Panda", image: "https://via.placeholder.com/60/555555" },
-    { id: 5, brand: "Stussy", name: "Basic Logo Hoodie Black", image: "https://via.placeholder.com/60/666666" },
-    { id: 6, brand: "Carhartt WIP", name: "OG Active Jacket", image: "https://via.placeholder.com/60/777777" },
-];
+const IMG_BASE = 'http://localhost:8080/api/img/get?imgNm=';
 
-function PostCreateModal({ onClose }) {
+function PostCreateModal({ onClose, onSuccess }) {
     const [images, setImages] = useState([]);
+    const [title, setTitle] = useState("");
     const [caption, setCaption] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [taggedProducts, setTaggedProducts] = useState([]);
+    const [submitting, setSubmitting] = useState(false);
     const fileInputRef = useRef(null);
+    const searchTimerRef = useRef(null);
 
     const handleOverlayClick = (e) => {
-        if (e.target === e.currentTarget) {
-            onClose();
-        }
+        if (e.target === e.currentTarget) onClose();
     };
 
     const handleFileChange = (e) => {
         const files = Array.from(e.target.files);
         if (files.length === 0) return;
-
-        const newImages = files.map((file) => ({
-            file,
-            preview: URL.createObjectURL(file),
-        }));
+        const newImages = files.map((file) => ({ file, preview: URL.createObjectURL(file) }));
         setImages((prev) => [...prev, ...newImages]);
-
-        if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
+        if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
     const handleRemoveImage = (index) => {
@@ -46,20 +35,27 @@ function PostCreateModal({ onClose }) {
         });
     };
 
-    const handleSearch = (query) => {
+    const handleSearch = useCallback((query) => {
         setSearchQuery(query);
+        if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
         if (query.trim() === "") {
             setSearchResults([]);
             return;
         }
-        // TODO: 백엔드 API 검색 연동
-        const filtered = dummyProducts.filter(
-            (p) =>
-                p.name.toLowerCase().includes(query.toLowerCase()) ||
-                p.brand.toLowerCase().includes(query.toLowerCase())
-        );
-        setSearchResults(filtered);
-    };
+        searchTimerRef.current = setTimeout(() => {
+            ListProduct(query, 0, 10)
+                .then(res => {
+                    const items = res.data.content || [];
+                    setSearchResults(items.map(p => ({
+                        id: p.id,
+                        brand: p.brandNm,
+                        name: p.productNm,
+                        image: p.images?.length > 0 ? `${IMG_BASE}${p.images[0].imgNm}` : '',
+                    })));
+                })
+                .catch(() => setSearchResults([]));
+        }, 300);
+    }, []);
 
     const handleAddProduct = (product) => {
         if (taggedProducts.some((p) => p.id === product.id)) return;
@@ -73,16 +69,29 @@ function PostCreateModal({ onClose }) {
     };
 
     const handleSubmit = () => {
-        // TODO: 백엔드 API 연동
-        onClose();
+        if (images.length === 0 || !title.trim()) return;
+        setSubmitting(true);
+        const fd = new FormData();
+        fd.append('title', title.trim());
+        fd.append('content', caption.trim());
+        images.forEach(img => fd.append('images', img.file));
+
+        InsertPost(fd)
+            .then(() => {
+                if (onSuccess) onSuccess();
+                onClose();
+            })
+            .catch(err => {
+                const msg = err.response?.data?.msg || '게시물 등록에 실패했습니다.';
+                alert(msg);
+            })
+            .finally(() => setSubmitting(false));
     };
 
     return (
         <div className="post-overlay" onClick={handleOverlayClick}>
             <div className="post-modal">
-                <button className="post-close" onClick={onClose}>
-                    ✕
-                </button>
+                <button className="post-close" onClick={onClose}>✕</button>
                 <h2>새 게시물</h2>
 
                 <input
@@ -94,29 +103,17 @@ function PostCreateModal({ onClose }) {
                     style={{ display: "none" }}
                 />
 
-                {/* 이미지 영역 (고정 높이) */}
+                {/* 이미지 영역 */}
                 <div className="post-image-area">
                     {images.length > 0 ? (
                         <div className="post-preview-grid">
                             {images.map((img, index) => (
                                 <div key={index} className="post-preview-item">
-                                    <img
-                                        className="post-preview-image"
-                                        src={img.preview}
-                                        alt={`미리보기 ${index + 1}`}
-                                    />
-                                    <button
-                                        className="post-preview-remove"
-                                        onClick={() => handleRemoveImage(index)}
-                                    >
-                                        ✕
-                                    </button>
+                                    <img className="post-preview-image" src={img.preview} alt={`미리보기 ${index + 1}`} />
+                                    <button className="post-preview-remove" onClick={() => handleRemoveImage(index)}>✕</button>
                                 </div>
                             ))}
-                            <button
-                                className="post-preview-add"
-                                onClick={() => fileInputRef.current?.click()}
-                            >
+                            <button className="post-preview-add" onClick={() => fileInputRef.current?.click()}>
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                                     <line x1="12" y1="5" x2="12" y2="19" />
                                     <line x1="5" y1="12" x2="19" y2="12" />
@@ -124,17 +121,8 @@ function PostCreateModal({ onClose }) {
                             </button>
                         </div>
                     ) : (
-                        <div
-                            className="post-upload-zone"
-                            onClick={() => fileInputRef.current?.click()}
-                        >
-                            <svg
-                                className="post-upload-icon"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                            >
+                        <div className="post-upload-zone" onClick={() => fileInputRef.current?.click()}>
+                            <svg className="post-upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                                 <circle cx="8.5" cy="8.5" r="1.5" />
                                 <polyline points="21 15 16 10 5 21" />
@@ -144,6 +132,16 @@ function PostCreateModal({ onClose }) {
                         </div>
                     )}
                 </div>
+
+                {/* 제목 입력 */}
+                <input
+                    className="post-caption"
+                    type="text"
+                    placeholder="제목을 입력하세요"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    style={{ marginBottom: 8 }}
+                />
 
                 {/* 상품 검색 */}
                 <div className="post-product-search">
@@ -165,7 +163,7 @@ function PostCreateModal({ onClose }) {
                         <ul className="post-search-results">
                             {searchResults.map((product) => (
                                 <li key={product.id} onClick={() => handleAddProduct(product)}>
-                                    <img src={product.image} alt={product.name} />
+                                    {product.image && <img src={product.image} alt={product.name} />}
                                     <div className="post-search-result-info">
                                         <span className="post-search-result-brand">{product.brand}</span>
                                         <span className="post-search-result-name">{product.name}</span>
@@ -180,17 +178,12 @@ function PostCreateModal({ onClose }) {
                             <div className="post-tagged-products">
                                 {taggedProducts.map((product) => (
                                     <div key={product.id} className="post-tagged-item">
-                                        <img src={product.image} alt={product.name} />
+                                        {product.image && <img src={product.image} alt={product.name} />}
                                         <div className="post-tagged-info">
                                             <span className="post-tagged-brand">{product.brand}</span>
                                             <span className="post-tagged-name">{product.name}</span>
                                         </div>
-                                        <button
-                                            className="post-tagged-remove"
-                                            onClick={() => handleRemoveProduct(product.id)}
-                                        >
-                                            ✕
-                                        </button>
+                                        <button className="post-tagged-remove" onClick={() => handleRemoveProduct(product.id)}>✕</button>
                                     </div>
                                 ))}
                             </div>
@@ -210,9 +203,9 @@ function PostCreateModal({ onClose }) {
                 <button
                     className="post-submit-btn"
                     onClick={handleSubmit}
-                    disabled={images.length === 0}
+                    disabled={images.length === 0 || !title.trim() || submitting}
                 >
-                    공유하기
+                    {submitting ? '업로드 중...' : '공유하기'}
                 </button>
             </div>
         </div>

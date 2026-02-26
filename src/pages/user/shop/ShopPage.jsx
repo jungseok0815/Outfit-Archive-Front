@@ -1,45 +1,73 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Navbar from '../../../components/user/header/Header';
 import AuthModal from '../auth/AuthPage';
 import ProductCard from '../../../components/user/card/ProductCard';
+import { ListProduct } from '../../../api/user/product';
 import "../../../App.css";
 import "./ShopPage.css";
 
+const IMG_BASE = 'http://localhost:8080/api/img/get?imgNm=';
+
+const CATEGORY_MAP = {
+  "전체": null,
+  "상의": "TOP",
+  "하의": "BOTTOM",
+  "아우터": "OUTER",
+  "원피스": "DRESS",
+  "신발": "SHOES",
+  "가방": "BAG",
+};
+
+const CATEGORY_KOR = {
+  TOP: '상의', BOTTOM: '하의', OUTER: '아우터',
+  DRESS: '원피스', SHOES: '신발', BAG: '가방',
+};
+
+const categories = ["전체", "상의", "하의", "아우터", "원피스", "신발", "가방"];
+
 function ShopPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [inputValue, setInputValue] = useState("");
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("전체");
+  const [products, setProducts] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const debounceRef = useRef(null);
 
-  const categories = ["전체", "신발", "상의", "하의", "아우터", "가방", "액세서리"];
+  useEffect(() => {
+    setLoading(true);
+    const categoryEnum = CATEGORY_MAP[selectedCategory];
+    ListProduct(searchQuery, categoryEnum)
+      .then(res => {
+        const items = res.data.content || [];
+        setTotalCount(res.data.totalElements || 0);
+        setProducts(items.map(p => ({
+          id: p.id,
+          image: p.images?.length > 0 ? `${IMG_BASE}${p.images[0].imgNm}` : '',
+          brand: p.brandNm,
+          name: p.productNm,
+          price: p.productPrice?.toLocaleString(),
+          category: CATEGORY_KOR[p.category] || p.category,
+        })));
+      })
+      .catch(e => console.error('상품 조회 실패:', e))
+      .finally(() => setLoading(false));
+  }, [searchQuery, selectedCategory]);
 
-  const allProducts = [
-    { id: 1, image: "https://via.placeholder.com/300/222222", brand: "Nike", name: "Air Force 1 '07 Low White", price: "139,000", category: "신발" },
-    { id: 2, image: "https://via.placeholder.com/300/333333", brand: "Adidas", name: "Samba OG Cloud White", price: "129,000", category: "신발" },
-    { id: 3, image: "https://via.placeholder.com/300/444444", brand: "New Balance", name: "993 Made in USA Grey", price: "259,000", category: "신발" },
-    { id: 4, image: "https://via.placeholder.com/300/555555", brand: "Nike", name: "Dunk Low Panda", price: "149,000", category: "신발" },
-    { id: 5, image: "https://via.placeholder.com/300/666666", brand: "Stussy", name: "Basic Logo Tee Black", price: "65,000", category: "상의" },
-    { id: 6, image: "https://via.placeholder.com/300/777777", brand: "IAB Studio", name: "Pigment Hoodie Grey", price: "89,000", category: "상의" },
-    { id: 7, image: "https://via.placeholder.com/300/888888", brand: "Carhartt WIP", name: "OG Detroit Jacket Black", price: "289,000", category: "아우터" },
-    { id: 8, image: "https://via.placeholder.com/300/999999", brand: "The North Face", name: "1996 Retro Nuptse Black", price: "369,000", category: "아우터" },
-    { id: 9, image: "https://via.placeholder.com/300/aaaaaa", brand: "Levi's", name: "501 Original Fit Medium", price: "109,000", category: "하의" },
-    { id: 10, image: "https://via.placeholder.com/300/bbbbbb", brand: "Dickies", name: "874 Work Pants Black", price: "59,000", category: "하의" },
-    { id: 11, image: "https://via.placeholder.com/300/cccccc", brand: "Converse", name: "Chuck 70 High Black", price: "95,000", category: "신발" },
-    { id: 12, image: "https://via.placeholder.com/300/dddddd", brand: "Salomon", name: "XT-6 Advanced Black", price: "219,000", category: "신발" },
-    { id: 13, image: "https://via.placeholder.com/300/eeeeee", brand: "Asics", name: "Gel-1130 Silver White", price: "139,000", category: "신발" },
-    { id: 14, image: "https://via.placeholder.com/300/e0e0e0", brand: "Acne Studios", name: "Face Logo Beanie Black", price: "180,000", category: "액세서리" },
-    { id: 15, image: "https://via.placeholder.com/300/d0d0d0", brand: "Maison Margiela", name: "5AC Mini Bag White", price: "1,890,000", category: "가방" },
-    { id: 16, image: "https://via.placeholder.com/300/c0c0c0", brand: "Musinsa Standard", name: "Crewneck Sweatshirt Grey", price: "34,900", category: "상의" },
-  ];
-
-  const filteredProducts = allProducts.filter((product) => {
-    const matchCategory = selectedCategory === "전체" || product.category === selectedCategory;
-    const matchSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        product.brand.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchCategory && (searchQuery === "" || matchSearch);
-  });
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setInputValue(value);
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setSearchQuery(value);
+    }, 400);
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
+    clearTimeout(debounceRef.current);
+    setSearchQuery(inputValue);
   };
 
   return (
@@ -64,8 +92,8 @@ function ShopPage() {
             type="text"
             className="shop-search-input"
             placeholder="브랜드, 상품명 검색"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={inputValue}
+            onChange={handleInputChange}
           />
         </form>
       </div>
@@ -83,20 +111,23 @@ function ShopPage() {
         ))}
       </div>
 
-      {/* 상품 수 + 정렬 */}
+      {/* 상품 수 */}
       <div className="shop-toolbar">
-        <span className="shop-count">상품 {filteredProducts.length}개</span>
+        <span className="shop-count">상품 {totalCount}개</span>
       </div>
 
       {/* 상품 그리드 */}
-      <div className="shop-grid">
-        {filteredProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="shop-empty"><p>상품을 불러오는 중...</p></div>
+      ) : (
+        <div className="shop-grid">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
 
-      {/* 결과 없음 */}
-      {filteredProducts.length === 0 && (
+      {!loading && products.length === 0 && (
         <div className="shop-empty">
           <p>검색 결과가 없습니다.</p>
         </div>

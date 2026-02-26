@@ -1,6 +1,8 @@
-import React,{useState} from "react";
+import React,{useState, useCallback} from "react";
 import "../auth/loginForm.css"
 import {postJoin} from '../../../api/auth';
+import Toast from '../../../components/common/Toast/Toast';
+
 function JoinForm(){
   const [joinForm, setJoinForm] = useState({
     userId: "",
@@ -9,6 +11,9 @@ function JoinForm(){
     userAge: "",
     authName: "USER"
   });
+  const [toast, setToast] = useState({ message: "", type: "success" });
+
+  const closeToast = useCallback(() => setToast({ message: "", type: "success" }), []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -19,12 +24,15 @@ function JoinForm(){
     e.preventDefault();
     console.log(joinForm)
     postJoin(joinForm).then(res =>{
-        if(res.status === 200 && res.data.success) alert("회원가입이 완료되었습니다!")
+        if(res.status === 200) setToast({ message: "회원가입이 완료되었습니다!", type: "success" });
     }).catch(error => {
-        console.log(error.response)
+        const msg = error.response?.data?.msg || '회원가입에 실패했습니다.';
+        setToast({ message: msg, type: "error" });
     })
   };
     return (
+      <>
+      <Toast message={toast.message} type={toast.type} onClose={closeToast} />
       <form onSubmit={handleSubmit}>
         <div className="form-group">
             <label htmlFor="userNm">사용자 이름</label>
@@ -80,6 +88,7 @@ function JoinForm(){
             회원가입
         </button>
       </form>
+      </>
     );
 }
 

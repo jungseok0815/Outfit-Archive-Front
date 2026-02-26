@@ -1,661 +1,380 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Package, Truck, CheckCircle, Clock, ChevronDown, ChevronLeft, ChevronRight, Search, MapPin, Phone, User } from 'lucide-react';
 import './OrderManagement.css';
+import { ListOrder, UpdateOrderStatus, DeleteOrder } from '../../../api/admin/order';
 
-const STATUS_OPTIONS = [
-  { value: '결제완료', label: '결제완료', color: '#6c5ce7' },
-  { value: '상품준비중', label: '상품준비중', color: '#f39c12' },
-  { value: '배송중', label: '배송중', color: '#3498db' },
-  { value: '배송완료', label: '배송완료', color: '#27ae60' },
-  { value: '취소', label: '취소', color: '#e74c3c' },
-];
+// 백엔드 OrderStatus enum → 한글 매핑
+const STATUS_MAP = {
+    PAYMENT_COMPLETE: { label: '결제완료', color: '#6c5ce7' },
+    SHIPPING: { label: '배송중', color: '#3498db' },
+    DELIVERED: { label: '배송완료', color: '#27ae60' },
+    CANCELLED: { label: '취소', color: '#e74c3c' },
+};
+
+const STATUS_ORDER = ['PAYMENT_COMPLETE', 'SHIPPING', 'DELIVERED'];
 
 const PAGE_SIZE = 10;
 
-const dummyOrders = [
-  {
-    date: '2025-01-15',
-    orders: [
-      {
-        id: 'OA-20250115-001',
-        product: { name: '오버핏 후디', brand: '999휴머니티', price: 89000, quantity: 1, image: null, category: '상의' },
-        buyer: { name: '김민수', phone: '010-1234-5678', address: '서울시 강남구 역삼동 123-45' },
-        status: '배송중',
-        paymentMethod: '카드결제',
-        shipping: { carrier: 'CJ대한통운', trackingNo: '640012345678', shippedAt: '2025-01-15 14:30' },
-      },
-      {
-        id: 'OA-20250115-002',
-        product: { name: '에어맥스 97', brand: '나이키', price: 189000, quantity: 1, image: null, category: '신발' },
-        buyer: { name: '이지은', phone: '010-9876-5432', address: '서울시 마포구 서교동 456-78' },
-        status: '결제완료',
-        paymentMethod: '카드결제',
-      },
-      {
-        id: 'OA-20250115-003',
-        product: { name: '캐시미어 니트', brand: '해칭룸', price: 128000, quantity: 2, image: null, category: '상의' },
-        buyer: { name: '박준혁', phone: '010-5555-1234', address: '경기도 성남시 분당구 정자동 11-3' },
-        status: '상품준비중',
-        paymentMethod: '무통장입금',
-      },
-    ],
-  },
-  {
-    date: '2025-01-14',
-    orders: [
-      {
-        id: 'OA-20250114-001',
-        product: { name: '와이드 카고팬츠', brand: '999휴머니티', price: 79000, quantity: 1, image: null, category: '하의' },
-        buyer: { name: '최서연', phone: '010-3333-7777', address: '서울시 송파구 잠실동 200-5' },
-        status: '배송완료',
-        paymentMethod: '카드결제',
-        shipping: { carrier: '한진택배', trackingNo: '550098765432', shippedAt: '2025-01-13 09:15', deliveredAt: '2025-01-14 16:40' },
-      },
-      {
-        id: 'OA-20250114-002',
-        product: { name: '윈드러너 자켓', brand: '나이키', price: 139000, quantity: 1, image: null, category: '아우터' },
-        buyer: { name: '정다윤', phone: '010-8888-2222', address: '인천시 남동구 구월동 55-12' },
-        status: '배송완료',
-        paymentMethod: '간편결제',
-        shipping: { carrier: 'CJ대한통운', trackingNo: '640087654321', shippedAt: '2025-01-13 11:00', deliveredAt: '2025-01-14 14:20' },
-      },
-      {
-        id: 'OA-20250114-003',
-        product: { name: '슬랙스', brand: '해칭룸', price: 89000, quantity: 1, image: null, category: '하의' },
-        buyer: { name: '김태형', phone: '010-7777-3333', address: '서울시 성동구 성수동 44-2' },
-        status: '결제완료',
-        paymentMethod: '카드결제',
-      },
-    ],
-  },
-  {
-    date: '2025-01-13',
-    orders: [
-      {
-        id: 'OA-20250113-001',
-        product: { name: '울 블렌드 코트', brand: '해칭룸', price: 198000, quantity: 1, image: null, category: '아우터' },
-        buyer: { name: '한지민', phone: '010-1111-4444', address: '서울시 용산구 이태원동 88-9' },
-        status: '취소',
-        paymentMethod: '카드결제',
-      },
-      {
-        id: 'OA-20250113-002',
-        product: { name: '테크 플리스 팬츠', brand: '나이키', price: 109000, quantity: 1, image: null, category: '하의' },
-        buyer: { name: '오승우', phone: '010-6666-9999', address: '경기도 고양시 일산동구 장항동 33-7' },
-        status: '배송중',
-        paymentMethod: '카드결제',
-        shipping: { carrier: '롯데택배', trackingNo: '770055556666', shippedAt: '2025-01-13 16:45' },
-      },
-      {
-        id: 'OA-20250113-003',
-        product: { name: '그래픽 반팔티', brand: '999휴머니티', price: 45000, quantity: 3, image: null, category: '상의' },
-        buyer: { name: '신예은', phone: '010-2222-8888', address: '서울시 서초구 서초동 1600-3' },
-        status: '배송완료',
-        paymentMethod: '간편결제',
-        shipping: { carrier: 'CJ대한통운', trackingNo: '640011112222', shippedAt: '2025-01-12 10:00', deliveredAt: '2025-01-13 11:30' },
-      },
-    ],
-  },
-  {
-    date: '2025-01-12',
-    orders: [
-      {
-        id: 'OA-20250112-001',
-        product: { name: '나일론 백팩', brand: '999휴머니티', price: 65000, quantity: 1, image: null, category: '악세서리' },
-        buyer: { name: '윤서준', phone: '010-4444-6666', address: '서울시 강서구 화곡동 120-8' },
-        status: '배송완료',
-        paymentMethod: '카드결제',
-        shipping: { carrier: 'CJ대한통운', trackingNo: '640033334444', shippedAt: '2025-01-11 09:00', deliveredAt: '2025-01-12 15:20' },
-      },
-      {
-        id: 'OA-20250112-002',
-        product: { name: '드라이핏 반팔티', brand: '나이키', price: 45000, quantity: 2, image: null, category: '상의' },
-        buyer: { name: '장하늘', phone: '010-5555-7777', address: '경기도 수원시 영통구 매탄동 55-1' },
-        status: '배송완료',
-        paymentMethod: '간편결제',
-        shipping: { carrier: '한진택배', trackingNo: '550011223344', shippedAt: '2025-01-11 13:30', deliveredAt: '2025-01-12 10:15' },
-      },
-    ],
-  },
-  {
-    date: '2025-01-11',
-    orders: [
-      {
-        id: 'OA-20250111-001',
-        product: { name: '헤리티지 크로스백', brand: '나이키', price: 35000, quantity: 1, image: null, category: '악세서리' },
-        buyer: { name: '임수정', phone: '010-9999-1111', address: '서울시 관악구 신림동 333-7' },
-        status: '배송완료',
-        paymentMethod: '카드결제',
-        shipping: { carrier: '롯데택배', trackingNo: '770099887766', shippedAt: '2025-01-10 15:00', deliveredAt: '2025-01-11 11:40' },
-      },
-      {
-        id: 'OA-20250111-002',
-        product: { name: '오버핏 후디', brand: '999휴머니티', price: 89000, quantity: 1, image: null, category: '상의' },
-        buyer: { name: '강도윤', phone: '010-3333-5555', address: '부산시 해운대구 우동 1500-3' },
-        status: '상품준비중',
-        paymentMethod: '무통장입금',
-      },
-      {
-        id: 'OA-20250111-003',
-        product: { name: '캐시미어 니트', brand: '해칭룸', price: 128000, quantity: 1, image: null, category: '상의' },
-        buyer: { name: '문지원', phone: '010-2222-4444', address: '대전시 유성구 봉명동 88-12' },
-        status: '결제완료',
-        paymentMethod: '카드결제',
-      },
-    ],
-  },
-  {
-    date: '2025-01-10',
-    orders: [
-      {
-        id: 'OA-20250110-001',
-        product: { name: '윈드러너 자켓', brand: '나이키', price: 139000, quantity: 1, image: null, category: '아우터' },
-        buyer: { name: '배수빈', phone: '010-8888-6666', address: '대구시 수성구 범어동 22-5' },
-        status: '배송완료',
-        paymentMethod: '간편결제',
-        shipping: { carrier: 'CJ대한통운', trackingNo: '640055667788', shippedAt: '2025-01-09 10:20', deliveredAt: '2025-01-10 14:00' },
-      },
-      {
-        id: 'OA-20250110-002',
-        product: { name: '와이드 카고팬츠', brand: '999휴머니티', price: 79000, quantity: 2, image: null, category: '하의' },
-        buyer: { name: '서지호', phone: '010-1111-9999', address: '광주시 서구 치평동 900-4' },
-        status: '취소',
-        paymentMethod: '카드결제',
-      },
-      {
-        id: 'OA-20250110-003',
-        product: { name: '에어맥스 97', brand: '나이키', price: 189000, quantity: 1, image: null, category: '신발' },
-        buyer: { name: '조은서', phone: '010-6666-2222', address: '울산시 남구 삼산동 150-9' },
-        status: '배송중',
-        paymentMethod: '카드결제',
-        shipping: { carrier: '한진택배', trackingNo: '550077889900', shippedAt: '2025-01-10 08:45' },
-      },
-    ],
-  },
-  {
-    date: '2025-01-09',
-    orders: [
-      {
-        id: 'OA-20250109-001',
-        product: { name: '울 블렌드 코트', brand: '해칭룸', price: 198000, quantity: 1, image: null, category: '아우터' },
-        buyer: { name: '황예린', phone: '010-4444-8888', address: '제주시 연동 312-5' },
-        status: '배송완료',
-        paymentMethod: '카드결제',
-        shipping: { carrier: 'CJ대한통운', trackingNo: '640099001122', shippedAt: '2025-01-08 14:10', deliveredAt: '2025-01-09 17:30' },
-      },
-      {
-        id: 'OA-20250109-002',
-        product: { name: '테크 플리스 팬츠', brand: '나이키', price: 109000, quantity: 1, image: null, category: '하의' },
-        buyer: { name: '노현우', phone: '010-7777-1111', address: '세종시 보람동 55-3' },
-        status: '배송완료',
-        paymentMethod: '간편결제',
-        shipping: { carrier: '롯데택배', trackingNo: '770033445566', shippedAt: '2025-01-08 11:00', deliveredAt: '2025-01-09 13:25' },
-      },
-    ],
-  },
-  {
-    date: '2025-01-08',
-    orders: [
-      {
-        id: 'OA-20250108-001',
-        product: { name: '그래픽 반팔티', brand: '999휴머니티', price: 45000, quantity: 2, image: null, category: '상의' },
-        buyer: { name: '권유진', phone: '010-1234-9999', address: '서울시 동작구 사당동 77-3' },
-        status: '배송완료',
-        paymentMethod: '카드결제',
-        shipping: { carrier: 'CJ대한통운', trackingNo: '640044556677', shippedAt: '2025-01-07 09:30', deliveredAt: '2025-01-08 14:50' },
-      },
-      {
-        id: 'OA-20250108-002',
-        product: { name: '슬랙스', brand: '해칭룸', price: 89000, quantity: 1, image: null, category: '하의' },
-        buyer: { name: '이도현', phone: '010-5678-1234', address: '경기도 안양시 동안구 평촌동 200-1' },
-        status: '배송중',
-        paymentMethod: '간편결제',
-        shipping: { carrier: '한진택배', trackingNo: '550033221100', shippedAt: '2025-01-08 11:20' },
-      },
-      {
-        id: 'OA-20250108-003',
-        product: { name: '에어맥스 97', brand: '나이키', price: 189000, quantity: 1, image: null, category: '신발' },
-        buyer: { name: '송민아', phone: '010-8765-4321', address: '서울시 노원구 상계동 500-12' },
-        status: '결제완료',
-        paymentMethod: '카드결제',
-      },
-    ],
-  },
-  {
-    date: '2025-01-07',
-    orders: [
-      {
-        id: 'OA-20250107-001',
-        product: { name: '오버핏 후디', brand: '999휴머니티', price: 89000, quantity: 1, image: null, category: '상의' },
-        buyer: { name: '정승환', phone: '010-3456-7890', address: '인천시 연수구 송도동 88-15' },
-        status: '배송완료',
-        paymentMethod: '카드결제',
-        shipping: { carrier: 'CJ대한통운', trackingNo: '640077889911', shippedAt: '2025-01-06 10:00', deliveredAt: '2025-01-07 16:30' },
-      },
-      {
-        id: 'OA-20250107-002',
-        product: { name: '캐시미어 니트', brand: '해칭룸', price: 128000, quantity: 1, image: null, category: '상의' },
-        buyer: { name: '한소희', phone: '010-6543-2109', address: '서울시 중구 을지로 33-7' },
-        status: '취소',
-        paymentMethod: '무통장입금',
-      },
-      {
-        id: 'OA-20250107-003',
-        product: { name: '헤리티지 크로스백', brand: '나이키', price: 35000, quantity: 3, image: null, category: '악세서리' },
-        buyer: { name: '유재석', phone: '010-1111-2222', address: '경기도 용인시 수지구 죽전동 10-5' },
-        status: '배송완료',
-        paymentMethod: '간편결제',
-        shipping: { carrier: '롯데택배', trackingNo: '770011223344', shippedAt: '2025-01-06 14:00', deliveredAt: '2025-01-07 10:20' },
-      },
-    ],
-  },
-  {
-    date: '2025-01-06',
-    orders: [
-      {
-        id: 'OA-20250106-001',
-        product: { name: '윈드러너 자켓', brand: '나이키', price: 139000, quantity: 1, image: null, category: '아우터' },
-        buyer: { name: '김지수', phone: '010-9876-1234', address: '부산시 수영구 광안동 200-3' },
-        status: '배송완료',
-        paymentMethod: '카드결제',
-        shipping: { carrier: '한진택배', trackingNo: '550099887766', shippedAt: '2025-01-05 13:00', deliveredAt: '2025-01-06 15:40' },
-      },
-      {
-        id: 'OA-20250106-002',
-        product: { name: '와이드 카고팬츠', brand: '999휴머니티', price: 79000, quantity: 1, image: null, category: '하의' },
-        buyer: { name: '박보검', phone: '010-2345-6789', address: '서울시 강동구 천호동 120-9' },
-        status: '상품준비중',
-        paymentMethod: '카드결제',
-      },
-      {
-        id: 'OA-20250106-003',
-        product: { name: '울 블렌드 코트', brand: '해칭룸', price: 198000, quantity: 1, image: null, category: '아우터' },
-        buyer: { name: '이서진', phone: '010-4567-8901', address: '대전시 서구 둔산동 900-7' },
-        status: '배송중',
-        paymentMethod: '간편결제',
-        shipping: { carrier: 'CJ대한통운', trackingNo: '640022334455', shippedAt: '2025-01-06 09:45' },
-      },
-      {
-        id: 'OA-20250106-004',
-        product: { name: '나일론 백팩', brand: '999휴머니티', price: 65000, quantity: 1, image: null, category: '악세서리' },
-        buyer: { name: '최우식', phone: '010-7890-1234', address: '서울시 영등포구 여의도동 50-2' },
-        status: '결제완료',
-        paymentMethod: '카드결제',
-      },
-    ],
-  },
-];
-
 const getStatusIcon = (status) => {
-  switch (status) {
-    case '결제완료': return <Clock className="w-4 h-4" />;
-    case '상품준비중': return <Package className="w-4 h-4" />;
-    case '배송중': return <Truck className="w-4 h-4" />;
-    case '배송완료': return <CheckCircle className="w-4 h-4" />;
-    case '취소': return <Clock className="w-4 h-4" />;
-    default: return <Clock className="w-4 h-4" />;
-  }
-};
-
-const getStatusColor = (status) => {
-  return STATUS_OPTIONS.find(s => s.value === status)?.color || '#999';
+    switch (status) {
+        case 'PAYMENT_COMPLETE': return <Clock className="w-4 h-4" />;
+        case 'SHIPPING': return <Truck className="w-4 h-4" />;
+        case 'DELIVERED': return <CheckCircle className="w-4 h-4" />;
+        case 'CANCELLED': return <Clock className="w-4 h-4" />;
+        default: return <Clock className="w-4 h-4" />;
+    }
 };
 
 const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  const days = ['일', '월', '화', '수', '목', '금', '토'];
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 (${days[date.getDay()]})`;
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const days = ['일', '월', '화', '수', '목', '금', '토'];
+    return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 (${days[date.getDay()]})`;
+};
+
+const formatDateKey = (dateStr) => {
+    if (!dateStr) return '';
+    return dateStr.substring(0, 10);
 };
 
 const OrderManagement = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('전체');
-  const [expandedOrder, setExpandedOrder] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('전체');
+    const [expandedOrder, setExpandedOrder] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
 
-  const totalOrders = dummyOrders.reduce((sum, g) => sum + g.orders.length, 0);
-  const statusCounts = dummyOrders.flatMap(g => g.orders).reduce((acc, o) => {
-    acc[o.status] = (acc[o.status] || 0) + 1;
-    return acc;
-  }, {});
+    const loadOrders = async () => {
+        setLoading(true);
+        try {
+            const res = await ListOrder('', 0, 200);
+            setOrders(res.data.content || []);
+        } catch (e) {
+            console.error('주문 조회 실패:', e);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  // 필터링된 전체 주문 (플랫)
-  const filteredAllOrders = useMemo(() => {
-    return dummyOrders.flatMap(group =>
-      group.orders
-        .filter(order => {
-          const matchSearch = searchTerm === '' ||
-            order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.product.name.includes(searchTerm) ||
-            order.buyer.name.includes(searchTerm);
-          const matchStatus = statusFilter === '전체' || order.status === statusFilter;
-          return matchSearch && matchStatus;
-        })
-        .map(order => ({ ...order, date: group.date }))
-    );
-  }, [searchTerm, statusFilter]);
+    useEffect(() => {
+        loadOrders();
+    }, []);
 
-  const totalFiltered = filteredAllOrders.length;
-  const totalPages = Math.max(1, Math.ceil(totalFiltered / PAGE_SIZE));
-  const safePage = Math.min(currentPage, totalPages);
+    const totalOrders = orders.length;
+    const statusCounts = orders.reduce((acc, o) => {
+        acc[o.status] = (acc[o.status] || 0) + 1;
+        return acc;
+    }, {});
 
-  // 현재 페이지의 주문만 잘라냄
-  const pagedOrders = filteredAllOrders.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+    // 검색 + 상태 필터링
+    const filteredOrders = useMemo(() => {
+        return orders.filter(order => {
+            const matchSearch = searchTerm === '' ||
+                String(order.id).includes(searchTerm) ||
+                order.productNm?.includes(searchTerm) ||
+                order.recipientName?.includes(searchTerm) ||
+                order.userNm?.includes(searchTerm);
+            const matchStatus = statusFilter === '전체' || order.status === statusFilter;
+            return matchSearch && matchStatus;
+        });
+    }, [orders, searchTerm, statusFilter]);
 
-  // 페이징된 주문을 날짜별로 다시 그룹핑
-  const pagedGroups = useMemo(() => {
-    const map = new Map();
-    pagedOrders.forEach(order => {
-      if (!map.has(order.date)) map.set(order.date, []);
-      map.get(order.date).push(order);
-    });
-    return Array.from(map.entries()).map(([date, orders]) => ({ date, orders }));
-  }, [pagedOrders]);
+    const totalFiltered = filteredOrders.length;
+    const totalPages = Math.max(1, Math.ceil(totalFiltered / PAGE_SIZE));
+    const safePage = Math.min(currentPage, totalPages);
+    const pagedOrders = filteredOrders.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1);
-  };
+    // 날짜별 그룹핑
+    const pagedGroups = useMemo(() => {
+        const map = new Map();
+        pagedOrders.forEach(order => {
+            const key = formatDateKey(order.orderDate);
+            if (!map.has(key)) map.set(key, []);
+            map.get(key).push(order);
+        });
+        return Array.from(map.entries()).map(([date, orders]) => ({ date, orders }));
+    }, [pagedOrders]);
 
-  const handleFilterChange = (value) => {
-    setStatusFilter(value);
-    setCurrentPage(1);
-  };
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1);
+    };
 
-  // 페이지 번호 목록 생성
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxVisible = 5;
-    let start = Math.max(1, safePage - Math.floor(maxVisible / 2));
-    let end = start + maxVisible - 1;
-    if (end > totalPages) {
-      end = totalPages;
-      start = Math.max(1, end - maxVisible + 1);
+    const handleFilterChange = (value) => {
+        setStatusFilter(value);
+        setCurrentPage(1);
+    };
+
+    const handleStatusUpdate = (order, newStatus) => {
+        UpdateOrderStatus({ id: order.id, status: newStatus })
+            .then(() => {
+                setOrders(prev => prev.map(o => o.id === order.id ? { ...o, status: newStatus } : o));
+            })
+            .catch(err => {
+                alert(err.response?.data?.msg || '상태 변경에 실패했습니다.');
+            });
+    };
+
+    const handleDelete = (orderId) => {
+        if (!window.confirm('주문을 삭제하시겠습니까?')) return;
+        DeleteOrder(orderId)
+            .then(() => {
+                setOrders(prev => prev.filter(o => o.id !== orderId));
+            })
+            .catch(err => {
+                alert(err.response?.data?.msg || '삭제에 실패했습니다.');
+            });
+    };
+
+    const getPageNumbers = () => {
+        const pages = [];
+        const maxVisible = 5;
+        let start = Math.max(1, safePage - Math.floor(maxVisible / 2));
+        let end = start + maxVisible - 1;
+        if (end > totalPages) { end = totalPages; start = Math.max(1, end - maxVisible + 1); }
+        for (let i = start; i <= end; i++) pages.push(i);
+        return pages;
+    };
+
+    if (loading) {
+        return <div className="order-management"><div className="order-empty">주문 데이터를 불러오는 중...</div></div>;
     }
-    for (let i = start; i <= end; i++) pages.push(i);
-    return pages;
-  };
 
-  return (
-    <div className="order-management">
-      {/* 요약 카드 */}
-      <div className="order-summary-cards">
-        <div className="order-summary-card order-summary-total">
-          <p className="order-summary-label">전체 주문</p>
-          <p className="order-summary-value">{totalOrders}</p>
-        </div>
-        {STATUS_OPTIONS.map(s => (
-          <div className="order-summary-card" key={s.value}>
-            <p className="order-summary-label">{s.label}</p>
-            <p className="order-summary-value" style={{ color: s.color }}>{statusCounts[s.value] || 0}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* 검색 & 필터 */}
-      <div className="order-toolbar">
-        <div className="order-search-box">
-          <Search className="order-search-icon" />
-          <input
-            type="text"
-            placeholder="주문번호, 상품명, 주문자명 검색"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="order-search-input"
-          />
-        </div>
-        <div className="order-filter-btns">
-          <button
-            className={`order-filter-btn ${statusFilter === '전체' ? 'active' : ''}`}
-            onClick={() => handleFilterChange('전체')}
-          >전체</button>
-          {STATUS_OPTIONS.map(s => (
-            <button
-              key={s.value}
-              className={`order-filter-btn ${statusFilter === s.value ? 'active' : ''}`}
-              onClick={() => handleFilterChange(s.value)}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* 날짜별 주문 목록 */}
-      <div className="order-list">
-        {pagedGroups.length === 0 ? (
-          <div className="order-empty">검색 결과가 없습니다.</div>
-        ) : (
-          pagedGroups.map((group) => (
-            <div className="order-date-group" key={group.date}>
-              <div className="order-date-header">
-                <span className="order-date-text">{formatDate(group.date)}</span>
-                <span className="order-date-count">{group.orders.length}건</span>
-              </div>
-
-              <div className="order-date-items">
-                {group.orders.map((order) => (
-                  <div
-                    className={`order-item ${expandedOrder === order.id ? 'expanded' : ''}`}
-                    key={order.id}
-                  >
-                    {/* 주문 메인 행 */}
-                    <div
-                      className="order-item-main"
-                      onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}
-                    >
-                      {/* 상품 정보 */}
-                      <div className="order-item-product">
-                        <div className="order-item-thumb">
-                          {order.product.image ? (
-                            <img src={order.product.image} alt={order.product.name} />
-                          ) : (
-                            <div className="order-item-thumb-placeholder">
-                              <Package className="w-5 h-5" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="order-item-product-info">
-                          <span className="order-item-brand">{order.product.brand}</span>
-                          <span className="order-item-name">{order.product.name}</span>
-                          <span className="order-item-price">
-                            ₩{(order.product.price * order.product.quantity).toLocaleString()}
-                            {order.product.quantity > 1 && (
-                              <span className="order-item-qty"> ({order.product.quantity}개)</span>
-                            )}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* 주문자 */}
-                      <div className="order-item-buyer">
-                        <User className="w-3.5 h-3.5" />
-                        <span>{order.buyer.name}</span>
-                      </div>
-
-                      {/* 배송 상태 */}
-                      <div
-                        className="order-item-status"
-                        style={{ '--status-color': getStatusColor(order.status) }}
-                      >
-                        {getStatusIcon(order.status)}
-                        <span>{order.status}</span>
-                      </div>
-
-                      {/* 주문번호 & 확장 토글 */}
-                      <div className="order-item-meta">
-                        <span className="order-item-id">{order.id}</span>
-                        <ChevronDown className={`order-item-chevron ${expandedOrder === order.id ? 'rotated' : ''}`} />
-                      </div>
+    return (
+        <div className="order-management">
+            {/* 요약 카드 */}
+            <div className="order-summary-cards">
+                <div className="order-summary-card order-summary-total">
+                    <p className="order-summary-label">전체 주문</p>
+                    <p className="order-summary-value">{totalOrders}</p>
+                </div>
+                {Object.entries(STATUS_MAP).map(([key, { label, color }]) => (
+                    <div className="order-summary-card" key={key}>
+                        <p className="order-summary-label">{label}</p>
+                        <p className="order-summary-value" style={{ color }}>{statusCounts[key] || 0}</p>
                     </div>
-
-                    {/* 확장 상세 */}
-                    {expandedOrder === order.id && (
-                      <div className="order-item-detail">
-                        <div className="order-detail-grid">
-                          {/* 주문자 상세 */}
-                          <div className="order-detail-section">
-                            <h4 className="order-detail-title">주문자 정보</h4>
-                            <div className="order-detail-rows">
-                              <div className="order-detail-row">
-                                <User className="w-4 h-4" />
-                                <span>{order.buyer.name}</span>
-                              </div>
-                              <div className="order-detail-row">
-                                <Phone className="w-4 h-4" />
-                                <span>{order.buyer.phone}</span>
-                              </div>
-                              <div className="order-detail-row">
-                                <MapPin className="w-4 h-4" />
-                                <span>{order.buyer.address}</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* 상품 상세 */}
-                          <div className="order-detail-section">
-                            <h4 className="order-detail-title">상품 정보</h4>
-                            <div className="order-detail-rows">
-                              <div className="order-detail-row">
-                                <span className="order-detail-label">브랜드</span>
-                                <span>{order.product.brand}</span>
-                              </div>
-                              <div className="order-detail-row">
-                                <span className="order-detail-label">카테고리</span>
-                                <span>{order.product.category}</span>
-                              </div>
-                              <div className="order-detail-row">
-                                <span className="order-detail-label">단가</span>
-                                <span>₩{order.product.price.toLocaleString()}</span>
-                              </div>
-                              <div className="order-detail-row">
-                                <span className="order-detail-label">수량</span>
-                                <span>{order.product.quantity}개</span>
-                              </div>
-                              <div className="order-detail-row">
-                                <span className="order-detail-label">결제수단</span>
-                                <span>{order.paymentMethod}</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* 운송장 정보 */}
-                          {order.shipping && (
-                            <div className="order-detail-section">
-                              <h4 className="order-detail-title">운송장 정보</h4>
-                              <div className="order-shipping-card">
-                                <div className="order-shipping-header">
-                                  <Truck className="w-4 h-4" />
-                                  <span className="order-shipping-carrier">{order.shipping.carrier}</span>
-                                </div>
-                                <div className="order-shipping-tracking">
-                                  <span className="order-shipping-tracking-label">운송장번호</span>
-                                  <span className="order-shipping-tracking-no">{order.shipping.trackingNo}</span>
-                                </div>
-                                <div className="order-shipping-dates">
-                                  <div className="order-shipping-date-row">
-                                    <span className="order-shipping-date-label">발송일시</span>
-                                    <span>{order.shipping.shippedAt}</span>
-                                  </div>
-                                  {order.shipping.deliveredAt && (
-                                    <div className="order-shipping-date-row">
-                                      <span className="order-shipping-date-label">배송완료</span>
-                                      <span>{order.shipping.deliveredAt}</span>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* 배송 상태 변경 */}
-                          <div className="order-detail-section">
-                            <h4 className="order-detail-title">배송 상태 관리</h4>
-                            <div className="order-status-track">
-                              {STATUS_OPTIONS.filter(s => s.value !== '취소').map((s, i) => {
-                                const currentIdx = STATUS_OPTIONS.filter(x => x.value !== '취소').findIndex(x => x.value === order.status);
-                                const isActive = i <= currentIdx && order.status !== '취소';
-                                return (
-                                  <div className={`order-status-step ${isActive ? 'active' : ''}`} key={s.value}>
-                                    <div className="order-status-dot" style={isActive ? { backgroundColor: s.color } : {}} />
-                                    <span className="order-status-step-label">{s.label}</span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                            {order.status === '취소' && (
-                              <div className="order-cancelled-badge">주문 취소됨</div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
                 ))}
-              </div>
             </div>
-          ))
-        )}
-      </div>
 
-      {/* 페이징 */}
-      {totalFiltered > 0 && (
-        <div className="order-pagination">
-          <div className="order-pagination-info">
-            총 <strong>{totalFiltered}</strong>건 중{' '}
-            <strong>{(safePage - 1) * PAGE_SIZE + 1}-{Math.min(safePage * PAGE_SIZE, totalFiltered)}</strong>건
-          </div>
-          <div className="order-pagination-controls">
-            <button
-              className="order-page-btn order-page-arrow"
-              disabled={safePage <= 1}
-              onClick={() => setCurrentPage(1)}
-              title="첫 페이지"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              <ChevronLeft className="w-4 h-4 order-page-double" />
-            </button>
-            <button
-              className="order-page-btn order-page-arrow"
-              disabled={safePage <= 1}
-              onClick={() => setCurrentPage(safePage - 1)}
-              title="이전"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
+            {/* 검색 & 필터 */}
+            <div className="order-toolbar">
+                <div className="order-search-box">
+                    <Search className="order-search-icon" />
+                    <input
+                        type="text"
+                        placeholder="주문번호, 상품명, 주문자명 검색"
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        className="order-search-input"
+                    />
+                </div>
+                <div className="order-filter-btns">
+                    <button
+                        className={`order-filter-btn ${statusFilter === '전체' ? 'active' : ''}`}
+                        onClick={() => handleFilterChange('전체')}
+                    >전체</button>
+                    {Object.entries(STATUS_MAP).map(([key, { label }]) => (
+                        <button
+                            key={key}
+                            className={`order-filter-btn ${statusFilter === key ? 'active' : ''}`}
+                            onClick={() => handleFilterChange(key)}
+                        >{label}</button>
+                    ))}
+                </div>
+            </div>
 
-            {getPageNumbers().map(num => (
-              <button
-                key={num}
-                className={`order-page-btn ${safePage === num ? 'active' : ''}`}
-                onClick={() => setCurrentPage(num)}
-              >
-                {num}
-              </button>
-            ))}
+            {/* 날짜별 주문 목록 */}
+            <div className="order-list">
+                {pagedGroups.length === 0 ? (
+                    <div className="order-empty">검색 결과가 없습니다.</div>
+                ) : (
+                    pagedGroups.map((group) => (
+                        <div className="order-date-group" key={group.date}>
+                            <div className="order-date-header">
+                                <span className="order-date-text">{formatDate(group.date)}</span>
+                                <span className="order-date-count">{group.orders.length}건</span>
+                            </div>
 
-            <button
-              className="order-page-btn order-page-arrow"
-              disabled={safePage >= totalPages}
-              onClick={() => setCurrentPage(safePage + 1)}
-              title="다음"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-            <button
-              className="order-page-btn order-page-arrow"
-              disabled={safePage >= totalPages}
-              onClick={() => setCurrentPage(totalPages)}
-              title="마지막 페이지"
-            >
-              <ChevronRight className="w-4 h-4" />
-              <ChevronRight className="w-4 h-4 order-page-double" />
-            </button>
-          </div>
+                            <div className="order-date-items">
+                                {group.orders.map((order) => {
+                                    const statusInfo = STATUS_MAP[order.status] || { label: order.status, color: '#999' };
+                                    return (
+                                        <div
+                                            className={`order-item ${expandedOrder === order.id ? 'expanded' : ''}`}
+                                            key={order.id}
+                                        >
+                                            {/* 주문 메인 행 */}
+                                            <div
+                                                className="order-item-main"
+                                                onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}
+                                            >
+                                                <div className="order-item-product">
+                                                    <div className="order-item-thumb">
+                                                        <div className="order-item-thumb-placeholder">
+                                                            <Package className="w-5 h-5" />
+                                                        </div>
+                                                    </div>
+                                                    <div className="order-item-product-info">
+                                                        <span className="order-item-brand">{order.userNm}</span>
+                                                        <span className="order-item-name">{order.productNm}</span>
+                                                        <span className="order-item-price">
+                                                            ₩{order.totalPrice?.toLocaleString()}
+                                                            {order.quantity > 1 && (
+                                                                <span className="order-item-qty"> ({order.quantity}개)</span>
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="order-item-buyer">
+                                                    <User className="w-3.5 h-3.5" />
+                                                    <span>{order.recipientName}</span>
+                                                </div>
+
+                                                <div
+                                                    className="order-item-status"
+                                                    style={{ '--status-color': statusInfo.color }}
+                                                >
+                                                    {getStatusIcon(order.status)}
+                                                    <span>{statusInfo.label}</span>
+                                                </div>
+
+                                                <div className="order-item-meta">
+                                                    <span className="order-item-id">#{order.id}</span>
+                                                    <ChevronDown className={`order-item-chevron ${expandedOrder === order.id ? 'rotated' : ''}`} />
+                                                </div>
+                                            </div>
+
+                                            {/* 확장 상세 */}
+                                            {expandedOrder === order.id && (
+                                                <div className="order-item-detail">
+                                                    <div className="order-detail-grid">
+                                                        {/* 수령인 정보 */}
+                                                        <div className="order-detail-section">
+                                                            <h4 className="order-detail-title">수령인 정보</h4>
+                                                            <div className="order-detail-rows">
+                                                                <div className="order-detail-row">
+                                                                    <User className="w-4 h-4" />
+                                                                    <span>{order.recipientName}</span>
+                                                                </div>
+                                                                <div className="order-detail-row">
+                                                                    <Phone className="w-4 h-4" />
+                                                                    <span>{order.recipientPhone}</span>
+                                                                </div>
+                                                                <div className="order-detail-row">
+                                                                    <MapPin className="w-4 h-4" />
+                                                                    <span>{order.shippingAddress}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* 상품 정보 */}
+                                                        <div className="order-detail-section">
+                                                            <h4 className="order-detail-title">상품 정보</h4>
+                                                            <div className="order-detail-rows">
+                                                                <div className="order-detail-row">
+                                                                    <span className="order-detail-label">주문자</span>
+                                                                    <span>{order.userNm} ({order.userId})</span>
+                                                                </div>
+                                                                <div className="order-detail-row">
+                                                                    <span className="order-detail-label">상품명</span>
+                                                                    <span>{order.productNm}</span>
+                                                                </div>
+                                                                <div className="order-detail-row">
+                                                                    <span className="order-detail-label">수량</span>
+                                                                    <span>{order.quantity}개</span>
+                                                                </div>
+                                                                <div className="order-detail-row">
+                                                                    <span className="order-detail-label">결제금액</span>
+                                                                    <span>₩{order.totalPrice?.toLocaleString()}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* 배송 상태 관리 */}
+                                                        <div className="order-detail-section">
+                                                            <h4 className="order-detail-title">배송 상태 관리</h4>
+                                                            <div className="order-status-track">
+                                                                {STATUS_ORDER.map((statusKey, i) => {
+                                                                    const currentIdx = STATUS_ORDER.indexOf(order.status);
+                                                                    const isActive = i <= currentIdx && order.status !== 'CANCELLED';
+                                                                    const info = STATUS_MAP[statusKey];
+                                                                    return (
+                                                                        <div
+                                                                            className={`order-status-step ${isActive ? 'active' : ''}`}
+                                                                            key={statusKey}
+                                                                            onClick={() => order.status !== 'CANCELLED' && handleStatusUpdate(order, statusKey)}
+                                                                            style={{ cursor: order.status !== 'CANCELLED' ? 'pointer' : 'default' }}
+                                                                        >
+                                                                            <div className="order-status-dot" style={isActive ? { backgroundColor: info.color } : {}} />
+                                                                            <span className="order-status-step-label">{info.label}</span>
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                            {order.status === 'CANCELLED' && (
+                                                                <div className="order-cancelled-badge">주문 취소됨</div>
+                                                            )}
+                                                            <div className="flex gap-2 mt-3">
+                                                                {order.status !== 'CANCELLED' && (
+                                                                    <button
+                                                                        className="text-xs px-3 py-1.5 bg-red-50 text-red-500 border border-red-200 rounded-md hover:bg-red-100 transition-colors"
+                                                                        onClick={() => handleStatusUpdate(order, 'CANCELLED')}
+                                                                    >
+                                                                        주문 취소
+                                                                    </button>
+                                                                )}
+                                                                <button
+                                                                    className="text-xs px-3 py-1.5 bg-gray-50 text-gray-500 border border-gray-200 rounded-md hover:bg-gray-100 transition-colors"
+                                                                    onClick={() => handleDelete(order.id)}
+                                                                >
+                                                                    주문 삭제
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {/* 페이징 */}
+            {totalFiltered > 0 && (
+                <div className="order-pagination">
+                    <div className="order-pagination-info">
+                        총 <strong>{totalFiltered}</strong>건 중{' '}
+                        <strong>{(safePage - 1) * PAGE_SIZE + 1}-{Math.min(safePage * PAGE_SIZE, totalFiltered)}</strong>건
+                    </div>
+                    <div className="order-pagination-controls">
+                        <button className="order-page-btn order-page-arrow" disabled={safePage <= 1} onClick={() => setCurrentPage(1)}>
+                            <ChevronLeft className="w-4 h-4" /><ChevronLeft className="w-4 h-4 order-page-double" />
+                        </button>
+                        <button className="order-page-btn order-page-arrow" disabled={safePage <= 1} onClick={() => setCurrentPage(safePage - 1)}>
+                            <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        {getPageNumbers().map(num => (
+                            <button key={num} className={`order-page-btn ${safePage === num ? 'active' : ''}`} onClick={() => setCurrentPage(num)}>
+                                {num}
+                            </button>
+                        ))}
+                        <button className="order-page-btn order-page-arrow" disabled={safePage >= totalPages} onClick={() => setCurrentPage(safePage + 1)}>
+                            <ChevronRight className="w-4 h-4" />
+                        </button>
+                        <button className="order-page-btn order-page-arrow" disabled={safePage >= totalPages} onClick={() => setCurrentPage(totalPages)}>
+                            <ChevronRight className="w-4 h-4" /><ChevronRight className="w-4 h-4 order-page-double" />
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
-      )}
-    </div>
-  );
+    );
 };
 
 export default OrderManagement;

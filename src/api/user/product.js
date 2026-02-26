@@ -1,6 +1,9 @@
 import api from '../api';
 
-export const ListProduct =  (keyword) =>{
-    if(keyword === null) return api.get(`/api/admin/product/list`)
-    return api.get(`/api/admin/product/list?keyword=${keyword}`)
-    }
+// GET /api/usr/product/list → Spring Page<ResponseProductDto>
+// ResponseProductDto: { id, productNm, productCode, productPrice, productQuantity, brandId, brandNm, category, images[] }
+export const ListProduct = (keyword = '', category = null, page = 0, size = 12) => {
+    const params = { keyword, page, size };
+    if (category) params.category = category;
+    return api.get('/api/usr/product/list', { params });
+}

@@ -14,29 +14,12 @@ function AdminLoginPage({ onLoginSuccess }) {
     setError("");
   };
 
-  // TODO: 백엔드 연동 후 더미 로그인 제거
-  const DUMMY_ADMIN = {
-    userId: "wjdtjr9401@naver.com",
-    userPwd: "kil79518@",
-    userNm: "관리자",
-    authName: "ROLE_ADMIN",
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // 더미 관리자 계정 체크
-    if (loginForm.userId === DUMMY_ADMIN.userId && loginForm.userPwd === DUMMY_ADMIN.userPwd) {
-      const { userPwd, ...adminInfo } = DUMMY_ADMIN;
-      login(adminInfo);
-      onLoginSuccess();
-      return;
-    }
-
-    // 백엔드 API 로그인
     postLogin(loginForm)
       .then((res) => {
-        const userInfo = res.data.data;
+        const userInfo = res.data;
         if (userInfo.authName === "ROLE_ADMIN") {
           login(userInfo);
           onLoginSuccess();
@@ -66,14 +49,14 @@ function AdminLoginPage({ onLoginSuccess }) {
 
         <form onSubmit={handleSubmit} className="admin-login-form">
           <div className="admin-login-field">
-            <label htmlFor="admin-userId">이메일</label>
+            <label htmlFor="admin-userId">아이디</label>
             <input
-              type="email"
+              type="text"
               id="admin-userId"
               name="userId"
               value={loginForm.userId}
               onChange={handleInputChange}
-              placeholder="관리자 이메일을 입력하세요"
+              placeholder="관리자 아이디를 입력하세요"
               required
             />
           </div>

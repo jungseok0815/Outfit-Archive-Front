@@ -19,7 +19,7 @@ function LoginForm({ onClose }) {
       e.preventDefault();
       console.log(loginForm)
       postLogin(loginForm).then(res =>{
-        const userInfo = res.data.data;
+        const userInfo = res.data;
         login(userInfo)
         if(userInfo.authName === "ROLE_USER") {
           onClose();
