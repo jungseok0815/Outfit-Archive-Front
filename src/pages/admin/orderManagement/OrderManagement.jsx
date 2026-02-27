@@ -37,7 +37,9 @@ const formatDateKey = (dateStr) => {
     return dateStr.substring(0, 10);
 };
 
-const OrderManagement = () => {
+const OrderManagement = ({ user }) => {
+    const brandId = user?.adminRole === 'PARTNER' ? user?.brandId : null;
+
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -48,7 +50,7 @@ const OrderManagement = () => {
     const loadOrders = async () => {
         setLoading(true);
         try {
-            const res = await ListOrder('', 0, 200);
+            const res = await ListOrder('', 0, 200, brandId);
             setOrders(res.data.content || []);
         } catch (e) {
             console.error('주문 조회 실패:', e);

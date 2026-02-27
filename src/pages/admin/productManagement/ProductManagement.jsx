@@ -8,7 +8,9 @@ import { ListProduct } from '../../../api/user/product';
 import useUpdateEffect from '../../../hooks/useDidMountEffect';
 
 
-const ProductManagement = ({ registerTrigger }) => {
+const ProductManagement = ({ registerTrigger, user }) => {
+  const isPartner = user?.adminRole === 'PARTNER';
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [products, setProducts] = useState([]);
   const [updateProduct, setUpdateProduct] = useState(false)
@@ -16,6 +18,10 @@ const ProductManagement = ({ registerTrigger }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(0);
 
+  const filterByBrand = (list) => {
+    if (!isPartner || !user?.brandId) return list;
+    return list.filter((p) => p.brandId === user.brandId);
+  };
 
   // 초기 상품 리스트 조회
   useEffect(() => {fetchProducts()}, [])
@@ -31,7 +37,7 @@ const ProductManagement = ({ registerTrigger }) => {
 
   useUpdateEffect(()=>{
     ListProduct(searchTerm).then((res)=>{
-      if(res.status === 200) setProducts(res.data.data.content)
+      if(res.status === 200) setProducts(filterByBrand(res.data.data.content))
     })
   },[searchTerm])
 
@@ -49,7 +55,7 @@ const ProductManagement = ({ registerTrigger }) => {
   const fetchProducts =  async () => {
     try {
         const response = await ListProduct(null);
-        setProducts(response.data.data.content);
+        setProducts(filterByBrand(response.data.data.content));
     } catch (error) {
         console.error("상품 목록 조회 실패:", error);
     }

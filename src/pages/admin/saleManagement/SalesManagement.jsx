@@ -64,14 +64,16 @@ const getPeriodKey = (dateStr, period) => {
     return String(y);
 };
 
-const SalesManagement = () => {
+const SalesManagement = ({ user }) => {
+    const brandId = user?.adminRole === 'PARTNER' ? user?.brandId : null;
+
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
     const [period, setPeriod] = useState('monthly');
 
     useEffect(() => {
         setLoading(true);
-        ListOrder('', 0, 1000)
+        ListOrder('', 0, 1000, brandId)
             .then(res => setOrders(res.data.content || []))
             .catch(e => console.error('주문 데이터 조회 실패:', e))
             .finally(() => setLoading(false));

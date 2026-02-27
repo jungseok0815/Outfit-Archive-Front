@@ -1,6 +1,6 @@
 import React,{useState, useCallback} from "react";
 import "../auth/loginForm.css"
-import {postJoin} from '../../../api/auth';
+import { postJoin } from '../../../api/user/auth';
 import Toast from '../../../components/common/Toast/Toast';
 
 function JoinForm(){
