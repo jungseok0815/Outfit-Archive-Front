@@ -15,12 +15,10 @@ export const AdminJoin = (joinForm) => {
 // 관리자 목록 조회
 // 응답: [{ id, memberId, memberNm, adminRole }]
 export const ListAdmin = () => {
-    return api.get("/api/admin/auth/members");
+    return api.get("/api/admin/auth/membersList");
 }
 
 
-// 관리자 목록 삭제
-// 응답: [{ id, memberId, memberNm, adminRole }]
-export const deleteAdmin = () => {
-    return api.get("/api/admin/auth/delete");
+export const deleteAdmin = (id) => {
+  return api.delete(`/api/admin/auth/members/${id}`);
 }

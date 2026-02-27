@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { AdminJoin, ListAdmin } from '../../../api/admin/auth';
+import { AdminJoin, ListAdmin, deleteAdmin } from '../../../api/admin/auth';
 import { ListBrand } from '../../../api/admin/brand';
+import ConfirmModal from '../../../components/common/Modal/ConfirmModal';
 import './AdminManagement.css';
 
 const ROLE_OPTIONS = [
@@ -29,11 +30,15 @@ const AdminManagement = () => {
   const [adminList, setAdminList] = useState([]);
   const [brandList, setBrandList] = useState([]);
   const [listLoading, setListLoading] = useState(false);
+  const [confirmTarget, setConfirmTarget] = useState(null);
 
   const fetchAdminList = () => {
     setListLoading(true);
     ListAdmin()
-      .then((res) => setAdminList(res.data || []))
+      .then((res) => {
+        console.log("res admin  :" , res.data)
+        setAdminList(res.data || [])
+      })
       .catch((err) => console.error('관리자 목록 조회 실패:', err))
       .finally(() => setListLoading(false));
   };
@@ -64,7 +69,7 @@ const AdminManagement = () => {
       return;
     }
     AdminJoin(form)
-      .then(() => {
+      .then((res) => {
         setSuccess('계정이 성공적으로 등록되었습니다.');
         setForm(INITIAL_FORM);
         fetchAdminList();
@@ -74,9 +79,25 @@ const AdminManagement = () => {
       });
   };
 
+  const handleDeleteConfirm = () => {
+    deleteAdmin(confirmTarget.id)
+      .then(() => {
+        setConfirmTarget(null);
+        fetchAdminList();
+      })
+      .catch((err) => alert(err.response?.data?.msg || '삭제에 실패했습니다.'));
+  };
+
   const isPartner = form.adminRole === 'PARTNER';
 
   return (
+    <>
+    <ConfirmModal
+      isOpen={!!confirmTarget}
+      message={`'${confirmTarget?.memberNm}' 계정을 삭제하시겠습니까?`}
+      onConfirm={handleDeleteConfirm}
+      onCancel={() => setConfirmTarget(null)}
+    />
     <div className="admin-mgmt-wrap">
       <div className="admin-mgmt-layout">
         {/* 등록 폼 */}
@@ -156,6 +177,7 @@ const AdminManagement = () => {
                   <th>아이디</th>
                   <th>권한</th>
                   <th>소속 브랜드</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -184,6 +206,14 @@ const AdminManagement = () => {
                     <td className="admin-mgmt-brand">
                       {admin.brandNm || <span className="admin-mgmt-no-brand">-</span>}
                     </td>
+                    <td>
+                      <button
+                        className="admin-mgmt-delete-btn"
+                        onClick={() => setConfirmTarget(admin)}
+                      >
+                        삭제
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -192,6 +222,7 @@ const AdminManagement = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
