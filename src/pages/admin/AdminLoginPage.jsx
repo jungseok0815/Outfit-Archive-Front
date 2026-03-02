@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../../store/context/UserContext";
-import { postAdminLogin } from "../../api/auth";
+import { postLogin } from "../../api/auth";
 import "./AdminLoginPage.css";
 
 function AdminLoginPage({ onLoginSuccess }) {
@@ -19,9 +19,13 @@ function AdminLoginPage({ onLoginSuccess }) {
 
     postAdminLogin(loginForm)
       .then((res) => {
-        const adminInfo = res.data;
-        login({ ...adminInfo, authName: "ROLE_ADMIN" });
-        onLoginSuccess();
+        const userInfo = res.data;
+        if (userInfo.authName === "ROLE_ADMIN") {
+          login(userInfo);
+          onLoginSuccess();
+        } else {
+          setError("관리자 권한이 없는 계정입니다.");
+        }
       })
       .catch((error) => {
         const msg = error.response?.data?.msg || "로그인에 실패했습니다.";
@@ -48,9 +52,9 @@ function AdminLoginPage({ onLoginSuccess }) {
             <label htmlFor="admin-memberId">아이디</label>
             <input
               type="text"
-              id="admin-memberId"
-              name="memberId"
-              value={loginForm.memberId}
+              id="admin-userId"
+              name="userId"
+              value={loginForm.userId}
               onChange={handleInputChange}
               placeholder="관리자 아이디를 입력하세요"
               required
@@ -60,9 +64,9 @@ function AdminLoginPage({ onLoginSuccess }) {
             <label htmlFor="admin-memberPwd">비밀번호</label>
             <input
               type="password"
-              id="admin-memberPwd"
-              name="memberPwd"
-              value={loginForm.memberPwd}
+              id="admin-userPwd"
+              name="userPwd"
+              value={loginForm.userPwd}
               onChange={handleInputChange}
               placeholder="비밀번호를 입력하세요"
               required
