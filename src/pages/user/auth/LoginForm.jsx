@@ -21,12 +21,7 @@ function LoginForm({ onClose }) {
       postLogin(loginForm).then(res =>{
         const userInfo = res.data;
         login(userInfo)
-        if(userInfo.authName === "ROLE_USER") {
-          onClose();
-        }
-        if(userInfo.authName === "ROLE_ADMIN") {
-          window.location.href = "/admin";
-        }
+        onClose();
       }).catch(error => {
           const errorResult = error.response.data
           alert(errorResult.msg)

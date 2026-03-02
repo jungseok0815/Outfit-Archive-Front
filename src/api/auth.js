@@ -11,6 +11,13 @@ export const postJoin = (joinForm) => {
     return api.post("/api/usr/join", joinForm);
 }
 
+// 관리자 로그인 - JWT 없이 단순 로그인
+// 요청: { memberId, memberPwd }
+// 응답: { id, memberId, memberNm, adminRole }
+export const postAdminLogin = (loginForm) => {
+    return api.post("/api/admin/auth/login", loginForm);
+}
+
 export const AdminJoin = (joinForm) => {
     return api.post("/api/admin/auth/join", joinForm);
 }

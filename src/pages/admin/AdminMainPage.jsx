@@ -92,10 +92,10 @@ function Admin() {
         <div className="admin-sidebar-footer">
           <div className="admin-user-info">
             <div className="admin-user-avatar">
-              {user?.userNm?.charAt(0) || "A"}
+              {user?.memberNm?.charAt(0) || "A"}
             </div>
             <div className="admin-user-detail">
-              <span className="admin-user-name">{user?.userNm || "관리자"}</span>
+              <span className="admin-user-name">{user?.memberNm || "관리자"}</span>
               <span className="admin-user-role">Administrator</span>
             </div>
           </div>
