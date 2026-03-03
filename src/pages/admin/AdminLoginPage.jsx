@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../../store/context/UserContext";
-import { postLogin } from "../../api/auth";
+import { postAdminLogin } from "../../api/admin/auth";
 import "./AdminLoginPage.css";
 
 function AdminLoginPage({ onLoginSuccess }) {
@@ -20,7 +20,8 @@ function AdminLoginPage({ onLoginSuccess }) {
     postAdminLogin(loginForm)
       .then((res) => {
         const userInfo = res.data;
-        if (userInfo.authName === "ROLE_ADMIN") {
+        console.log("로그인 유저 정보는 : " , userInfo)
+        if (userInfo.adminRole) {
           login(userInfo);
           onLoginSuccess();
         } else {
@@ -52,9 +53,9 @@ function AdminLoginPage({ onLoginSuccess }) {
             <label htmlFor="admin-memberId">아이디</label>
             <input
               type="text"
-              id="admin-userId"
-              name="userId"
-              value={loginForm.userId}
+              id="admin-memberId"
+              name="memberId"
+              value={loginForm.memberId}
               onChange={handleInputChange}
               placeholder="관리자 아이디를 입력하세요"
               required
@@ -64,9 +65,9 @@ function AdminLoginPage({ onLoginSuccess }) {
             <label htmlFor="admin-memberPwd">비밀번호</label>
             <input
               type="password"
-              id="admin-userPwd"
-              name="userPwd"
-              value={loginForm.userPwd}
+              id="admin-memberPwd"
+              name="memberPwd"
+              value={loginForm.memberPwd}
               onChange={handleInputChange}
               placeholder="비밀번호를 입력하세요"
               required
