@@ -239,9 +239,9 @@
 .admin-register-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  font-size: 14px;
+  gap: 6px;
+  padding: 7px 14px;
+  font-size: 13px;
   font-weight: 600;
   font-family: inherit;
   color: #ffffff;

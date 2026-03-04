@@ -1,3 +1,136 @@
+/* 액션 툴바 */
+.pm-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 32px 12px;
+  justify-content: flex-end;
+}
+
+.pm-btn-register {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background-color: #1a1a2e;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.pm-btn-register:hover { background-color: #2d2d4e; }
+
+.pm-btn-excel {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background-color: #27ae60;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.pm-btn-excel:hover { background-color: #219150; }
+
+.pm-guide-wrap {
+  position: relative;
+}
+
+.pm-btn-guide {
+  width: 26px;
+  height: 26px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background-color: #aaa;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  line-height: 1;
+}
+.pm-btn-guide:hover { background-color: #888; }
+
+/* 엑셀 양식 안내 툴팁 */
+.pm-guide {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 420px;
+  background: #f8fff8;
+  border: 1px solid #b7e4c7;
+  border-radius: 10px;
+  padding: 16px 20px;
+  z-index: 100;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.pm-guide-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a6b3a;
+  margin: 0 0 6px;
+}
+
+.pm-guide-desc {
+  font-size: 12px;
+  color: #555;
+  margin: 0 0 12px;
+}
+
+.pm-guide-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+.pm-guide-table th {
+  background: #d4edda;
+  color: #155724;
+  padding: 6px 10px;
+  text-align: left;
+  font-weight: 600;
+}
+.pm-guide-table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid #e2f0e7;
+  color: #333;
+}
+.pm-guide-table tr:last-child td { border-bottom: none; }
+
+.pm-guide-categories {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.pm-guide-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+}
+
+.pm-guide-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  background: #d4edda;
+  color: #155724;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.pm-guide-note {
+  font-size: 11px;
+  color: #888;
+  margin: 0;
+}
+
 .productManagerInsert{
     display: flex;
     margin-right: 35px;

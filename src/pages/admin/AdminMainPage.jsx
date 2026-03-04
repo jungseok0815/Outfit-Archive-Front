@@ -71,7 +71,6 @@ const ROLE_LABELS = {
 
 const registerLabels = {
   "브랜드 관리": "브랜드 등록",
-  "상품 관리": "상품 등록",
 };
 
 function Admin() {
