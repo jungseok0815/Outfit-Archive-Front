@@ -1,14 +1,25 @@
 import React, { useState, useRef, useCallback } from "react";
 import "./PostCreateModal.css";
 import { ListProduct } from '../../../api/user/product';
-import { InsertPost } from '../../../api/user/post';
+import { InsertPost, UpdatePost } from '../../../api/user/post';
 
 const IMG_BASE = 'http://localhost:8080/api/img/get?imgNm=';
 
-function PostCreateModal({ onClose, onSuccess }) {
-    const [images, setImages] = useState([]);
-    const [title, setTitle] = useState("");
-    const [caption, setCaption] = useState("");
+function PostCreateModal({ onClose, onSuccess, editingPost }) {
+    const isEditMode = !!editingPost;
+
+    const [images, setImages] = useState(() => {
+        if (editingPost?.rawImages?.length > 0) {
+            return editingPost.rawImages.map(img => ({
+                file: null,
+                preview: `${IMG_BASE}${img.imgNm}`,
+                isServer: true,
+            }));
+        }
+        return [];
+    });
+    const [title, setTitle] = useState(editingPost?.title || "");
+    const [caption, setCaption] = useState(editingPost?.content || "");
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [taggedProducts, setTaggedProducts] = useState([]);
@@ -23,14 +34,14 @@ function PostCreateModal({ onClose, onSuccess }) {
     const handleFileChange = (e) => {
         const files = Array.from(e.target.files);
         if (files.length === 0) return;
-        const newImages = files.map((file) => ({ file, preview: URL.createObjectURL(file) }));
+        const newImages = files.map((file) => ({ file, preview: URL.createObjectURL(file), isServer: false }));
         setImages((prev) => [...prev, ...newImages]);
         if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
     const handleRemoveImage = (index) => {
         setImages((prev) => {
-            URL.revokeObjectURL(prev[index].preview);
+            if (!prev[index].isServer) URL.revokeObjectURL(prev[index].preview);
             return prev.filter((_, i) => i !== index);
         });
     };
@@ -74,15 +85,25 @@ function PostCreateModal({ onClose, onSuccess }) {
         const fd = new FormData();
         fd.append('title', title.trim());
         fd.append('content', caption.trim());
-        images.forEach(img => fd.append('images', img.file));
 
-        InsertPost(fd)
+        const newFiles = images.filter(img => !img.isServer);
+        newFiles.forEach(img => fd.append('images', img.file));
+
+        let request;
+        if (isEditMode) {
+            fd.append('id', editingPost.id);
+            request = UpdatePost(fd);
+        } else {
+            request = InsertPost(fd);
+        }
+
+        request
             .then(() => {
                 if (onSuccess) onSuccess();
                 onClose();
             })
             .catch(err => {
-                const msg = err.response?.data?.msg || '게시물 등록에 실패했습니다.';
+                const msg = err.response?.data?.msg || (isEditMode ? '게시물 수정에 실패했습니다.' : '게시물 등록에 실패했습니다.');
                 alert(msg);
             })
             .finally(() => setSubmitting(false));
@@ -92,7 +113,7 @@ function PostCreateModal({ onClose, onSuccess }) {
         <div className="post-overlay" onClick={handleOverlayClick}>
             <div className="post-modal">
                 <button className="post-close" onClick={onClose}>✕</button>
-                <h2>새 게시물</h2>
+                <h2>{isEditMode ? '게시물 수정' : '새 게시물'}</h2>
 
                 <input
                     type="file"
@@ -205,7 +226,7 @@ function PostCreateModal({ onClose, onSuccess }) {
                     onClick={handleSubmit}
                     disabled={images.length === 0 || !title.trim() || submitting}
                 >
-                    {submitting ? '업로드 중...' : '공유하기'}
+                    {submitting ? '업로드 중...' : (isEditMode ? '수정하기' : '공유하기')}
                 </button>
             </div>
         </div>

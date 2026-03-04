@@ -4,7 +4,7 @@ import AuthModal from "../auth/AuthPage";
 import PostCreateModal from "./PostCreateModal";
 import PostDetailPanel from "./PostDetailPanel";
 import { useAuth } from "../../../store/context/UserContext";
-import { ListPost } from '../../../api/user/post';
+import { ListMyPost, DeletePost } from '../../../api/user/post';
 import "../../../App.css";
 import "./MyPage.css";
 
@@ -24,21 +24,19 @@ function MyPage() {
   const [showPostModal, setShowPostModal] = useState(false);
   const [activeTab, setActiveTab] = useState("posts");
   const [selectedPost, setSelectedPost] = useState(null);
+  const [editingPost, setEditingPost] = useState(null);
   const [posts, setPosts] = useState([]);
 
   const loadPosts = () => {
-    ListPost('', 0, 100)
+    ListMyPost(0, 100)
       .then(res => {
         const all = res.data.content || [];
-        // 현재 로그인 사용자의 게시물만 필터
-        const myPosts = user
-          ? all.filter(p => p.userNm === user.userNm)
-          : all;
-        setPosts(myPosts.map(p => ({
+        setPosts(all.map(p => ({
           id: p.id,
           images: p.images?.length > 0
             ? p.images.map(img => `${IMG_BASE}${img.imgNm}`)
             : [''],
+          rawImages: p.images || [],
           likes: p.likeCount,
           comments: p.commentCount,
           title: p.title,
@@ -47,6 +45,25 @@ function MyPage() {
         })));
       })
       .catch(e => console.error('게시물 조회 실패:', e));
+  };
+
+  const handleDelete = (postId) => {
+    if (!window.confirm('정말 삭제하시겠습니까?')) return;
+    DeletePost(postId)
+      .then(() => {
+        setSelectedPost(null);
+        loadPosts();
+      })
+      .catch(e => {
+        const msg = e.response?.data?.msg || '삭제에 실패했습니다.';
+        alert(msg);
+      });
+  };
+
+  const handleEdit = (post) => {
+    setSelectedPost(null);
+    setEditingPost(post);
+    setShowPostModal(true);
   };
 
   useEffect(() => {
@@ -61,11 +78,19 @@ function MyPage() {
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
       {showPostModal && (
         <PostCreateModal
-          onClose={() => setShowPostModal(false)}
+          onClose={() => { setShowPostModal(false); setEditingPost(null); }}
           onSuccess={loadPosts}
+          editingPost={editingPost}
         />
       )}
-      {selectedPost && <PostDetailPanel post={selectedPost} onClose={() => setSelectedPost(null)} />}
+      {selectedPost && (
+        <PostDetailPanel
+          post={selectedPost}
+          onClose={() => setSelectedPost(null)}
+          onDelete={handleDelete}
+          onEdit={handleEdit}
+        />
+      )}
 
       {/* 프로필 헤더 */}
       <div className="mypage-profile">

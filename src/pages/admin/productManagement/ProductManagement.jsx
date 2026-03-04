@@ -5,8 +5,9 @@ import ProducttModal from "../../../components/common/Modal/ProductModal"
 import "../../../styles/admin/productManagement/ProductManagement.css"
 import { ListProduct } from '../../../api/admin/product';
 import useUpdateEffect from '../../../hooks/useDidMountEffect';
-import { FileSpreadsheet } from 'lucide-react';
+import { FileSpreadsheet, ChevronLeft, ChevronRight } from 'lucide-react';
 
+const PAGE_SIZE = 24;
 
 const ProductManagement = ({ registerTrigger, user }) => {
   const isPartner = user?.adminRole === 'PARTNER';
@@ -16,7 +17,7 @@ const ProductManagement = ({ registerTrigger, user }) => {
   const [updateProduct, setUpdateProduct] = useState(false)
   const [product, setProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [page, setPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [guideOpen, setGuideOpen] = useState(false);
   const excelInputRef = useRef(null);
 
@@ -39,13 +40,12 @@ const ProductManagement = ({ registerTrigger, user }) => {
 
   useUpdateEffect(()=>{
     ListProduct(searchTerm).then((res)=>{
-      if(res.status === 200) setProducts(filterByBrand(res.data.content))
+      if(res.status === 200) {
+        setProducts(filterByBrand(res.data.content))
+        setCurrentPage(1)
+      }
     })
   },[searchTerm])
-
-  useUpdateEffect(()=>{
-    console.log("tetete1111")
-  },[page])
 
   // 헤더 등록 버튼 클릭 시 모달 열기
   useEffect(() => {
@@ -79,6 +79,22 @@ const ProductManagement = ({ registerTrigger, user }) => {
   const handleUpdateProduct = () => setUpdateProduct(true)
 
   const handleChangeSearchTerm = (e) => setSearchTerm(e.target.value)
+
+  // 페이징 계산
+  const totalProducts = products.length;
+  const totalPages = Math.max(1, Math.ceil(totalProducts / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const pagedProducts = products.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    let start = Math.max(1, safePage - Math.floor(maxVisible / 2));
+    let end = start + maxVisible - 1;
+    if (end > totalPages) { end = totalPages; start = Math.max(1, end - maxVisible + 1); }
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  };
 
   const handleExcelUpload = (e) => {
     const file = e.target.files[0];
@@ -142,7 +158,37 @@ const ProductManagement = ({ registerTrigger, user }) => {
         </div>
       </div>
 
-      <Content products={products} openModal={handleOpenModal}/>
+      <Content products={pagedProducts} openModal={handleOpenModal}/>
+
+      {/* 페이징 */}
+      {totalProducts > 0 && (
+        <div className="pm-pagination">
+          <div className="pm-pagination-info">
+            총 <strong>{totalProducts}</strong>건 중{' '}
+            <strong>{(safePage - 1) * PAGE_SIZE + 1}-{Math.min(safePage * PAGE_SIZE, totalProducts)}</strong>건
+          </div>
+          <div className="pm-pagination-controls">
+            <button className="pm-page-btn pm-page-arrow" disabled={safePage <= 1} onClick={() => setCurrentPage(1)}>
+              <ChevronLeft className="w-4 h-4" /><ChevronLeft className="w-4 h-4 pm-page-double" />
+            </button>
+            <button className="pm-page-btn pm-page-arrow" disabled={safePage <= 1} onClick={() => setCurrentPage(safePage - 1)}>
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            {getPageNumbers().map(num => (
+              <button key={num} className={`pm-page-btn ${safePage === num ? 'active' : ''}`} onClick={() => setCurrentPage(num)}>
+                {num}
+              </button>
+            ))}
+            <button className="pm-page-btn pm-page-arrow" disabled={safePage >= totalPages} onClick={() => setCurrentPage(safePage + 1)}>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+            <button className="pm-page-btn pm-page-arrow" disabled={safePage >= totalPages} onClick={() => setCurrentPage(totalPages)}>
+              <ChevronRight className="w-4 h-4" /><ChevronRight className="w-4 h-4 pm-page-double" />
+            </button>
+          </div>
+        </div>
+      )}
+
       <ProducttModal isOpen={isModalOpen} onClose={handleCloseModal} updateProduct={handleUpdateProduct} product={product} user={user}/>
     </div>;
 };

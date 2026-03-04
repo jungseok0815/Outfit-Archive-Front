@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./PostDetailPanel.css";
 import { ListComment, InsertComment } from '../../../api/user/post';
 
-function PostDetailPanel({ post, onClose }) {
+function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
   const [imageIndex, setImageIndex] = useState(0);
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState([]);
@@ -56,7 +56,21 @@ function PostDetailPanel({ post, onClose }) {
   return (
     <div className="detail-overlay" onClick={onClose}>
       <div className="detail-panel" onClick={(e) => e.stopPropagation()}>
-        <button className="detail-close" onClick={onClose}>✕</button>
+        <div className="detail-header">
+          <button className="detail-close" onClick={onClose}>✕</button>
+          <div className="detail-actions">
+            {onEdit && (
+              <button className="detail-action-btn detail-edit-btn" onClick={() => onEdit(post)}>
+                수정
+              </button>
+            )}
+            {onDelete && (
+              <button className="detail-action-btn detail-delete-btn" onClick={() => onDelete(post.id)}>
+                삭제
+              </button>
+            )}
+          </div>
+        </div>
 
         {/* 이미지 캐러셀 */}
         {images.length > 0 && (

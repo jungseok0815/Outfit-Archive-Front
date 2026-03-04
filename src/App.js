@@ -6,6 +6,7 @@ import ShopPage from './pages/user/shop/ShopPage';
 import StylePage from './pages/user/style/StylePage';
 import Admin from './pages/admin/AdminMainPage';
 import PrivateMasterRoute from './routes/PrivateMasterRoute';
+import PrivateUserRoute from './routes/PrivateUserRoute';
 import MyPage from './pages/user/mypage/MyPage';
 import { AuthProvider } from './store/context/UserContext';
 
@@ -21,7 +22,7 @@ function App() {
                   <Route path='/' element={<Main/>}/>
                   <Route path='/shop' element={<ShopPage/>}/>
                   <Route path='/style' element={<StylePage/>}/>
-                  <Route path='/mypage' element={<MyPage/>}/>
+                  <Route path='/mypage' element={<PrivateUserRoute component={<MyPage/>}/>}/>
                   <Route path='/admin' element={<PrivateMasterRoute component={<Admin />}/>}/>
                   </Routes>
               </BrowserRouter>

@@ -12,6 +12,16 @@ export const InsertPost = (insertForm) => {
     });
 }
 
+export const ListMyPost = (page = 0, size = 10) => {
+    return api.get('/api/usr/post/my', { params: { page, size } });
+}
+
+export const UpdatePost = (updateForm) => {
+    return api.put('/api/usr/post/update', updateForm, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
+}
+
 export const DeletePost = (id) => {
     return api.delete('/api/usr/post/delete', { params: { id } });
 }

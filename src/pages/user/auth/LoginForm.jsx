@@ -31,14 +31,14 @@ function LoginForm({ onClose }) {
   return (
     <form onSubmit={handleSubmit}>
       <div className="form-group">
-        <label htmlFor="userId">이메일</label>
+        <label htmlFor="userId">아이디</label>
         <input
-          type="email"
+          type="text"
           id="userId"
           name="userId"
           value={loginForm.userId}
           onChange={handleInputChange}
-          placeholder="이메일을 입력하세요"
+          placeholder="아이디를 입력하세요"
           required
         />
       </div>
