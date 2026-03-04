@@ -4,8 +4,8 @@ import { InsertProduct, UpdateProduct, DeleteProduct} from "../../../api/admin/p
 import { ImagePlus } from 'lucide-react'
 import { CancelButton, DeleteButton, SubmitButton } from "../Button/Button";
 
-const ProductModal = ({ isOpen, onClose, updateProduct,product }) => {
- 
+const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
+
   const [formData, setFormData] = useState({
     id : "",
     productNm: "",
@@ -20,13 +20,14 @@ const ProductModal = ({ isOpen, onClose, updateProduct,product }) => {
   const [imagePreview, setImagePreview] = useState([]);
 
   useEffect(() => {
+    const autoBrand = user?.brandNm || "";
     if (product) {
       setFormData({
         id : product.id || "",
         productNm: product.productNm || "",
         productPrice: product.productPrice || "",
         productQuantity: product.productQuantity || "",
-        productBrand: product.productBrand || "",
+        productBrand: product.productBrand || autoBrand,
         productCode: product.productCode || "",
         category: product.category || "",
         image: []
@@ -45,7 +46,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct,product }) => {
         productNm: "",
         productPrice: "",
         productQuantity: "",
-        productBrand: "",
+        productBrand: autoBrand,
         productCode: "",
         category:  "",
         image: []
@@ -225,20 +226,6 @@ const ProductModal = ({ isOpen, onClose, updateProduct,product }) => {
                     </select>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      브랜드
-                    </label>
-                    <input
-                      type="text"
-                      name="productBrand"
-                      value={formData.productBrand}
-                      onChange={handleChange}
-                      placeholder="브랜드명 입력"
-                      className="w-full px-3 py-1.5 border border-gray-300 rounded-md"
-                      required
-                    />
-                  </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">

@@ -183,6 +183,11 @@
   color: #ccc;
 }
 
+.admin-mgmt-brand-name {
+  font-weight: 500;
+  color: #27ae60;
+}
+
 .admin-mgmt-delete-btn {
   padding: 4px 12px;
   font-size: 12px;

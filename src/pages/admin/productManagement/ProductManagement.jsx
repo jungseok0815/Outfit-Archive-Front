@@ -4,7 +4,7 @@ import Content from "./ProductManagementContent"
 import ProducttModal from "../../../components/common/Modal/ProductModal"
 import "../../../styles/admin/productManagement/ProductManagement.css"
 import { InsertButton } from '../../../components/common/Button/Button';
-import { ListProduct } from '../../../api/user/product';
+import { ListProduct } from '../../../api/admin/product';
 import useUpdateEffect from '../../../hooks/useDidMountEffect';
 
 
@@ -37,7 +37,7 @@ const ProductManagement = ({ registerTrigger, user }) => {
 
   useUpdateEffect(()=>{
     ListProduct(searchTerm).then((res)=>{
-      if(res.status === 200) setProducts(filterByBrand(res.data.data.content))
+      if(res.status === 200) setProducts(filterByBrand(res.data.content))
     })
   },[searchTerm])
 
@@ -55,7 +55,7 @@ const ProductManagement = ({ registerTrigger, user }) => {
   const fetchProducts =  async () => {
     try {
         const response = await ListProduct(null);
-        setProducts(filterByBrand(response.data.data.content));
+        setProducts(filterByBrand(response.data.content));
     } catch (error) {
         console.error("상품 목록 조회 실패:", error);
     }
@@ -82,7 +82,7 @@ const ProductManagement = ({ registerTrigger, user }) => {
   return <div>
       <SearchBar searchTerm={searchTerm} onChange={handleChangeSearchTerm}/>
       <Content products={products} openModal={handleOpenModal}/>
-      <ProducttModal isOpen={isModalOpen} onClose={handleCloseModal} updateProduct={handleUpdateProduct} product={product}/>
+      <ProducttModal isOpen={isModalOpen} onClose={handleCloseModal} updateProduct={handleUpdateProduct} product={product} user={user}/>
     </div>;
 };
 

@@ -90,6 +90,16 @@ const AdminManagement = () => {
 
   const isPartner = form.adminRole === 'PARTNER';
 
+  const getBrandName = (admin) => {
+    console.log("getbarandName : ", admin.brandNm)
+    if (admin.brandNm) return admin.brandNm;
+    if (admin.brandId) {
+      const brand = brandList.find((b) => b.id === admin.brandId);
+      return brand?.brandNm || null;
+    }
+    return null;
+  };
+
   return (
     <>
     <ConfirmModal
@@ -204,7 +214,13 @@ const AdminManagement = () => {
                       </span>
                     </td>
                     <td className="admin-mgmt-brand">
-                      {admin.brandNm || <span className="admin-mgmt-no-brand">-</span>}
+                      {admin.adminRole === 'PARTNER' ? (
+                        getBrandName(admin)
+                          ? <span className="admin-mgmt-brand-name">{getBrandName(admin)}</span>
+                          : <span className="admin-mgmt-no-brand">브랜드 미지정</span>
+                      ) : (
+                        <span className="admin-mgmt-no-brand">-</span>
+                      )}
                     </td>
                     <td>
                       <button

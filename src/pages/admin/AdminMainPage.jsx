@@ -137,7 +137,12 @@ function Admin() {
             </div>
             <div className="admin-user-detail">
               <span className="admin-user-name">{user?.memberNm || "관리자"}</span>
-              <span className="admin-user-role">{ROLE_LABELS[adminRole] || "Administrator"}</span>
+              <span className="admin-user-role">
+                {ROLE_LABELS[adminRole] || "Administrator"}
+                {adminRole === 'PARTNER' && user?.brandNm && (
+                  <span className="admin-user-brand"> · {user.brandNm}</span>
+                )}
+              </span>
             </div>
           </div>
           <button className="admin-logout-btn" onClick={handleLogout}>
