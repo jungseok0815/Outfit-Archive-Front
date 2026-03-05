@@ -11,6 +11,7 @@ function ProfileEditModal({ onClose, onSuccess }) {
         userAge: user?.userAge || "",
         userPwd: "",
         userPwdConfirm: "",
+        bio: user?.bio || "",
     });
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
@@ -50,9 +51,10 @@ function ProfileEditModal({ onClose, onSuccess }) {
             userNm: form.userNm.trim(),
             userAge: Number(form.userAge),
             userPwd: form.userPwd,
+            bio: form.bio.trim(),
         })
             .then(() => {
-                login({ ...user, userNm: form.userNm.trim(), userAge: Number(form.userAge) });
+                login({ ...user, userNm: form.userNm.trim(), userAge: Number(form.userAge), bio: form.bio.trim() });
                 if (onSuccess) onSuccess();
                 onClose();
             })
@@ -92,6 +94,17 @@ function ProfileEditModal({ onClose, onSuccess }) {
                         min="1"
                     />
                     {errors.userAge && <span className="profile-edit-error">{errors.userAge}</span>}
+                </div>
+
+                <div className="profile-edit-field">
+                    <label>소개글</label>
+                    <textarea
+                        name="bio"
+                        value={form.bio}
+                        onChange={handleChange}
+                        placeholder="자신을 소개해보세요 (최대 200자)"
+                        maxLength={200}
+                    />
                 </div>
 
                 <div className="profile-edit-field">

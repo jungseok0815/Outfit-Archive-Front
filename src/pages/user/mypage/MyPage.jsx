@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import Navbar from "../../../components/user/header/Header";
 import AuthModal from "../auth/AuthPage";
 import PostCreateModal from "./PostCreateModal";
@@ -72,6 +72,7 @@ function MyPage() {
   };
 
   useEffect(() => {
+    console.log("user : " , user)
     loadPosts();
     if (user?.id) {
       GetFollowCount(user.id)
@@ -131,7 +132,7 @@ function MyPage() {
               <strong>{followCount.followingCount}</strong> <span>팔로잉</span>
             </div>
           </div>
-          <p className="mypage-bio">패션을 사랑하는 사람 | Outfit Archive</p>
+          {user?.bio && <p className="mypage-bio">{user.bio}</p>}
         </div>
       </div>
 

@@ -79,9 +79,26 @@
     width: 100%;
 }
 
-.profile-edit-field input:focus {
+.profile-edit-field input:focus,
+.profile-edit-field textarea:focus {
     border-color: #222222;
     background-color: #ffffff;
+}
+
+.profile-edit-field textarea {
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #222222;
+    background-color: #f8f8f8;
+    border: 1px solid #ebebeb;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+    width: 100%;
+    resize: vertical;
+    min-height: 80px;
 }
 
 .profile-edit-error {
