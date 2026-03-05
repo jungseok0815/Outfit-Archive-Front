@@ -1,9 +1,9 @@
 import React from "react";
 import "./Card.css";
 
-function StyleCard({ card }) {
+function StyleCard({ card, onClick }) {
   return (
-    <div className="card">
+    <div className="card" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
       <div className="card-image">
         <img src={card.image} alt={card.title} />
       </div>

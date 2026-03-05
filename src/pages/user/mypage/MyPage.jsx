@@ -46,6 +46,7 @@ function MyPage() {
           title: p.title,
           content: p.content,
           userNm: p.userNm,
+          products: p.products || [],
         })));
       })
       .catch(e => console.error('게시물 조회 실패:', e));

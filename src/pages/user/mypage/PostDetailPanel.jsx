@@ -5,6 +5,7 @@ import { ListComment, InsertComment } from '../../../api/user/post';
 function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
   const [imageIndex, setImageIndex] = useState(0);
   const [showComments, setShowComments] = useState(false);
+  const [showProducts, setShowProducts] = useState(false);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [submittingComment, setSubmittingComment] = useState(false);
@@ -12,6 +13,7 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
   useEffect(() => {
     setImageIndex(0);
     setShowComments(false);
+    setShowProducts(false);
     setComments([]);
     setNewComment("");
   }, [post]);
@@ -98,6 +100,13 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
           </div>
         )}
 
+        {/* 제목 */}
+        {post.title && (
+          <div className="detail-title-wrap">
+            <p className="detail-title">{post.title}</p>
+          </div>
+        )}
+
         {/* 캡션 */}
         {post.content && (
           <div className="detail-caption">
@@ -122,7 +131,35 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
             </svg>
             {post.comments}
           </button>
+          {post.products?.length > 0 && (
+            <button
+              className={`detail-stat-item detail-stat-btn ${showProducts ? "active" : ""}`}
+              onClick={() => setShowProducts(!showProducts)}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 7h-3V6a4 4 0 00-8 0v1H5a1 1 0 00-1 1v11a3 3 0 003 3h10a3 3 0 003-3V8a1 1 0 00-1-1zm-9-1a2 2 0 014 0v1h-4V6zm8 13a1 1 0 01-1 1H7a1 1 0 01-1-1V9h2v1a1 1 0 002 0V9h4v1a1 1 0 002 0V9h2v10z"/>
+              </svg>
+              {post.products.length}
+            </button>
+          )}
         </div>
+
+        {/* 상품 섹션 */}
+        {showProducts && post.products?.length > 0 && (
+          <div className="detail-products">
+            <p className="detail-products-title">착용 상품</p>
+            {post.products.map((product) => (
+              <div key={product.id} className="detail-product-item">
+                <div className="detail-product-thumb" />
+                <div className="detail-product-info">
+                  <span className="detail-product-brand">{product.brandNm}</span>
+                  <span className="detail-product-name">{product.productNm}</span>
+                  <span className="detail-product-price">{product.productPrice?.toLocaleString()}원</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* 댓글 섹션 */}
         {showComments && (

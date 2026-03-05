@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Navbar from '../../../components/user/header/Header';
 import AuthModal from '../auth/AuthPage';
 import StyleCard from '../../../components/user/card/StyleCard';
+import PostDetailPanel from '../mypage/PostDetailPanel';
 import { ListPost } from '../../../api/user/post';
 import "../../../App.css";
 import "./StylePage.css";
@@ -15,6 +16,7 @@ function StylePage() {
   const [selectedTag, setSelectedTag] = useState("전체");
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -26,10 +28,12 @@ function StylePage() {
           user: p.userNm,
           avatar: null,
           image: p.images?.length > 0 ? `${IMG_BASE}${p.images[0].imgNm}` : '',
+          images: p.images?.length > 0 ? p.images.map(img => `${IMG_BASE}${img.imgNm}`) : [],
           title: p.title,
           content: p.content || '',
           likes: p.likeCount,
           comments: p.commentCount,
+          products: p.products || [],
         })));
       })
       .catch(e => console.error('스타일 피드 조회 실패:', e))
@@ -47,6 +51,12 @@ function StylePage() {
     <div className="app">
       <Navbar onLoginClick={() => setShowAuthModal(true)} />
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+      {selectedPost && (
+        <PostDetailPanel
+          post={selectedPost}
+          onClose={() => setSelectedPost(null)}
+        />
+      )}}
 
       {/* 페이지 헤더 */}
       <div className="style-header">
@@ -73,7 +83,7 @@ function StylePage() {
       ) : (
         <div className="style-grid">
           {filteredCards.map((card) => (
-            <StyleCard key={card.id} card={card} />
+            <StyleCard key={card.id} card={card} onClick={() => setSelectedPost(card)} />
           ))}
         </div>
       )}

@@ -173,6 +173,20 @@
     background-color: rgba(255, 255, 255, 0.85);
 }
 
+/* ===== 제목 ===== */
+.detail-title-wrap {
+    padding: 14px 20px 0;
+}
+
+.detail-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #222222;
+    margin: 0;
+    text-align: left;
+    word-break: break-word;
+}
+
 /* ===== 통계 (좋아요, 댓글) ===== */
 .detail-stats {
     display: flex;
