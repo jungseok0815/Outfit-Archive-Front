@@ -54,13 +54,14 @@ function PostCreateModal({ onClose, onSuccess, editingPost }) {
             return;
         }
         searchTimerRef.current = setTimeout(() => {
-            ListProduct(query, 0, 10)
+            ListProduct(query, null, 0, 10)
                 .then(res => {
                     const items = res.data.content || [];
                     setSearchResults(items.map(p => ({
                         id: p.id,
                         brand: p.brandNm,
                         name: p.productNm,
+                        price: p.productPrice,
                         image: p.images?.length > 0 ? `${IMG_BASE}${p.images[0].imgNm}` : '',
                     })));
                 })
@@ -184,10 +185,16 @@ function PostCreateModal({ onClose, onSuccess, editingPost }) {
                         <ul className="post-search-results">
                             {searchResults.map((product) => (
                                 <li key={product.id} onClick={() => handleAddProduct(product)}>
-                                    {product.image && <img src={product.image} alt={product.name} />}
+                                    {product.image
+                                        ? <img src={product.image} alt={product.name} />
+                                        : <div className="post-search-result-img-placeholder" />
+                                    }
                                     <div className="post-search-result-info">
                                         <span className="post-search-result-brand">{product.brand}</span>
-                                        <span className="post-search-result-name">{product.name}</span>
+                                        <div className="post-search-result-row">
+                                            <span className="post-search-result-name">{product.name}</span>
+                                            <span className="post-search-result-price">{product.price?.toLocaleString()}원</span>
+                                        </div>
                                     </div>
                                 </li>
                             ))}

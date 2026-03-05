@@ -5,6 +5,7 @@ import PostCreateModal from "./PostCreateModal";
 import PostDetailPanel from "./PostDetailPanel";
 import { useAuth } from "../../../store/context/UserContext";
 import { ListMyPost, DeletePost } from '../../../api/user/post';
+import { GetFollowCount } from '../../../api/user/follow';
 import "../../../App.css";
 import "./MyPage.css";
 
@@ -26,6 +27,7 @@ function MyPage() {
   const [selectedPost, setSelectedPost] = useState(null);
   const [editingPost, setEditingPost] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [followCount, setFollowCount] = useState({ followerCount: 0, followingCount: 0 });
 
   const loadPosts = () => {
     ListMyPost(0, 100)
@@ -68,6 +70,11 @@ function MyPage() {
 
   useEffect(() => {
     loadPosts();
+    if (user?.id) {
+      GetFollowCount(user.id)
+        .then(res => setFollowCount(res.data))
+        .catch(e => console.error('팔로우 수 조회 실패:', e));
+    }
   }, [user]);
 
   const displayName = user ? user.userNm : "Guest";
@@ -109,10 +116,10 @@ function MyPage() {
               <strong>{posts.length}</strong> <span>게시물</span>
             </div>
             <div className="mypage-stat">
-              <strong>234</strong> <span>팔로워</span>
+              <strong>{followCount.followerCount}</strong> <span>팔로워</span>
             </div>
             <div className="mypage-stat">
-              <strong>56</strong> <span>팔로잉</span>
+              <strong>{followCount.followingCount}</strong> <span>팔로잉</span>
             </div>
           </div>
           <p className="mypage-bio">패션을 사랑하는 사람 | Outfit Archive</p>
