@@ -3,6 +3,7 @@ import Navbar from "../../../components/user/header/Header";
 import AuthModal from "../auth/AuthPage";
 import PostCreateModal from "./PostCreateModal";
 import PostDetailPanel from "./PostDetailPanel";
+import ProfileEditModal from "./ProfileEditModal";
 import { useAuth } from "../../../store/context/UserContext";
 import { ListMyPost, DeletePost } from '../../../api/user/post';
 import { GetFollowCount } from '../../../api/user/follow';
@@ -27,6 +28,7 @@ function MyPage() {
   const [selectedPost, setSelectedPost] = useState(null);
   const [editingPost, setEditingPost] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [showProfileEditModal, setShowProfileEditModal] = useState(false);
   const [followCount, setFollowCount] = useState({ followerCount: 0, followingCount: 0 });
 
   const loadPosts = () => {
@@ -90,6 +92,12 @@ function MyPage() {
           editingPost={editingPost}
         />
       )}
+      {showProfileEditModal && (
+        <ProfileEditModal
+          onClose={() => setShowProfileEditModal(false)}
+          onSuccess={() => setShowProfileEditModal(false)}
+        />
+      )}
       {selectedPost && (
         <PostDetailPanel
           post={selectedPost}
@@ -109,7 +117,7 @@ function MyPage() {
         <div className="mypage-info">
           <div className="mypage-info-header">
             <h2 className="mypage-username">{displayName}</h2>
-            <button className="mypage-edit-btn">프로필 편집</button>
+            <button className="mypage-edit-btn" onClick={() => setShowProfileEditModal(true)}>프로필 편집</button>
           </div>
           <div className="mypage-stats">
             <div className="mypage-stat">

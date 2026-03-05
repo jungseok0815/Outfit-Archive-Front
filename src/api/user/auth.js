@@ -10,3 +10,8 @@ export const postLogin = (loginForm) => {
 export const postJoin = (joinForm) => {
     return api.post("/api/usr/join", joinForm);
 }
+
+// 프로필 수정 (이름, 나이, 비밀번호)
+export const UpdateUser = (updateForm) => {
+    return api.put("/api/usr/update", updateForm);
+}

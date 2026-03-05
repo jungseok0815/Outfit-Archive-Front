@@ -90,6 +90,8 @@ function PostCreateModal({ onClose, onSuccess, editingPost }) {
         const newFiles = images.filter(img => !img.isServer);
         newFiles.forEach(img => fd.append('images', img.file));
 
+        taggedProducts.forEach(p => fd.append('productIds', p.id));
+
         let request;
         if (isEditMode) {
             fd.append('id', editingPost.id);
