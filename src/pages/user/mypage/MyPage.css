@@ -8,13 +8,46 @@
   gap: 40px;
 }
 
+.mypage-avatar-wrap {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
 .mypage-avatar {
   width: 80px;
   height: 80px;
   border-radius: 50%;
   object-fit: cover;
   background-color: #d5d5d5;
-  flex-shrink: 0;
+  display: block;
+}
+
+.mypage-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ebebeb;
+}
+
+.mypage-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+  opacity: 0;
+}
+
+.mypage-avatar-wrap:hover .mypage-avatar-overlay {
+  background-color: rgba(0, 0, 0, 0.4);
+  opacity: 1;
 }
 
 .mypage-info {

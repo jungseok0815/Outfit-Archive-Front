@@ -15,3 +15,13 @@ export const postJoin = (joinForm) => {
 export const UpdateUser = (updateForm) => {
     return api.put("/api/usr/update", updateForm);
 }
+
+// 프로필 이미지 수정
+export const UpdateProfileImg = (id, file) => {
+    const fd = new FormData();
+    fd.append('id', id);
+    fd.append('profileImg', file);
+    return api.put("/api/usr/profile-img", fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
+}

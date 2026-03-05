@@ -1,4 +1,4 @@
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Navbar from "../../../components/user/header/Header";
 import AuthModal from "../auth/AuthPage";
 import PostCreateModal from "./PostCreateModal";
@@ -7,6 +7,7 @@ import ProfileEditModal from "./ProfileEditModal";
 import { useAuth } from "../../../store/context/UserContext";
 import { ListMyPost, DeletePost } from '../../../api/user/post';
 import { GetFollowCount } from '../../../api/user/follow';
+import { UpdateProfileImg } from '../../../api/user/auth';
 import "../../../App.css";
 import "./MyPage.css";
 
@@ -21,7 +22,8 @@ const dummyPointUsage = [
 ];
 
 function MyPage() {
-  const { user } = useAuth();
+  const { user, login } = useAuth();
+  const profileImgInputRef = useRef(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
   const [activeTab, setActiveTab] = useState("posts");
@@ -81,7 +83,19 @@ function MyPage() {
     }
   }, [user]);
 
+  const handleProfileImgChange = (e) => {
+    const file = e.target.files[0];
+    if (!file || !user?.id) return;
+    UpdateProfileImg(user.id, file)
+      .then(res => {
+        login({ ...user, profileImgNm: res.data.profileImgNm });
+      })
+      .catch(() => alert('프로필 이미지 변경에 실패했습니다.'));
+    e.target.value = '';
+  };
+
   const displayName = user ? user.userNm : "Guest";
+  const avatarSrc = user?.profileImgNm ? `${IMG_BASE}${user.profileImgNm}` : null;
 
   return (
     <div className="app">
@@ -111,11 +125,30 @@ function MyPage() {
 
       {/* 프로필 헤더 */}
       <div className="mypage-profile">
-        <img
-          className="mypage-avatar"
-          src="https://via.placeholder.com/80/d5d5d5/999999?text=ME"
-          alt="프로필"
+        <input
+          type="file"
+          accept="image/*"
+          ref={profileImgInputRef}
+          onChange={handleProfileImgChange}
+          style={{ display: 'none' }}
         />
+        <div className="mypage-avatar-wrap" onClick={() => profileImgInputRef.current?.click()}>
+          {avatarSrc
+            ? <img className="mypage-avatar" src={avatarSrc} alt="프로필" />
+            : <div className="mypage-avatar mypage-avatar-placeholder">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#bcbcbc" strokeWidth="1.5">
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+                </svg>
+              </div>
+          }
+          <div className="mypage-avatar-overlay">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="white" strokeWidth="1.5">
+              <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+          </div>
+        </div>
         <div className="mypage-info">
           <div className="mypage-info-header">
             <h2 className="mypage-username">{displayName}</h2>
