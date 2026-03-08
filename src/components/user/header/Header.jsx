@@ -7,7 +7,7 @@ function Navbar({ onLoginClick }) {
    const { user, logout } = useAuth();
   return (
     <nav className="navbar">
-      <div className="logo">Outfit Archive</div>
+      <Link to="/" className="logo">Outfit Archive</Link>
       <ul className="nav-links">
         <li><Link to={"/shop"}>Shop</Link></li>
         <li><Link to={"/style"}>Style</Link></li>
