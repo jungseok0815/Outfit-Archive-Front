@@ -23,6 +23,7 @@ function App() {
                   <Route path='/shop' element={<ShopPage/>}/>
                   <Route path='/style' element={<StylePage/>}/>
                   <Route path='/mypage' element={<PrivateUserRoute component={<MyPage/>}/>}/>
+                  <Route path='/mypage/:userId' element={<PrivateUserRoute component={<MyPage/>}/>}/>
                   <Route path='/admin' element={<PrivateMasterRoute component={<Admin />}/>}/>
                   </Routes>
               </BrowserRouter>

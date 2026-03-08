@@ -16,6 +16,11 @@ export const UpdateUser = (updateForm) => {
     return api.put("/api/usr/update", updateForm);
 }
 
+// 다른 유저 프로필 조회
+export const GetUserProfile = (userId) => {
+    return api.get(`/api/usr/profile/${userId}`);
+}
+
 // 프로필 이미지 수정
 export const UpdateProfileImg = (id, file) => {
     const fd = new FormData();

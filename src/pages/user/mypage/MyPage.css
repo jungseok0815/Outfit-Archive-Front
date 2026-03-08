@@ -26,6 +26,10 @@
   display: block;
 }
 
+.mypage-avatar-readonly {
+  cursor: default;
+}
+
 .mypage-avatar-placeholder {
   display: flex;
   align-items: center;
@@ -85,6 +89,17 @@
 
 .mypage-stat span {
   color: #999999;
+}
+
+.mypage-stat-clickable {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 4px 8px;
+  transition: background-color 0.15s ease;
+}
+
+.mypage-stat-clickable:hover {
+  background-color: #f5f5f5;
 }
 
 .mypage-bio {

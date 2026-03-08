@@ -16,6 +16,10 @@ export const ListMyPost = (page = 0, size = 10) => {
     return api.get('/api/usr/post/my', { params: { page, size } });
 }
 
+export const ListUserPost = (userId, page = 0, size = 100) => {
+    return api.get(`/api/usr/post/user/${userId}`, { params: { page, size } });
+}
+
 export const UpdatePost = (updateForm) => {
     return api.put('/api/usr/post/update', updateForm, {
         headers: { 'Content-Type': 'multipart/form-data' }

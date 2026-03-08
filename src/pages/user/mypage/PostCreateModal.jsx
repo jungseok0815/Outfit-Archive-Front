@@ -70,8 +70,9 @@ function PostCreateModal({ onClose, onSuccess, editingPost }) {
     }, []);
 
     const handleAddProduct = (product) => {
-        if (taggedProducts.some((p) => p.id === product.id)) return;
-        setTaggedProducts((prev) => [...prev, product]);
+        if (!taggedProducts.some((p) => p.id === product.id)) {
+            setTaggedProducts((prev) => [...prev, product]);
+        }
         setSearchQuery("");
         setSearchResults([]);
     };

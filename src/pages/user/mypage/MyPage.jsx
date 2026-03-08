@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
 import Navbar from "../../../components/user/header/Header";
 import AuthModal from "../auth/AuthPage";
 import PostCreateModal from "./PostCreateModal";
 import PostDetailPanel from "./PostDetailPanel";
 import ProfileEditModal from "./ProfileEditModal";
+import FollowListModal from "./FollowListModal";
 import { useAuth } from "../../../store/context/UserContext";
-import { ListMyPost, DeletePost } from '../../../api/user/post';
+import { ListMyPost, ListUserPost, DeletePost } from '../../../api/user/post';
 import { GetFollowCount } from '../../../api/user/follow';
-import { UpdateProfileImg } from '../../../api/user/auth';
+import { UpdateProfileImg, GetUserProfile } from '../../../api/user/auth';
 import "../../../App.css";
 import "./MyPage.css";
 
@@ -22,6 +24,7 @@ const dummyPointUsage = [
 ];
 
 function MyPage() {
+  const { userId: paramUserId } = useParams();
   const { user, login } = useAuth();
   const profileImgInputRef = useRef(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -32,25 +35,31 @@ function MyPage() {
   const [posts, setPosts] = useState([]);
   const [showProfileEditModal, setShowProfileEditModal] = useState(false);
   const [followCount, setFollowCount] = useState({ followerCount: 0, followingCount: 0 });
+  const [followModalType, setFollowModalType] = useState(null);
+  const [profileUser, setProfileUser] = useState(null);
+
+  // 본인 페이지 여부
+  const isOwnPage = !paramUserId || (user && String(user.id) === String(paramUserId));
+  const pageUserId = isOwnPage ? user?.id : paramUserId;
+
+  const mapPosts = (all) => all.map(p => ({
+    id: p.id,
+    images: p.images?.length > 0
+      ? p.images.map(img => `${IMG_BASE}${img.imgNm}`)
+      : [''],
+    rawImages: p.images || [],
+    likes: p.likeCount,
+    comments: p.commentCount,
+    title: p.title,
+    content: p.content,
+    userNm: p.userNm,
+    products: p.products || [],
+  }));
 
   const loadPosts = () => {
-    ListMyPost(0, 100)
-      .then(res => {
-        const all = res.data.content || [];
-        setPosts(all.map(p => ({
-          id: p.id,
-          images: p.images?.length > 0
-            ? p.images.map(img => `${IMG_BASE}${img.imgNm}`)
-            : [''],
-          rawImages: p.images || [],
-          likes: p.likeCount,
-          comments: p.commentCount,
-          title: p.title,
-          content: p.content,
-          userNm: p.userNm,
-          products: p.products || [],
-        })));
-      })
+    const request = isOwnPage ? ListMyPost(0, 100) : ListUserPost(paramUserId, 0, 100);
+    request
+      .then(res => setPosts(mapPosts(res.data.content || [])))
       .catch(e => console.error('게시물 조회 실패:', e));
   };
 
@@ -73,15 +82,25 @@ function MyPage() {
     setShowPostModal(true);
   };
 
+  // 다른 유저 프로필 조회
   useEffect(() => {
-    console.log("user : " , user)
+    if (!isOwnPage && paramUserId) {
+      GetUserProfile(paramUserId)
+        .then(res => setProfileUser(res.data))
+        .catch(() => setProfileUser(null));
+    } else {
+      setProfileUser(null);
+    }
+  }, [paramUserId, isOwnPage]);
+
+  useEffect(() => {
     loadPosts();
-    if (user?.id) {
-      GetFollowCount(user.id)
+    if (pageUserId) {
+      GetFollowCount(pageUserId)
         .then(res => setFollowCount(res.data))
         .catch(e => console.error('팔로우 수 조회 실패:', e));
     }
-  }, [user]);
+  }, [user, paramUserId]);
 
   const handleProfileImgChange = (e) => {
     const file = e.target.files[0];
@@ -94,8 +113,9 @@ function MyPage() {
     e.target.value = '';
   };
 
-  const displayName = user ? user.userNm : "Guest";
-  const avatarSrc = user?.profileImgNm ? `${IMG_BASE}${user.profileImgNm}` : null;
+  const currentProfile = isOwnPage ? user : profileUser;
+  const displayName = currentProfile ? currentProfile.userNm : "Guest";
+  const avatarSrc = currentProfile?.profileImgNm ? `${IMG_BASE}${currentProfile.profileImgNm}` : null;
 
   return (
     <div className="app">
@@ -114,6 +134,13 @@ function MyPage() {
           onSuccess={() => setShowProfileEditModal(false)}
         />
       )}
+      {followModalType && (
+        <FollowListModal
+          userId={pageUserId}
+          type={followModalType}
+          onClose={() => setFollowModalType(null)}
+        />
+      )}
       {selectedPost && (
         <PostDetailPanel
           post={selectedPost}
@@ -125,14 +152,16 @@ function MyPage() {
 
       {/* 프로필 헤더 */}
       <div className="mypage-profile">
-        <input
-          type="file"
-          accept="image/*"
-          ref={profileImgInputRef}
-          onChange={handleProfileImgChange}
-          style={{ display: 'none' }}
-        />
-        <div className="mypage-avatar-wrap" onClick={() => profileImgInputRef.current?.click()}>
+        {isOwnPage && (
+          <input
+            type="file"
+            accept="image/*"
+            ref={profileImgInputRef}
+            onChange={handleProfileImgChange}
+            style={{ display: 'none' }}
+          />
+        )}
+        <div className={`mypage-avatar-wrap${isOwnPage ? '' : ' mypage-avatar-readonly'}`} onClick={() => isOwnPage && profileImgInputRef.current?.click()}>
           {avatarSrc
             ? <img className="mypage-avatar" src={avatarSrc} alt="프로필" />
             : <div className="mypage-avatar mypage-avatar-placeholder">
@@ -142,30 +171,32 @@ function MyPage() {
                 </svg>
               </div>
           }
-          <div className="mypage-avatar-overlay">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="white" strokeWidth="1.5">
-              <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
-              <circle cx="12" cy="13" r="4" />
-            </svg>
-          </div>
+          {isOwnPage && (
+            <div className="mypage-avatar-overlay">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="white" strokeWidth="1.5">
+                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
+            </div>
+          )}
         </div>
         <div className="mypage-info">
           <div className="mypage-info-header">
             <h2 className="mypage-username">{displayName}</h2>
-            <button className="mypage-edit-btn" onClick={() => setShowProfileEditModal(true)}>프로필 편집</button>
+            {isOwnPage && <button className="mypage-edit-btn" onClick={() => setShowProfileEditModal(true)}>프로필 편집</button>}
           </div>
           <div className="mypage-stats">
             <div className="mypage-stat">
               <strong>{posts.length}</strong> <span>게시물</span>
             </div>
-            <div className="mypage-stat">
+            <div className="mypage-stat mypage-stat-clickable" onClick={() => setFollowModalType("follower")}>
               <strong>{followCount.followerCount}</strong> <span>팔로워</span>
             </div>
-            <div className="mypage-stat">
+            <div className="mypage-stat mypage-stat-clickable" onClick={() => setFollowModalType("following")}>
               <strong>{followCount.followingCount}</strong> <span>팔로잉</span>
             </div>
           </div>
-          {user?.bio && <p className="mypage-bio">{user.bio}</p>}
+          {currentProfile?.bio && <p className="mypage-bio">{currentProfile.bio}</p>}
         </div>
       </div>
 
@@ -177,24 +208,28 @@ function MyPage() {
           </svg>
           게시물
         </button>
-        <button className={`mypage-tab ${activeTab === "points" ? "active" : ""}`} onClick={() => setActiveTab("points")}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H11.5v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.65c.1 1.7 1.36 2.66 2.85 2.97V19h1.72v-1.67c1.52-.29 2.72-1.16 2.72-2.74 0-2.22-1.86-2.97-3.63-3.45z" />
-          </svg>
-          포인트현황
-        </button>
+        {isOwnPage && (
+          <button className={`mypage-tab ${activeTab === "points" ? "active" : ""}`} onClick={() => setActiveTab("points")}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H11.5v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.65c.1 1.7 1.36 2.66 2.85 2.97V19h1.72v-1.67c1.52-.29 2.72-1.16 2.72-2.74 0-2.22-1.86-2.97-3.63-3.45z" />
+            </svg>
+            포인트현황
+          </button>
+        )}
       </div>
 
       {/* 게시물 탭 */}
       {activeTab === "posts" && (
         <div className="mypage-grid">
-          <button className="mypage-add-post-btn" onClick={() => setShowPostModal(true)}>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            <span>새 게시물</span>
-          </button>
+          {isOwnPage && (
+            <button className="mypage-add-post-btn" onClick={() => setShowPostModal(true)}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              <span>새 게시물</span>
+            </button>
+          )}
           {posts.map((post) => (
             <div key={post.id} className="mypage-grid-item" onClick={() => setSelectedPost(post)}>
               <img src={post.images[0]} alt={`게시물 ${post.id}`} />
