@@ -57,7 +57,8 @@ function MyPage() {
   }));
 
   const loadPosts = () => {
-    const request = isOwnPage ? ListMyPost(0, 100) : ListUserPost(paramUserId, 0, 100);
+    const own = !paramUserId || (user && String(user.id) === String(paramUserId));
+    const request = own ? ListMyPost(0, 100) : ListUserPost(paramUserId, 0, 100);
     request
       .then(res => setPosts(mapPosts(res.data.content || [])))
       .catch(e => console.error('게시물 조회 실패:', e));
@@ -82,8 +83,15 @@ function MyPage() {
     setShowPostModal(true);
   };
 
-  // 다른 유저 프로필 조회
+  // 페이지 전환 시 프로필 + 게시물 + 팔로우 수 모두 갱신
   useEffect(() => {
+    // 상태 초기화
+    setPosts([]);
+    setFollowCount({ followerCount: 0, followingCount: 0 });
+    setSelectedPost(null);
+    setActiveTab("posts");
+
+    // 프로필 조회
     if (!isOwnPage && paramUserId) {
       GetUserProfile(paramUserId)
         .then(res => setProfileUser(res.data))
@@ -91,12 +99,14 @@ function MyPage() {
     } else {
       setProfileUser(null);
     }
-  }, [paramUserId, isOwnPage]);
 
-  useEffect(() => {
+    // 게시물 조회
     loadPosts();
-    if (pageUserId) {
-      GetFollowCount(pageUserId)
+
+    // 팔로우 수 조회
+    const targetId = isOwnPage ? user?.id : paramUserId;
+    if (targetId) {
+      GetFollowCount(targetId)
         .then(res => setFollowCount(res.data))
         .catch(e => console.error('팔로우 수 조회 실패:', e));
     }
@@ -114,7 +124,7 @@ function MyPage() {
   };
 
   const currentProfile = isOwnPage ? user : profileUser;
-  const displayName = currentProfile ? currentProfile.userNm : "Guest";
+  const displayName = currentProfile?.userNm || "";
   const avatarSrc = currentProfile?.profileImgNm ? `${IMG_BASE}${currentProfile.profileImgNm}` : null;
 
   return (

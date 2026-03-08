@@ -15,7 +15,9 @@ function FollowListModal({ userId, type, onClose }) {
   useEffect(() => {
     const fetchList = type === "follower" ? GetFollowerList : GetFollowingList;
     fetchList(userId)
-      .then(res => setUsers(res.data || []))
+      .then(res => {
+        console.log(res)
+        setUsers(res.data || [])})
       .catch(() => setUsers([]))
       .finally(() => setLoading(false));
   }, [userId, type]);

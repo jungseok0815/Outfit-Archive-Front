@@ -56,7 +56,7 @@ function StylePage() {
           post={selectedPost}
           onClose={() => setSelectedPost(null)}
         />
-      )}}
+      )}
 
       {/* 페이지 헤더 */}
       <div className="style-header">
