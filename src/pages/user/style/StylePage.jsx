@@ -32,6 +32,7 @@ function StylePage() {
           title: p.title,
           content: p.content || '',
           likes: p.likeCount,
+          liked: p.liked || false,
           comments: p.commentCount,
           products: p.products || [],
         })));

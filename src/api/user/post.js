@@ -35,6 +35,11 @@ export const ToggleLike = (postId) => {
     return api.post('/api/usr/post/like/toggle', null, { params: { postId } });
 }
 
+// GET /api/usr/post/like/status?postId={id} → { liked: boolean, likeCount: number }
+export const GetLikeStatus = (postId) => {
+    return api.get('/api/usr/post/like/status', { params: { postId } });
+}
+
 // GET /api/usr/post/comment/list?postId={id}
 export const ListComment = (postId, page = 0, size = 10) => {
     return api.get('/api/usr/post/comment/list', { params: { postId, page, size } });

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./PostDetailPanel.css";
-import { ListComment, InsertComment } from '../../../api/user/post';
+import { ListComment, InsertComment, ToggleLike, GetLikeStatus } from '../../../api/user/post';
 
 function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
   const [imageIndex, setImageIndex] = useState(0);
@@ -9,6 +9,8 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
 
   useEffect(() => {
     setImageIndex(0);
@@ -16,6 +18,18 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
     setShowProducts(false);
     setComments([]);
     setNewComment("");
+    setLikeCount(post?.likes || 0);
+    setLiked(false);
+
+    // 서버에서 내 좋아요 상태 조회
+    if (post?.id) {
+      GetLikeStatus(post.id)
+        .then(res => {
+          setLiked(res.data.liked);
+          setLikeCount(res.data.likeCount);
+        })
+        .catch(() => {});
+    }
   }, [post]);
 
   useEffect(() => {
@@ -47,6 +61,15 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
       })
       .catch(e => console.error('댓글 등록 실패:', e))
       .finally(() => setSubmittingComment(false));
+  };
+
+  const handleToggleLike = () => {
+    ToggleLike(post.id)
+      .then(res => {
+        setLiked(res.data.liked);
+        setLikeCount(res.data.likeCount);
+      })
+      .catch(e => console.error('좋아요 처리 실패:', e));
   };
 
   const formatDate = (dateStr) => {
@@ -116,12 +139,15 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
 
         {/* 통계 (좋아요, 댓글) */}
         <div className="detail-stats">
-          <div className="detail-stat-item">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <button
+            className={`detail-stat-item detail-stat-btn detail-like-btn ${liked ? "liked" : ""}`}
+            onClick={handleToggleLike}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill={liked ? "#e74c3c" : "none"} stroke={liked ? "#e74c3c" : "currentColor"} strokeWidth="2">
               <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
             </svg>
-            {post.likes}
-          </div>
+            {likeCount}
+          </button>
           <button
             className={`detail-stat-item detail-stat-btn ${showComments ? "active" : ""}`}
             onClick={() => setShowComments(!showComments)}

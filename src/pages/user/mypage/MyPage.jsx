@@ -7,7 +7,7 @@ import PostDetailPanel from "./PostDetailPanel";
 import ProfileEditModal from "./ProfileEditModal";
 import FollowListModal from "./FollowListModal";
 import { useAuth } from "../../../store/context/UserContext";
-import { ListMyPost, ListUserPost, DeletePost } from '../../../api/user/post';
+import { ListMyPost, ListPost, DeletePost } from '../../../api/user/post';
 import { GetFollowCount } from '../../../api/user/follow';
 import { UpdateProfileImg, GetUserProfile } from '../../../api/user/auth';
 import "../../../App.css";
@@ -49,6 +49,7 @@ function MyPage() {
       : [''],
     rawImages: p.images || [],
     likes: p.likeCount,
+    liked: p.liked || false,
     comments: p.commentCount,
     title: p.title,
     content: p.content,
@@ -56,11 +57,19 @@ function MyPage() {
     products: p.products || [],
   }));
 
-  const loadPosts = () => {
-    const own = !paramUserId || (user && String(user.id) === String(paramUserId));
-    const request = own ? ListMyPost(0, 100) : ListUserPost(paramUserId, 0, 100);
-    request
+  const loadMyPosts = () => {
+    ListMyPost(0, 100)
       .then(res => setPosts(mapPosts(res.data.content || [])))
+      .catch(e => console.error('게시물 조회 실패:', e));
+  };
+
+  const loadUserPosts = (userNm) => {
+    ListPost('', 0, 100)
+      .then(res => {
+        const all = res.data.content || [];
+        const filtered = all.filter(p => p.userNm === userNm);
+        setPosts(mapPosts(filtered));
+      })
       .catch(e => console.error('게시물 조회 실패:', e));
   };
 
@@ -69,7 +78,7 @@ function MyPage() {
     DeletePost(postId)
       .then(() => {
         setSelectedPost(null);
-        loadPosts();
+        loadMyPosts();
       })
       .catch(e => {
         const msg = e.response?.data?.msg || '삭제에 실패했습니다.';
@@ -91,17 +100,18 @@ function MyPage() {
     setSelectedPost(null);
     setActiveTab("posts");
 
-    // 프로필 조회
-    if (!isOwnPage && paramUserId) {
-      GetUserProfile(paramUserId)
-        .then(res => setProfileUser(res.data))
-        .catch(() => setProfileUser(null));
-    } else {
+    if (isOwnPage) {
       setProfileUser(null);
+      loadMyPosts();
+    } else if (paramUserId) {
+      // 프로필 조회 후 해당 유저의 게시물 필터링
+      GetUserProfile(paramUserId)
+        .then(res => {
+          setProfileUser(res.data);
+          loadUserPosts(res.data.userNm);
+        })
+        .catch(() => setProfileUser(null));
     }
-
-    // 게시물 조회
-    loadPosts();
 
     // 팔로우 수 조회
     const targetId = isOwnPage ? user?.id : paramUserId;
@@ -134,7 +144,7 @@ function MyPage() {
       {showPostModal && (
         <PostCreateModal
           onClose={() => { setShowPostModal(false); setEditingPost(null); }}
-          onSuccess={loadPosts}
+          onSuccess={loadMyPosts}
           editingPost={editingPost}
         />
       )}

@@ -231,6 +231,10 @@
     color: #222222;
 }
 
+.detail-like-btn.liked {
+    color: #e74c3c;
+}
+
 /* ===== 댓글 섹션 ===== */
 .detail-comments {
     padding: 16px 20px;
