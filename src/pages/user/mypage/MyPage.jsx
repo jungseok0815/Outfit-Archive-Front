@@ -10,18 +10,11 @@ import { useAuth } from "../../../store/context/UserContext";
 import { ListMyPost, ListPost, DeletePost } from '../../../api/user/post';
 import { GetFollowCount } from '../../../api/user/follow';
 import { UpdateProfileImg, GetUserProfile } from '../../../api/user/auth';
+import { GetPoint, GetPointHistory } from '../../../api/user/point';
 import "../../../App.css";
 import "./MyPage.css";
 
 const IMG_BASE = 'http://localhost:8080/api/img/get?imgNm=';
-
-const dummyPointUsage = [
-  { id: 1, date: "2025.02.09", description: "Nike Air Force 1 '07 할인 적용", amount: -1200, category: "상품 구매" },
-  { id: 2, date: "2025.02.04", description: "시즌 한정 이벤트 응모", amount: -300, category: "이벤트" },
-  { id: 3, date: "2025.01.30", description: "Adidas Samba OG 할인 적용", amount: -600, category: "상품 구매" },
-  { id: 4, date: "2025.01.22", description: "프리미엄 스타일링 리포트 열람", amount: -200, category: "콘텐츠" },
-  { id: 5, date: "2025.01.15", description: "럭키드로우 참여", amount: -200, category: "이벤트" },
-];
 
 function MyPage() {
   const { userId: paramUserId } = useParams();
@@ -37,6 +30,8 @@ function MyPage() {
   const [followCount, setFollowCount] = useState({ followerCount: 0, followingCount: 0 });
   const [followModalType, setFollowModalType] = useState(null);
   const [profileUser, setProfileUser] = useState(null);
+  const [currentPoint, setCurrentPoint] = useState(0);
+  const [pointHistory, setPointHistory] = useState([]);
 
   // 본인 페이지 여부
   const isOwnPage = !paramUserId || (user && String(user.id) === String(paramUserId));
@@ -119,6 +114,16 @@ function MyPage() {
       GetFollowCount(targetId)
         .then(res => setFollowCount(res.data))
         .catch(e => console.error('팔로우 수 조회 실패:', e));
+    }
+
+    // 포인트 조회 (본인 페이지일 때만)
+    if (isOwnPage && user?.id) {
+      GetPoint()
+        .then(res => setCurrentPoint(res.data.point))
+        .catch(e => console.error('포인트 조회 실패:', e));
+      GetPointHistory(0, 20)
+        .then(res => setPointHistory(res.data.content || []))
+        .catch(e => console.error('포인트 내역 조회 실패:', e));
     }
   }, [user, paramUserId]);
 
@@ -281,16 +286,19 @@ function MyPage() {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 8h4v6H4v-6zm16 6h-4v-8h4v8z" />
                 </svg>
-                게시물 포인트 현황
+                포인트 적립 현황
               </h4>
               <div className="mypage-points-card-main">
                 <span className="mypage-points-card-label">총 적립 포인트</span>
-                <strong className="mypage-points-card-value earn">+8,000 P</strong>
+                <strong className="mypage-points-card-value earn">
+                  +{pointHistory.filter(h => h.type === 'EARN').reduce((sum, h) => sum + h.amount, 0).toLocaleString()} P
+                </strong>
               </div>
               <div className="mypage-points-card-rows">
-                <div className="mypage-points-card-row"><span>구매 유도 건수</span><strong>80건</strong></div>
-                <div className="mypage-points-card-row"><span>이번 달 적립</span><strong className="earn">+2,100 P</strong></div>
-                <div className="mypage-points-card-row"><span>태그 상품 수</span><strong>8개</strong></div>
+                <div className="mypage-points-card-row">
+                  <span>적립 건수</span>
+                  <strong>{pointHistory.filter(h => h.type === 'EARN').length}건</strong>
+                </div>
               </div>
             </div>
             <div className="mypage-points-card">
@@ -302,29 +310,45 @@ function MyPage() {
               </h4>
               <div className="mypage-points-card-main">
                 <span className="mypage-points-card-label">보유 포인트</span>
-                <strong className="mypage-points-card-value">5,500 P</strong>
+                <strong className="mypage-points-card-value">{currentPoint.toLocaleString()} P</strong>
               </div>
               <div className="mypage-points-card-rows">
-                <div className="mypage-points-card-row"><span>총 사용</span><strong className="spend">-2,500 P</strong></div>
-                <div className="mypage-points-card-row"><span>상품 구매 사용</span><strong className="spend">-1,800 P</strong></div>
-                <div className="mypage-points-card-row"><span>이벤트 사용</span><strong className="spend">-700 P</strong></div>
+                <div className="mypage-points-card-row">
+                  <span>총 사용</span>
+                  <strong className="spend">
+                    {pointHistory.filter(h => h.type === 'USE').reduce((sum, h) => sum + h.amount, 0).toLocaleString()} P
+                  </strong>
+                </div>
+                <div className="mypage-points-card-row">
+                  <span>사용 건수</span>
+                  <strong>{pointHistory.filter(h => h.type === 'USE').length}건</strong>
+                </div>
               </div>
             </div>
           </div>
 
           <div className="mypage-usage-section">
-            <h3 className="mypage-usage-title">포인트 사용현황</h3>
+            <h3 className="mypage-usage-title">포인트 내역</h3>
             <div className="mypage-usage-list">
-              {dummyPointUsage.map((item) => (
+              {pointHistory.map((item) => (
                 <div key={item.id} className="mypage-usage-item">
                   <div className="mypage-usage-item-left">
-                    <span className="mypage-usage-category">{item.category}</span>
+                    <span className="mypage-usage-category">{item.type === 'EARN' ? '적립' : '사용'}</span>
                     <span className="mypage-usage-desc">{item.description}</span>
-                    <span className="mypage-usage-date">{item.date}</span>
+                    <span className="mypage-usage-date">{item.createdAt?.substring(0, 10)}</span>
                   </div>
-                  <span className="mypage-usage-amount">{item.amount.toLocaleString()} P</span>
+                  <span className={`mypage-usage-amount ${item.amount > 0 ? 'earn' : ''}`}>
+                    {item.amount > 0 ? '+' : ''}{item.amount.toLocaleString()} P
+                  </span>
                 </div>
               ))}
+              {pointHistory.length === 0 && (
+                <div className="mypage-usage-item">
+                  <div className="mypage-usage-item-left">
+                    <span className="mypage-usage-desc">포인트 내역이 없습니다.</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
