@@ -170,8 +170,8 @@ function MyPage() {
         <PostDetailPanel
           post={selectedPost}
           onClose={() => setSelectedPost(null)}
-          onDelete={handleDelete}
-          onEdit={handleEdit}
+          onDelete={isOwnPage ? handleDelete : undefined}
+          onEdit={isOwnPage ? handleEdit : undefined}
         />
       )}
 

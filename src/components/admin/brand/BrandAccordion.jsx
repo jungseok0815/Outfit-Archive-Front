@@ -1,6 +1,7 @@
 import { React, useState } from 'react';
 import { ChevronDown, Edit2, Package } from 'lucide-react';
 import BrandItemCard from './BrandItemCard';
+import ProductModal from '../../common/Modal/ProductModal';
 
 const CATEGORY_KOR = {
     TOP: '상의', BOTTOM: '하의', OUTER: '아우터',
@@ -10,6 +11,8 @@ const CATEGORY_KOR = {
 const BrandAccordion = ({ brand, id, onRefresh }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false);
+    const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
 
     const totalStock = brand.products?.reduce((sum, p) => sum + p.productQuantity, 0) || 0;
     const productCount = brand.products?.length || 0;
@@ -94,6 +97,7 @@ const BrandAccordion = ({ brand, id, onRefresh }) => {
                                     <div
                                         key={product.id}
                                         className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                                        onClick={() => { setSelectedProduct(product); setIsProductModalOpen(true); }}
                                     >
                                         <div className="relative h-32 bg-gray-100">
                                             <img
@@ -124,7 +128,10 @@ const BrandAccordion = ({ brand, id, onRefresh }) => {
                                 ))}
 
                                 {/* 상품 추가 버튼 */}
-                                <div className="bg-white rounded-lg border-2 border-dashed border-gray-300 overflow-hidden flex items-center justify-center min-h-[180px] cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-colors">
+                                <div
+                                    className="bg-white rounded-lg border-2 border-dashed border-gray-300 overflow-hidden flex items-center justify-center min-h-[180px] cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-colors"
+                                    onClick={() => { setSelectedProduct(null); setIsProductModalOpen(true); }}
+                                >
                                     <div className="text-center">
                                         <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-gray-100 flex items-center justify-center">
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round">
@@ -144,6 +151,14 @@ const BrandAccordion = ({ brand, id, onRefresh }) => {
                     </div>
                 </div>
             </div>
+
+            <ProductModal
+                isOpen={isProductModalOpen}
+                onClose={() => { setIsProductModalOpen(false); setSelectedProduct(null); }}
+                updateProduct={onRefresh}
+                product={selectedProduct}
+                user={{ brandNm: brand.brandNm }}
+            />
         </div>
     );
 };
