@@ -1,9 +1,16 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./Card.css";
 
 function ProductCard({ product, rank }) {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/shop/${product.id}`, { state: { product } });
+  };
+
   return (
-    <div className="card">
+    <div className="card" onClick={handleClick}>
       {rank && <div className="card-rank">{rank}</div>}
       <div className="card-image">
         <img src={product.image} alt={product.name} />

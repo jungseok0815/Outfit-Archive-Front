@@ -3,6 +3,7 @@ import './App.css';
 import { BrowserRouter,Routes,Route } from 'react-router-dom';
 import Main from './pages/user/userMain/UserMain';
 import ShopPage from './pages/user/shop/ShopPage';
+import ProductDetailPage from './pages/user/shop/ProductDetailPage';
 import StylePage from './pages/user/style/StylePage';
 import Admin from './pages/admin/AdminMainPage';
 import PrivateMasterRoute from './routes/PrivateMasterRoute';
@@ -21,6 +22,7 @@ function App() {
                 <Routes>
                   <Route path='/' element={<Main/>}/>
                   <Route path='/shop' element={<ShopPage/>}/>
+                  <Route path='/shop/:productId' element={<ProductDetailPage/>}/>
                   <Route path='/style' element={<StylePage/>}/>
                   <Route path='/mypage' element={<PrivateUserRoute component={<MyPage/>}/>}/>
                   <Route path='/mypage/:userId' element={<PrivateUserRoute component={<MyPage/>}/>}/>

@@ -11,7 +11,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
     productNm: "",
     productPrice : "",
     productQuantity : "",
-    productBrand : "",
+    brandId : "",
     productCode : "",
     category: "",
     image: []
@@ -20,24 +20,26 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
   const [imagePreview, setImagePreview] = useState([]);
 
   useEffect(() => {
-    const autoBrand = user?.brandNm || "";
+    const autoBrandId = user?.brandId || "";
     if (product) {
       setFormData({
         id : product.id || "",
         productNm: product.productNm || "",
         productPrice: product.productPrice || "",
         productQuantity: product.productQuantity || "",
-        productBrand: product.productBrand || autoBrand,
+        brandId: product.brandId || autoBrandId,
         productCode: product.productCode || "",
         category: product.category || "",
         image: []
       });
 
-      if(product.images.length > 0){
+      if(product.images && product.images.length > 0){
         const produtImgs = product.images.map((img) => {
          return `http://localhost:8080/api/img/get?imgNm=${img.imgNm}`
         })
         setImagePreview(produtImgs)
+      } else {
+        setImagePreview([])
       }
 
     }else{
@@ -46,14 +48,14 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
         productNm: "",
         productPrice: "",
         productQuantity: "",
-        productBrand: autoBrand,
+        brandId: autoBrandId,
         productCode: "",
         category:  "",
         image: []
       });
       setImagePreview([])
     }
-}, [product])
+}, [product, user])
 
 
   const handleChange = (e) => {

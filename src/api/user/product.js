@@ -7,3 +7,8 @@ export const ListProduct = (keyword = '', category = null, page = 0, size = 12) 
     if (category) params.category = category;
     return api.get('/api/usr/product/list', { params });
 }
+
+// GET /api/usr/product/get?id={id} → ResponseProductDto
+export const GetProduct = (id) => {
+    return api.get('/api/usr/product/get', { params: { id } });
+}

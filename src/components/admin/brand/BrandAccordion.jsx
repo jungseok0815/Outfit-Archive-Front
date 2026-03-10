@@ -157,7 +157,7 @@ const BrandAccordion = ({ brand, id, onRefresh }) => {
                 onClose={() => { setIsProductModalOpen(false); setSelectedProduct(null); }}
                 updateProduct={onRefresh}
                 product={selectedProduct}
-                user={{ brandNm: brand.brandNm }}
+                user={{ brandNm: brand.brandNm, brandId: id }}
             />
         </div>
     );
