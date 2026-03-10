@@ -5,7 +5,7 @@ import AuthModal from '../auth/AuthPage';
 import StyleCard from '../../../components/user/card/StyleCard';
 import ProductCard from '../../../components/user/card/ProductCard';
 import { ListPost } from '../../../api/user/post';
-import { RecommendProducts } from '../../../api/user/recommend';
+import { ListProduct } from '../../../api/user/product';
 import "../../../App.css";
 import "./UserMain.css";
 import "../../../styles/user/Hero.css";
@@ -44,18 +44,19 @@ function App() {
       })
       .catch(e => console.error('피드 조회 실패:', e));
 
-    RecommendProducts(12)
+    ListProduct('', null, 0, 12)
       .then(res => {
-        const products = res.data || [];
-        setPopularProducts(products.map(p => ({
-          id: p.productId,
-          image: '',
+        const items = res.data.content || [];
+        setPopularProducts(items.map(p => ({
+          id: p.id,
+          image: p.images?.length > 0 ? `${IMG_BASE}${p.images[0].imgNm}` : '',
           brand: p.brandNm,
           name: p.productNm,
           price: p.productPrice?.toLocaleString(),
+          _raw: p,
         })));
       })
-      .catch(e => console.error('추천 상품 조회 실패:', e));
+      .catch(e => console.error('상품 조회 실패:', e));
   }, []);
 
   useEffect(() => {

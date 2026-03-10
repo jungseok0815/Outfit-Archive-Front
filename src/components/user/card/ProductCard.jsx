@@ -6,7 +6,7 @@ function ProductCard({ product, rank }) {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/shop/${product.id}`, { state: { product } });
+    navigate(`/shop/${product.id}`, { state: { product: product._raw || product } });
   };
 
   return (

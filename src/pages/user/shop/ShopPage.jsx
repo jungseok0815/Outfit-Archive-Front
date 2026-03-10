@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Navbar from '../../../components/user/header/Header';
 import AuthModal from '../auth/AuthPage';
 import ProductCard from '../../../components/user/card/ProductCard';
@@ -7,6 +7,7 @@ import "../../../App.css";
 import "./ShopPage.css";
 
 const IMG_BASE = 'http://localhost:8080/api/img/get?imgNm=';
+const PAGE_SIZE = 12;
 
 const CATEGORY_MAP = {
   "전체": null,
@@ -33,27 +34,80 @@ function ShopPage() {
   const [products, setProducts] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const debounceRef = useRef(null);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
 
+  const debounceRef = useRef(null);
+  const observerRef = useRef(null);
+  const loadingRef = useRef(false);
+
+  const mapProduct = (p) => ({
+    id: p.id,
+    image: p.images?.length > 0 ? `${IMG_BASE}${p.images[0].imgNm}` : '',
+    brand: p.brandNm,
+    name: p.productNm,
+    price: p.productPrice?.toLocaleString(),
+    category: CATEGORY_KOR[p.category] || p.category,
+    _raw: p,
+  });
+
+  // 첫 페이지 로드 (검색어·카테고리 변경 시 리셋)
   useEffect(() => {
+    setProducts([]);
+    setPage(0);
+    setHasMore(true);
     setLoading(true);
+    loadingRef.current = true;
+
     const categoryEnum = CATEGORY_MAP[selectedCategory];
-    ListProduct(searchQuery, categoryEnum)
+    ListProduct(searchQuery, categoryEnum, 0, PAGE_SIZE)
       .then(res => {
-        const items = res.data.content || [];
-        setTotalCount(res.data.totalElements || 0);
-        setProducts(items.map(p => ({
-          id: p.id,
-          image: p.images?.length > 0 ? `${IMG_BASE}${p.images[0].imgNm}` : '',
-          brand: p.brandNm,
-          name: p.productNm,
-          price: p.productPrice?.toLocaleString(),
-          category: CATEGORY_KOR[p.category] || p.category,
-        })));
+        const data = res.data;
+        setTotalCount(data.totalElements || 0);
+        setProducts((data.content || []).map(mapProduct));
+        setHasMore(!data.last);
       })
       .catch(e => console.error('상품 조회 실패:', e))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+        loadingRef.current = false;
+      });
   }, [searchQuery, selectedCategory]);
+
+  // 다음 페이지 로드
+  const loadMore = useCallback(() => {
+    if (loadingRef.current || !hasMore) return;
+
+    const nextPage = page + 1;
+    setPage(nextPage);
+    loadingRef.current = true;
+
+    const categoryEnum = CATEGORY_MAP[selectedCategory];
+    ListProduct(searchQuery, categoryEnum, nextPage, PAGE_SIZE)
+      .then(res => {
+        const data = res.data;
+        setProducts(prev => [...prev, ...(data.content || []).map(mapProduct)]);
+        setHasMore(!data.last);
+      })
+      .catch(e => console.error('상품 추가 로드 실패:', e))
+      .finally(() => {
+        loadingRef.current = false;
+      });
+  }, [page, hasMore, searchQuery, selectedCategory]);
+
+  // IntersectionObserver — 하단 감지 시 다음 페이지 로드
+  const sentinelRef = useCallback(node => {
+    if (observerRef.current) observerRef.current.disconnect();
+    if (!node) return;
+
+    observerRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        loadMore();
+      }
+    }, { threshold: 0.1 });
+
+    observerRef.current.observe(node);
+  }, [loadMore]);
 
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -117,14 +171,23 @@ function ShopPage() {
       </div>
 
       {/* 상품 그리드 */}
-      {loading ? (
+      {loading && products.length === 0 ? (
         <div className="shop-empty"><p>상품을 불러오는 중...</p></div>
       ) : (
-        <div className="shop-grid">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <>
+          <div className="shop-grid">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+
+          {/* 무한 스크롤 감지 영역 */}
+          {hasMore && products.length > 0 && (
+            <div ref={sentinelRef} className="shop-scroll-sentinel">
+              <div className="shop-spinner" />
+            </div>
+          )}
+        </>
       )}
 
       {!loading && products.length === 0 && (

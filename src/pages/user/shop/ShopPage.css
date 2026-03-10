@@ -109,10 +109,30 @@
 .shop-grid {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px 60px;
+  padding: 0 20px 20px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+}
+
+/* 무한 스크롤 감지 영역 */
+.shop-scroll-sentinel {
+  display: flex;
+  justify-content: center;
+  padding: 32px 0 60px;
+}
+
+.shop-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #ebebeb;
+  border-top-color: #222222;
+  border-radius: 50%;
+  animation: shop-spin 0.7s linear infinite;
+}
+
+@keyframes shop-spin {
+  to { transform: rotate(360deg); }
 }
 
 /* 검색 결과 없음 */
