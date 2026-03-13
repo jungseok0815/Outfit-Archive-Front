@@ -311,6 +311,15 @@ function MyPage() {
                     <span className={`mypage-order-status ${cls}`}>{label}</span>
                   </div>
                   <div className="mypage-order-body">
+                    {order.productImgNm ? (
+                      <img
+                        className="mypage-order-img"
+                        src={`${IMG_BASE}${order.productImgNm}`}
+                        alt={order.productNm}
+                      />
+                    ) : (
+                      <div className="mypage-order-img mypage-order-img-empty" />
+                    )}
                     <div className="mypage-order-info">
                       {order.brandNm && <span className="mypage-order-brand">{order.brandNm}</span>}
                       <span className="mypage-order-product">{order.productNm}</span>
@@ -318,6 +327,18 @@ function MyPage() {
                     </div>
                     <strong className="mypage-order-price">{order.totalPrice?.toLocaleString()}원</strong>
                   </div>
+                  {order.status === 'SHIPPING' && order.trackingNumber && (
+                    <div className="mypage-order-tracking">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3" />
+                        <rect x="9" y="11" width="14" height="10" rx="2" />
+                        <circle cx="12" cy="16" r="1" />
+                        <circle cx="20" cy="16" r="1" />
+                      </svg>
+                      <span className="mypage-order-tracking-label">송장번호</span>
+                      <span className="mypage-order-tracking-number">{order.trackingNumber}</span>
+                    </div>
+                  )}
                   {(order.recipientName || order.shippingAddress) && (
                     <div className="mypage-order-shipping">
                       {order.recipientName && <span>{order.recipientName} {order.recipientPhone}</span>}

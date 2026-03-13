@@ -296,6 +296,18 @@
   gap: 16px;
 }
 
+.mypage-order-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.mypage-order-img-empty {
+  background-color: #f0f0f0;
+}
+
 .mypage-order-info {
   display: flex;
   flex-direction: column;
@@ -330,6 +342,29 @@
   font-weight: 700;
   color: #222222;
   flex-shrink: 0;
+}
+
+.mypage-order-tracking {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-top: 1px solid #f5f5f5;
+  background-color: #fff8f0;
+  color: #e65100;
+}
+
+.mypage-order-tracking-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e65100;
+}
+
+.mypage-order-tracking-number {
+  font-size: 13px;
+  font-weight: 700;
+  color: #e65100;
+  letter-spacing: 0.5px;
 }
 
 .mypage-order-shipping {
