@@ -11,6 +11,7 @@ import { ListMyPost, ListPost, DeletePost } from '../../../api/user/post';
 import { GetFollowCount } from '../../../api/user/follow';
 import { UpdateProfileImg, GetUserProfile } from '../../../api/user/auth';
 import { GetPoint, GetPointHistory } from '../../../api/user/point';
+import { ListMyOrder } from '../../../api/user/order';
 import "../../../App.css";
 import "./MyPage.css";
 
@@ -32,6 +33,7 @@ function MyPage() {
   const [profileUser, setProfileUser] = useState(null);
   const [currentPoint, setCurrentPoint] = useState(0);
   const [pointHistory, setPointHistory] = useState([]);
+  const [orders, setOrders] = useState([]);
 
   // 본인 페이지 여부
   const isOwnPage = !paramUserId || (user && String(user.id) === String(paramUserId));

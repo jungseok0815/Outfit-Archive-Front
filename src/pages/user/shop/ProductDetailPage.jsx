@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../../components/user/header/Header";
 import AuthModal from "../auth/AuthPage";
-import { GetProduct } from "../../../api/user/product";
+import { GetProduct, ListProductReview } from "../../../api/user/product";
 import "../../../App.css";
 import "./ProductDetailPage.css";
 
@@ -22,6 +22,7 @@ function ProductDetailPage() {
   const [loading, setLoading] = useState(!product);
   const [imgIndex, setImgIndex] = useState(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
     if (!product) {
@@ -34,6 +35,25 @@ function ProductDetailPage() {
         .finally(() => setLoading(false));
     }
   }, [productId, product]);
+
+  useEffect(() => {
+    if (productId) {
+      ListProductReview(productId, 0, 20)
+        .then((res) => setReviews(res.data.content || []))
+        .catch(() => {});
+    }
+  }, [productId]);
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+  };
+
+  const renderStars = (rating) =>
+    Array.from({ length: 5 }, (_, i) => (
+      <span key={i} className={`review-star ${i < rating ? "filled" : ""}`}>★</span>
+    ));
 
   if (loading) {
     return (
@@ -134,6 +154,29 @@ function ProductDetailPage() {
                 </span>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* 상품 후기 */}
+        <div className="review-section">
+          <h2 className="review-section-title">상품 후기 <span className="review-count">{reviews.length}</span></h2>
+
+          {/* 후기 목록 */}
+          <div className="review-list">
+            {reviews.length === 0 ? (
+              <p className="review-empty">아직 후기가 없습니다. 첫 번째 후기를 남겨보세요!</p>
+            ) : (
+              reviews.map((review) => (
+                <div key={review.id} className="review-item">
+                  <div className="review-item-header">
+                    <span className="review-item-user">{review.userNm}</span>
+                    <div className="review-item-stars">{renderStars(review.rating)}</div>
+                    <span className="review-item-date">{formatDate(review.createdAt)}</span>
+                  </div>
+                  <p className="review-item-content">{review.content}</p>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
