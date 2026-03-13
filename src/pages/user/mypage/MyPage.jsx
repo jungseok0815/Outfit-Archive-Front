@@ -126,6 +126,9 @@ function MyPage() {
       GetPointHistory(0, 20)
         .then(res => setPointHistory(res.data.content || []))
         .catch(e => console.error('포인트 내역 조회 실패:', e));
+      ListMyOrder(0, 50)
+        .then(res => setOrders(res.data.content || []))
+        .catch(e => console.error('구매내역 조회 실패:', e));
     }
   }, [user, paramUserId]);
 
@@ -236,6 +239,14 @@ function MyPage() {
           게시물
         </button>
         {isOwnPage && (
+          <button className={`mypage-tab ${activeTab === "orders" ? "active" : ""}`} onClick={() => setActiveTab("orders")}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 7h-3V6a4 4 0 00-8 0v1H5a1 1 0 00-1 1v11a3 3 0 003 3h10a3 3 0 003-3V8a1 1 0 00-1-1zm-9-1a2 2 0 014 0v1h-4V6zm8 13a1 1 0 01-1 1H7a1 1 0 01-1-1V9h2v1a1 1 0 002 0V9h4v1a1 1 0 002 0V9h2v10z"/>
+            </svg>
+            구매내역
+          </button>
+        )}
+        {isOwnPage && (
           <button className={`mypage-tab ${activeTab === "points" ? "active" : ""}`} onClick={() => setActiveTab("points")}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H11.5v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.65c.1 1.7 1.36 2.66 2.85 2.97V19h1.72v-1.67c1.52-.29 2.72-1.16 2.72-2.74 0-2.22-1.86-2.97-3.63-3.45z" />
@@ -276,6 +287,47 @@ function MyPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* 구매내역 탭 */}
+      {activeTab === "orders" && (
+        <div className="mypage-orders">
+          {orders.length === 0 ? (
+            <p className="mypage-orders-empty">구매 내역이 없습니다.</p>
+          ) : (
+            orders.map((order) => {
+              const statusMap = {
+                PAYMENT_COMPLETE: { label: "결제완료", cls: "status-paid" },
+                SHIPPING: { label: "배송중", cls: "status-shipping" },
+                DELIVERED: { label: "배송완료", cls: "status-delivered" },
+                CANCELLED: { label: "취소", cls: "status-cancelled" },
+              };
+              const { label, cls } = statusMap[order.status] || { label: order.status, cls: "" };
+              return (
+                <div key={order.id} className="mypage-order-item">
+                  <div className="mypage-order-header">
+                    <span className="mypage-order-date">{order.orderDate?.substring(0, 10)}</span>
+                    <span className={`mypage-order-status ${cls}`}>{label}</span>
+                  </div>
+                  <div className="mypage-order-body">
+                    <div className="mypage-order-info">
+                      {order.brandNm && <span className="mypage-order-brand">{order.brandNm}</span>}
+                      <span className="mypage-order-product">{order.productNm}</span>
+                      <span className="mypage-order-qty">수량 {order.quantity}개</span>
+                    </div>
+                    <strong className="mypage-order-price">{order.totalPrice?.toLocaleString()}원</strong>
+                  </div>
+                  {(order.recipientName || order.shippingAddress) && (
+                    <div className="mypage-order-shipping">
+                      {order.recipientName && <span>{order.recipientName} {order.recipientPhone}</span>}
+                      {order.shippingAddress && <span>{order.shippingAddress}</span>}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
       )}
 
