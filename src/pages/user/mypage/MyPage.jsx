@@ -6,6 +6,7 @@ import PostCreateModal from "./PostCreateModal";
 import PostDetailPanel from "./PostDetailPanel";
 import ProfileEditModal from "./ProfileEditModal";
 import FollowListModal from "./FollowListModal";
+import ReviewWriteModal from "./ReviewWriteModal";
 import { useAuth } from "../../../store/context/UserContext";
 import { ListMyPost, ListPost, DeletePost } from '../../../api/user/post';
 import { GetFollowCount } from '../../../api/user/follow';
@@ -34,6 +35,7 @@ function MyPage() {
   const [currentPoint, setCurrentPoint] = useState(0);
   const [pointHistory, setPointHistory] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [reviewOrder, setReviewOrder] = useState(null);
 
   // 본인 페이지 여부
   const isOwnPage = !paramUserId || (user && String(user.id) === String(paramUserId));
@@ -69,6 +71,21 @@ function MyPage() {
         setPosts(mapPosts(filtered));
       })
       .catch(e => console.error('게시물 조회 실패:', e));
+  };
+
+  const loadOrders = () => {
+    ListMyOrder(0, 50)
+      .then(res => setOrders(res.data.content || []))
+      .catch(e => console.error('구매내역 조회 실패:', e));
+  };
+
+  const isReviewEligible = (order) => {
+    if (order.status !== 'DELIVERED') return false;
+    if (order.reviewWritten) return false;
+    if (!order.deliveredDate) return false;
+    const delivered = new Date(order.deliveredDate);
+    const twoWeeksLater = new Date(delivered.getTime() + 14 * 24 * 60 * 60 * 1000);
+    return new Date() <= twoWeeksLater;
   };
 
   const handleDelete = (postId) => {
@@ -127,9 +144,7 @@ function MyPage() {
       GetPointHistory(0, 20)
         .then(res => setPointHistory(res.data.content || []))
         .catch(e => console.error('포인트 내역 조회 실패:', e));
-      ListMyOrder(0, 50)
-        .then(res => setOrders(res.data.content || []))
-        .catch(e => console.error('구매내역 조회 실패:', e));
+      loadOrders();
     }
   }, [user, paramUserId]);
 
@@ -170,6 +185,13 @@ function MyPage() {
           userId={pageUserId}
           type={followModalType}
           onClose={() => setFollowModalType(null)}
+        />
+      )}
+      {reviewOrder && (
+        <ReviewWriteModal
+          order={reviewOrder}
+          onClose={() => setReviewOrder(null)}
+          onSuccess={loadOrders}
         />
       )}
       {selectedPost && (
@@ -306,7 +328,7 @@ function MyPage() {
               };
               const { label, cls } = statusMap[order.status] || { label: order.status, cls: "" };
               return (
-                <div key={order.id} className="mypage-order-item">
+                <div key={order.orderId} className="mypage-order-item">
                   <div className="mypage-order-header">
                     <span className="mypage-order-date">{order.orderDate?.substring(0, 10)}</span>
                     <span className={`mypage-order-status ${cls}`}>{label}</span>
@@ -344,6 +366,22 @@ function MyPage() {
                     <div className="mypage-order-shipping">
                       {order.recipientName && <span>{order.recipientName} {order.recipientPhone}</span>}
                       {order.shippingAddress && <span>{order.shippingAddress}</span>}
+                    </div>
+                  )}
+                  {order.status === 'DELIVERED' && (
+                    <div className="mypage-order-review">
+                      {order.reviewWritten ? (
+                        <span className="mypage-review-done-badge">작성 완료</span>
+                      ) : isReviewEligible(order) ? (
+                        <button
+                          className="mypage-review-btn"
+                          onClick={() => setReviewOrder(order)}
+                        >
+                          후기 작성
+                        </button>
+                      ) : (
+                        <span className="mypage-review-expired">작성 기간 만료</span>
+                      )}
                     </div>
                   )}
                 </div>

@@ -380,6 +380,46 @@
   color: #999999;
 }
 
+.mypage-order-review {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 12px 20px;
+  border-top: 1px solid #f5f5f5;
+}
+
+.mypage-review-btn {
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: #222222;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.mypage-review-btn:hover {
+  background-color: #444444;
+}
+
+.mypage-review-done-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #2e7d32;
+  background-color: #e8f5e9;
+  border-radius: 20px;
+}
+
+.mypage-review-expired {
+  font-size: 12px;
+  font-weight: 600;
+  color: #bcbcbc;
+}
+
 /* 포인트현황 탭 */
 .mypage-points {
   max-width: 900px;

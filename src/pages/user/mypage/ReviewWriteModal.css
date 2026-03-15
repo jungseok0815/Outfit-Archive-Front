@@ -1,0 +1,157 @@
+.review-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.review-modal {
+  background-color: #ffffff;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 480px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.review-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.review-modal-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #222222;
+  margin: 0;
+}
+
+.review-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999999;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.review-modal-close:hover {
+  color: #222222;
+}
+
+.review-modal-product {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  background-color: #fafafa;
+  border-radius: 10px;
+  border: 1px solid #f0f0f0;
+}
+
+.review-modal-brand {
+  font-size: 11px;
+  font-weight: 700;
+  color: #999999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.review-modal-product-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #222222;
+}
+
+.review-modal-rating {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.review-modal-rating-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #222222;
+}
+
+.review-modal-stars {
+  display: flex;
+  gap: 4px;
+}
+
+.review-modal-star {
+  font-size: 28px;
+  color: #d5d5d5;
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.15s ease;
+  user-select: none;
+}
+
+.review-modal-star:hover {
+  transform: scale(1.15);
+}
+
+.review-modal-star.filled {
+  color: #ffc107;
+}
+
+.review-modal-textarea {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 14px;
+  color: #222222;
+  border: 1px solid #ebebeb;
+  border-radius: 10px;
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+  line-height: 1.6;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.review-modal-textarea:focus {
+  outline: none;
+  border-color: #222222;
+}
+
+.review-modal-textarea::placeholder {
+  color: #bcbcbc;
+}
+
+.review-modal-char-count {
+  font-size: 12px;
+  color: #bcbcbc;
+  text-align: right;
+  margin-top: -14px;
+}
+
+.review-modal-submit {
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: #222222;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.review-modal-submit:hover:not(:disabled) {
+  background-color: #444444;
+}
+
+.review-modal-submit:disabled {
+  background-color: #d5d5d5;
+  cursor: not-allowed;
+}
