@@ -8,9 +8,9 @@ export const ListProduct = (keyword = '', category = null, page = 0, size = 12) 
     return api.get('/api/usr/product/list', { params });
 }
 
-// GET /api/usr/product/get?id={id} → ResponseProductDto
+// GET /api/usr/product/{id} → ResponseProductDto
 export const GetProduct = (id) => {
-    return api.get('/api/usr/product/get', { params: { id } });
+    return api.get(`/api/usr/product/${id}`);
 }
 
 // GET /api/usr/product/review/list?productId={id}&page=0&size=10 → Spring Page<ReviewDto>

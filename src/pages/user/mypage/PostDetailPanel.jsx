@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./PostDetailPanel.css";
 import { ListComment, InsertComment, ToggleLike, GetLikeStatus } from '../../../api/user/post';
+import { GetProduct } from '../../../api/user/product';
+
+const IMG_BASE = 'http://localhost:8080/api/img/get?imgNm=';
 
 function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
+  const navigate = useNavigate();
   const [imageIndex, setImageIndex] = useState(0);
   const [showComments, setShowComments] = useState(false);
   const [showProducts, setShowProducts] = useState(false);
@@ -11,6 +16,7 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
   const [submittingComment, setSubmittingComment] = useState(false);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+  const [productImages, setProductImages] = useState({});
 
   useEffect(() => {
     setImageIndex(0);
@@ -39,6 +45,27 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
         .catch(e => console.error('댓글 조회 실패:', e));
     }
   }, [showComments, post?.id]);
+
+  // 상품 이미지 로드
+  useEffect(() => {
+    if (showProducts && post?.products?.length > 0) {
+      post.products.forEach(product => {
+        if (!productImages[product.id]) {
+          GetProduct(product.id)
+            .then(res => {
+              const imgs = res.data.images || [];
+              if (imgs.length > 0) {
+                setProductImages(prev => ({
+                  ...prev,
+                  [product.id]: `${IMG_BASE}${imgs[0].imgNm}`
+                }));
+              }
+            })
+            .catch(() => {});
+        }
+      });
+    }
+  }, [showProducts, post?.products]);
 
   if (!post) return null;
 
@@ -175,8 +202,20 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
           <div className="detail-products">
             <p className="detail-products-title">착용 상품</p>
             {post.products.map((product) => (
-              <div key={product.id} className="detail-product-item">
-                <div className="detail-product-thumb" />
+              <div
+                key={product.id}
+                className="detail-product-item"
+                onClick={() => { onClose(); navigate(`/shop/${product.id}`); }}
+              >
+                <div className="detail-product-thumb">
+                  {productImages[product.id] ? (
+                    <img src={productImages[product.id]} alt={product.productNm} />
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bcbcbc" strokeWidth="1.5">
+                      <path d="M19 7h-3V6a4 4 0 00-8 0v1H5a1 1 0 00-1 1v11a3 3 0 003 3h10a3 3 0 003-3V8a1 1 0 00-1-1zm-9-1a2 2 0 014 0v1h-4V6z"/>
+                    </svg>
+                  )}
+                </div>
                 <div className="detail-product-info">
                   <span className="detail-product-brand">{product.brandNm}</span>
                   <span className="detail-product-name">{product.productNm}</span>
