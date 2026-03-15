@@ -4,7 +4,7 @@ import { postAdminLogin } from "../../api/admin/auth";
 import "./AdminLoginPage.css";
 
 function AdminLoginPage({ onLoginSuccess }) {
-  const { login } = useAuth();
+  const { adminLogin } = useAuth();
   const [loginForm, setLoginForm] = useState({ memberId: "", memberPwd: "" });
   const [error, setError] = useState("");
 
@@ -22,7 +22,7 @@ function AdminLoginPage({ onLoginSuccess }) {
         const userInfo = res.data;
         console.log("로그인 유저 정보는 : " , userInfo)
         if (userInfo.adminRole) {
-          login(userInfo);
+          adminLogin(userInfo);
           onLoginSuccess();
         } else {
           setError("관리자 권한이 없는 계정입니다.");

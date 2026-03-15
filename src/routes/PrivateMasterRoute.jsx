@@ -3,10 +3,10 @@ import { useAuth } from "../store/context/UserContext";
 import AdminLoginPage from "../pages/admin/AdminLoginPage";
 
 const PrivateMasterRoute = ({ component: Component }) => {
-  const { user } = useAuth();
+  const { adminUser } = useAuth();
   const [loginSuccess, setLoginSuccess] = useState(false);
 
-  if (user || loginSuccess) {
+  if (adminUser || loginSuccess) {
     return Component;
   }
 

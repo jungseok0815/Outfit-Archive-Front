@@ -5,6 +5,7 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
 
   const [user, setUser] = useState(null);
+  const [adminUser, setAdminUser] = useState(null);
   const [loading, setLoading] = useState(true); // 로딩 상태 추가
 
   useEffect(() => {
@@ -13,6 +14,10 @@ export const AuthProvider = ({ children }) => {
       if (storedUser) {
         setUser(JSON.parse(storedUser));
       }
+      const storedAdminUser = localStorage.getItem('adminUser');
+      if (storedAdminUser) {
+        setAdminUser(JSON.parse(storedAdminUser));
+      }
     } catch (error) {
       console.error('Failed to restore user from localStorage:', error);
     } finally {
@@ -20,17 +25,28 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // 로그인 함수
+  // 일반 유저 로그인 함수
   const login = (userData) => {
     setUser(userData);
-    // 필요한 경우 로컬 스토리지에 저장
     localStorage.setItem('user', JSON.stringify(userData));
   };
 
-  // 로그아웃 함수
+  // 일반 유저 로그아웃 함수
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+  };
+
+  // 관리자 로그인 함수
+  const adminLogin = (userData) => {
+    setAdminUser(userData);
+    localStorage.setItem('adminUser', JSON.stringify(userData));
+  };
+
+  // 관리자 로그아웃 함수
+  const adminLogout = () => {
+    setAdminUser(null);
+    localStorage.removeItem('adminUser');
   };
 
     // 로딩 중일 때는 아무것도 렌더링하지 않음
@@ -39,7 +55,7 @@ export const AuthProvider = ({ children }) => {
     }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, adminUser, adminLogin, adminLogout }}>
       {children}
     </AuthContext.Provider>
   );

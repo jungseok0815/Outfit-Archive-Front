@@ -74,8 +74,8 @@ const registerLabels = {
 };
 
 function Admin() {
-  const { user, logout } = useAuth();
-  const adminRole = user?.adminRole;
+  const { adminUser, adminLogout } = useAuth();
+  const adminRole = adminUser?.adminRole;
 
   const menuItems = ALL_MENU_ITEMS.filter((item) => item.roles.includes(adminRole));
 
@@ -89,11 +89,11 @@ function Admin() {
       case "브랜드 관리":
         return <BrandManagement registerTrigger={registerTrigger} />;
       case "상품 관리":
-        return <ProductManagement registerTrigger={registerTrigger} user={user} />;
+        return <ProductManagement registerTrigger={registerTrigger} user={adminUser} />;
       case "주문 관리":
-        return <OrderManagement user={user} />;
+        return <OrderManagement user={adminUser} />;
       case "매출 관리":
-        return <SalesManagement user={user} />;
+        return <SalesManagement user={adminUser} />;
       case "관리자 관리":
         return <AdminManagement />;
       default:
@@ -102,7 +102,7 @@ function Admin() {
   };
 
   const handleLogout = () => {
-    logout();
+    adminLogout();
     window.location.href = "/admin";
   };
 
@@ -132,14 +132,14 @@ function Admin() {
         <div className="admin-sidebar-footer">
           <div className="admin-user-info">
             <div className="admin-user-avatar">
-              {user?.memberNm?.charAt(0) || "A"}
+              {adminUser?.memberNm?.charAt(0) || "A"}
             </div>
             <div className="admin-user-detail">
-              <span className="admin-user-name">{user?.memberNm || "관리자"}</span>
+              <span className="admin-user-name">{adminUser?.memberNm || "관리자"}</span>
               <span className="admin-user-role">
                 {ROLE_LABELS[adminRole] || "Administrator"}
-                {adminRole === 'PARTNER' && user?.brandNm && (
-                  <span className="admin-user-brand"> · {user.brandNm}</span>
+                {adminRole === 'PARTNER' && adminUser?.brandNm && (
+                  <span className="admin-user-brand"> · {adminUser.brandNm}</span>
                 )}
               </span>
             </div>

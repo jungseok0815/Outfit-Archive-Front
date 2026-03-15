@@ -37,7 +37,7 @@ const AdminManagement = () => {
     ListAdmin()
       .then((res) => {
         console.log("res admin  :" , res.data)
-        setAdminList(res.data || [])
+        setAdminList(Array.isArray(res.data) ? res.data : [])
       })
       .catch((err) => console.error('관리자 목록 조회 실패:', err))
       .finally(() => setListLoading(false));

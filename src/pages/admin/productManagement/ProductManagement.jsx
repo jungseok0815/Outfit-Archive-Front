@@ -22,6 +22,7 @@ const ProductManagement = ({ registerTrigger, user }) => {
   const excelInputRef = useRef(null);
 
   const filterByBrand = (list) => {
+    if (!Array.isArray(list)) return [];
     if (!isPartner || !user?.brandId) return list;
     return list.filter((p) => p.brandId === user.brandId);
   };
