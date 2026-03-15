@@ -25,6 +25,7 @@ function StylePage() {
         const items = res.data.content || [];
         setPosts(items.map(p => ({
           id: p.id,
+          userId: p.userId,
           user: p.userNm,
           avatar: null,
           image: p.images?.length > 0 ? `${IMG_BASE}${p.images[0].imgNm}` : '',

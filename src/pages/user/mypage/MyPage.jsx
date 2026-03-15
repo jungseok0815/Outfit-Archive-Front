@@ -41,6 +41,7 @@ function MyPage() {
 
   const mapPosts = (all) => all.map(p => ({
     id: p.id,
+    userId: p.userId,
     images: p.images?.length > 0
       ? p.images.map(img => `${IMG_BASE}${img.imgNm}`)
       : [''],

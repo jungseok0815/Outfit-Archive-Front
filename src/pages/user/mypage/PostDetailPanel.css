@@ -173,6 +173,37 @@
     background-color: rgba(255, 255, 255, 0.85);
 }
 
+/* ===== 작성자 ===== */
+.detail-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px 0;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.detail-user:hover {
+    opacity: 0.7;
+}
+
+.detail-user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.detail-user-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #222222;
+}
+
 /* ===== 제목 ===== */
 .detail-title-wrap {
     padding: 14px 20px 0;

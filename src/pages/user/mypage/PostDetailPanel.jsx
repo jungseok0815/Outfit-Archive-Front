@@ -150,6 +150,27 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
           </div>
         )}
 
+        {/* 작성자 */}
+        {(post.user || post.userNm) && (
+          <div
+            className="detail-user"
+            onClick={() => {
+              if (post.userId) {
+                onClose();
+                navigate(`/mypage/${post.userId}`);
+              }
+            }}
+          >
+            <div className="detail-user-avatar">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="1.5">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+              </svg>
+            </div>
+            <span className="detail-user-name">{post.user || post.userNm}</span>
+          </div>
+        )}
+
         {/* 제목 */}
         {post.title && (
           <div className="detail-title-wrap">
