@@ -9,11 +9,9 @@ import "./StylePage.css";
 
 const IMG_BASE = 'http://localhost:8080/api/img/get?imgNm=';
 
-const tags = ["전체", "캐주얼", "스트릿", "미니멀", "빈티지", "스포티", "포멀"];
-
 function StylePage() {
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [selectedTag, setSelectedTag] = useState("전체");
+  const [searchTerm, setSearchTerm] = useState("");
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
@@ -43,11 +41,14 @@ function StylePage() {
   }, []);
 
   const filteredCards = useMemo(() => {
-    if (selectedTag === "전체") return posts;
+    if (!searchTerm.trim()) return posts;
+    const keyword = searchTerm.trim().toLowerCase();
     return posts.filter(card =>
-      card.title?.includes(selectedTag) || card.content?.includes(selectedTag)
+      card.title?.toLowerCase().includes(keyword) ||
+      card.content?.toLowerCase().includes(keyword) ||
+      card.user?.toLowerCase().includes(keyword)
     );
-  }, [posts, selectedTag]);
+  }, [posts, searchTerm]);
 
   return (
     <div className="app">
@@ -66,17 +67,28 @@ function StylePage() {
         <p className="style-page-subtitle">다양한 코디와 스타일을 탐색하세요</p>
       </div>
 
-      {/* 태그 필터 */}
-      <div className="style-tags">
-        {tags.map((tag) => (
-          <button
-            key={tag}
-            className={`style-tag ${selectedTag === tag ? 'active' : ''}`}
-            onClick={() => setSelectedTag(tag)}
-          >
-            {tag}
-          </button>
-        ))}
+      {/* 검색바 */}
+      <div className="style-search-wrap">
+        <div className="style-search-bar">
+          <svg className="style-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            type="text"
+            className="style-search-input"
+            placeholder="제목, 내용, 작성자로 검색"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+          />
+          {searchTerm && (
+            <button className="style-search-clear" onClick={() => setSearchTerm("")}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* 스타일 카드 그리드 */}
@@ -92,7 +104,7 @@ function StylePage() {
 
       {!loading && filteredCards.length === 0 && (
         <div className="style-empty">
-          <p>해당 태그의 스타일이 없습니다.</p>
+          <p>{searchTerm ? `"${searchTerm}" 검색 결과가 없습니다.` : '스타일이 없습니다.'}</p>
         </div>
       )}
     </div>

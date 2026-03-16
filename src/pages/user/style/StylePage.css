@@ -18,36 +18,63 @@
   margin: 0;
 }
 
-/* 태그 필터 */
-.style-tags {
+/* 검색바 */
+.style-search-wrap {
   display: flex;
   justify-content: center;
-  gap: 8px;
   padding: 0 20px 32px;
-  flex-wrap: wrap;
 }
 
-.style-tag {
-  padding: 8px 20px;
-  font-size: 0.85em;
-  font-weight: 500;
-  color: #999999;
-  background-color: #ffffff;
+.style-search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 480px;
+  background: #ffffff;
   border: 1px solid #ebebeb;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  border-radius: 24px;
+  padding: 0 16px;
+  transition: border-color 0.2s ease;
 }
 
-.style-tag:hover {
-  color: #222222;
-  border-color: #d5d5d5;
-}
-
-.style-tag.active {
-  background-color: #222222;
-  color: #ffffff;
+.style-search-bar:focus-within {
   border-color: #222222;
+}
+
+.style-search-icon {
+  color: #999999;
+  flex-shrink: 0;
+}
+
+.style-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 11px 10px;
+  font-size: 0.875em;
+  color: #222222;
+  background: transparent;
+}
+
+.style-search-input::placeholder {
+  color: #bbbbbb;
+}
+
+.style-search-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #aaaaaa;
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+.style-search-clear:hover {
+  color: #555555;
 }
 
 /* 스타일 카드 그리드 - 4열 (상품과 동일) */
