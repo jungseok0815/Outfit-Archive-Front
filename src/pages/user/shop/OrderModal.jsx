@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { loadTossPayments } from "@tosspayments/payment-sdk";
 import { InsertOrder } from "../../../api/user/order";
 import { GetPoint } from "../../../api/user/point";
 import "./OrderModal.css";
 
 const IMG_BASE = "http://localhost:8080/api/img/get?imgNm=";
+const TOSS_CLIENT_KEY = "test_ck_zXLkKEypNArWmo50nX3lmeaxYG5R";
 
-function OrderModal({ product, onClose, onSuccess }) {
+function OrderModal({ product, onClose }) {
   const [form, setForm] = useState({
     quantity: 1,
     recipientName: "",
@@ -40,29 +42,46 @@ function OrderModal({ product, onClose, onSuccess }) {
   const usePoint = Math.min(Number(form.usePoint) || 0, availablePoint, totalPrice);
   const finalPrice = Math.max(0, totalPrice - usePoint);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.recipientName.trim()) { setError("수령인 이름을 입력해주세요."); return; }
     if (!form.recipientPhone.trim()) { setError("연락처를 입력해주세요."); return; }
     if (!form.shippingAddress.trim()) { setError("배송지를 입력해주세요."); return; }
 
     setSubmitting(true);
-    InsertOrder({
-      productId: product.id,
-      quantity: form.quantity,
-      recipientName: form.recipientName.trim(),
-      recipientPhone: form.recipientPhone.trim(),
-      shippingAddress: form.shippingAddress.trim(),
-      usePoint,
-    })
-      .then(() => {
-        onSuccess?.();
-        onClose();
-      })
-      .catch(err => {
-        setError(err.response?.data?.msg || "주문에 실패했습니다.");
-      })
-      .finally(() => setSubmitting(false));
+    setError("");
+
+    try {
+      // 1단계: 주문 생성 (PENDING 상태)
+      const res = await InsertOrder({
+        productId: product.id,
+        quantity: form.quantity,
+        recipientName: form.recipientName.trim(),
+        recipientPhone: form.recipientPhone.trim(),
+        shippingAddress: form.shippingAddress.trim(),
+        usePoint,
+      });
+
+      const { tossOrderId, actualPayment, productNm } = res.data;
+
+      // 2단계: 토스 결제창 열기
+      const tossPayments = await loadTossPayments(TOSS_CLIENT_KEY);
+      await tossPayments.requestPayment("카드", {
+        amount: actualPayment,
+        orderId: tossOrderId,
+        orderName: productNm,
+        customerName: form.recipientName.trim(),
+        successUrl: `${window.location.origin}/payment/success`,
+        failUrl: `${window.location.origin}/payment/fail`,
+      });
+
+    } catch (err) {
+      // 토스 결제창 닫기(취소)는 에러를 던지지 않고 그냥 종료됨
+      const msg = err?.response?.data?.msg || err?.message || "";
+      if (msg) setError(msg);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const thumbImg = product.images?.length > 0
@@ -187,7 +206,7 @@ function OrderModal({ product, onClose, onSuccess }) {
               className="order-submit-btn"
               disabled={submitting}
             >
-              {submitting ? "주문 처리 중..." : `${finalPrice.toLocaleString()}원 결제하기`}
+              {submitting ? "처리 중..." : `${finalPrice.toLocaleString()}원 결제하기`}
             </button>
           </form>
         </div>

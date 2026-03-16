@@ -103,7 +103,6 @@ function ProductDetailPage() {
         <OrderModal
           product={product}
           onClose={() => setShowOrderModal(false)}
-          onSuccess={() => navigate('/mypage')}
         />
       )}
 

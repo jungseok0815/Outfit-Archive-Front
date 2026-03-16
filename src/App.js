@@ -9,6 +9,8 @@ import Admin from './pages/admin/AdminMainPage';
 import PrivateMasterRoute from './routes/PrivateMasterRoute';
 import PrivateUserRoute from './routes/PrivateUserRoute';
 import MyPage from './pages/user/mypage/MyPage';
+import PaymentSuccessPage from './pages/user/payment/PaymentSuccessPage';
+import PaymentFailPage from './pages/user/payment/PaymentFailPage';
 import { AuthProvider } from './store/context/UserContext';
 
 
@@ -26,6 +28,8 @@ function App() {
                   <Route path='/style' element={<StylePage/>}/>
                   <Route path='/mypage' element={<PrivateUserRoute component={<MyPage/>}/>}/>
                   <Route path='/mypage/:userId' element={<MyPage/>}/>
+                  <Route path='/payment/success' element={<PaymentSuccessPage/>}/>
+                  <Route path='/payment/fail' element={<PaymentFailPage/>}/>
                   <Route path='/admin' element={<PrivateMasterRoute component={<Admin />}/>}/>
                   </Routes>
               </BrowserRouter>

@@ -1,0 +1,143 @@
+.payment-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f8f8;
+  padding: 20px;
+}
+
+.payment-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* 아이콘 */
+.payment-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0 auto 24px;
+}
+
+.payment-icon.success {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.payment-icon.error {
+  background: #fdecea;
+  color: #c62828;
+}
+
+/* 스피너 */
+.payment-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid #ebebeb;
+  border-top-color: #222222;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 24px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.payment-loading-text {
+  font-size: 14px;
+  color: #888;
+}
+
+/* 텍스트 */
+.payment-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #222222;
+  margin: 0 0 10px;
+}
+
+.payment-desc {
+  font-size: 14px;
+  color: #888888;
+  margin: 0 0 28px;
+  line-height: 1.6;
+}
+
+.payment-code {
+  font-size: 12px;
+  color: #bbbbbb;
+  margin: -16px 0 28px;
+}
+
+/* 주문 정보 */
+.payment-order-info {
+  background: #f8f8f8;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.payment-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.payment-info-label {
+  color: #888888;
+}
+
+.payment-info-value {
+  font-weight: 600;
+  color: #222222;
+}
+
+.payment-info-value.earn {
+  color: #2e7d32;
+}
+
+/* 버튼 */
+.payment-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.payment-btn {
+  flex: 1;
+  padding: 13px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.payment-btn:hover { opacity: 0.85; }
+
+.payment-btn.primary {
+  background: #222222;
+  color: #ffffff;
+}
+
+.payment-btn.secondary {
+  background: #f0f0f0;
+  color: #444444;
+}
