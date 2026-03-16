@@ -25,7 +25,7 @@ function StylePage() {
           id: p.id,
           userId: p.userId,
           user: p.userNm,
-          avatar: null,
+          avatar: p.profileImgNm ? `${IMG_BASE}${p.profileImgNm}` : null,
           image: p.images?.length > 0 ? `${IMG_BASE}${p.images[0].imgNm}` : '',
           images: p.images?.length > 0 ? p.images.map(img => `${IMG_BASE}${img.imgNm}`) : [],
           title: p.title,

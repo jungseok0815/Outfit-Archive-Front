@@ -126,6 +126,27 @@
   background-color: #f5f5f5;
 }
 
+.mypage-follow-btn {
+  padding: 7px 24px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #222222;
+  border: 1px solid #222222;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.mypage-follow-btn.following {
+  color: #222222;
+  background-color: #ffffff;
+}
+
+.mypage-follow-btn:hover {
+  opacity: 0.85;
+}
+
 /* 탭 네비게이션 */
 .mypage-tabs {
   max-width: 900px;

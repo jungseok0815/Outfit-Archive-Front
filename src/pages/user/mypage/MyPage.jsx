@@ -9,7 +9,7 @@ import FollowListModal from "./FollowListModal";
 import ReviewWriteModal from "./ReviewWriteModal";
 import { useAuth } from "../../../store/context/UserContext";
 import { ListMyPost, ListPost, DeletePost } from '../../../api/user/post';
-import { GetFollowCount } from '../../../api/user/follow';
+import { GetFollowCount, CheckFollow, Follow, Unfollow } from '../../../api/user/follow';
 import { UpdateProfileImg, GetUserProfile } from '../../../api/user/auth';
 import { GetPoint, GetPointHistory } from '../../../api/user/point';
 import { ListMyOrder } from '../../../api/user/order';
@@ -30,6 +30,7 @@ function MyPage() {
   const [posts, setPosts] = useState([]);
   const [showProfileEditModal, setShowProfileEditModal] = useState(false);
   const [followCount, setFollowCount] = useState({ followerCount: 0, followingCount: 0 });
+  const [isFollowing, setIsFollowing] = useState(false);
   const [followModalType, setFollowModalType] = useState(null);
   const [profileUser, setProfileUser] = useState(null);
   const [currentPoint, setCurrentPoint] = useState(0);
@@ -112,6 +113,7 @@ function MyPage() {
     // 상태 초기화
     setPosts([]);
     setFollowCount({ followerCount: 0, followingCount: 0 });
+    setIsFollowing(false);
     setSelectedPost(null);
     setActiveTab("posts");
 
@@ -136,6 +138,13 @@ function MyPage() {
         .catch(e => console.error('팔로우 수 조회 실패:', e));
     }
 
+    // 팔로우 여부 확인 (다른 유저 페이지이고 로그인된 경우)
+    if (!isOwnPage && paramUserId && user) {
+      CheckFollow(paramUserId)
+        .then(res => setIsFollowing(res.data.following))
+        .catch(() => {});
+    }
+
     // 포인트 조회 (본인 페이지일 때만)
     if (isOwnPage && user?.id) {
       GetPoint()
@@ -157,6 +166,20 @@ function MyPage() {
       })
       .catch(() => alert('프로필 이미지 변경에 실패했습니다.'));
     e.target.value = '';
+  };
+
+  const handleFollowToggle = () => {
+    if (!user) { setShowAuthModal(true); return; }
+    const action = isFollowing ? Unfollow : Follow;
+    action(paramUserId)
+      .then(() => {
+        setIsFollowing(prev => !prev);
+        setFollowCount(prev => ({
+          ...prev,
+          followerCount: isFollowing ? prev.followerCount - 1 : prev.followerCount + 1,
+        }));
+      })
+      .catch(e => console.error('팔로우 처리 실패:', e));
   };
 
   const currentProfile = isOwnPage ? user : profileUser;
@@ -185,6 +208,7 @@ function MyPage() {
           userId={pageUserId}
           type={followModalType}
           onClose={() => setFollowModalType(null)}
+          isOwnPage={isOwnPage}
         />
       )}
       {reviewOrder && (
@@ -236,7 +260,17 @@ function MyPage() {
         <div className="mypage-info">
           <div className="mypage-info-header">
             <h2 className="mypage-username">{displayName}</h2>
-            {isOwnPage && <button className="mypage-edit-btn" onClick={() => setShowProfileEditModal(true)}>프로필 편집</button>}
+            {isOwnPage
+              ? <button className="mypage-edit-btn" onClick={() => setShowProfileEditModal(true)}>프로필 편집</button>
+              : user && (
+                <button
+                  className={`mypage-follow-btn ${isFollowing ? 'following' : ''}`}
+                  onClick={handleFollowToggle}
+                >
+                  {isFollowing ? '팔로잉' : '팔로우'}
+                </button>
+              )
+            }
           </div>
           <div className="mypage-stats">
             <div className="mypage-stat">

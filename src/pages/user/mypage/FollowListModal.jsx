@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { GetFollowerList, GetFollowingList } from "../../../api/user/follow";
+import { GetFollowerList, GetFollowingList, Follow, Unfollow } from "../../../api/user/follow";
 import "./FollowListModal.css";
 
 const IMG_BASE = 'http://localhost:8080/api/img/get?imgNm=';
 
-function FollowListModal({ userId, type, onClose }) {
+function FollowListModal({ userId, type, onClose, isOwnPage }) {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,9 +15,7 @@ function FollowListModal({ userId, type, onClose }) {
   useEffect(() => {
     const fetchList = type === "follower" ? GetFollowerList : GetFollowingList;
     fetchList(userId)
-      .then(res => {
-        console.log(res)
-        setUsers(res.data || [])})
+      .then(res => setUsers(res.data || []))
       .catch(() => setUsers([]))
       .finally(() => setLoading(false));
   }, [userId, type]);
@@ -29,6 +27,19 @@ function FollowListModal({ userId, type, onClose }) {
   const handleUserClick = (targetUserId) => {
     onClose();
     navigate(`/mypage/${targetUserId}`);
+  };
+
+  const handleUnfollow = (e, targetId) => {
+    e.stopPropagation();
+    Unfollow(targetId)
+      .then(() => setUsers(prev => prev.filter(u => u.id !== targetId)))
+      .catch(err => console.error('언팔로우 실패:', err));
+  };
+
+  const handleRemoveFollower = (e, targetId) => {
+    e.stopPropagation();
+    // 나를 팔로우하는 사람을 팔로워 목록에서 제거 (상대방이 나를 언팔하도록 처리할 수 없으므로 목록에서만 숨김)
+    setUsers(prev => prev.filter(u => u.id !== targetId));
   };
 
   return (
@@ -58,6 +69,22 @@ function FollowListModal({ userId, type, onClose }) {
                     </div>
                   )}
                   <span className="follow-modal-name">{u.userNm}</span>
+                  {isOwnPage && type === "following" && (
+                    <button
+                      className="follow-modal-action-btn unfollow"
+                      onClick={(e) => handleUnfollow(e, u.id)}
+                    >
+                      언팔로우
+                    </button>
+                  )}
+                  {isOwnPage && type === "follower" && (
+                    <button
+                      className="follow-modal-action-btn remove"
+                      onClick={(e) => handleRemoveFollower(e, u.id)}
+                    >
+                      삭제
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>

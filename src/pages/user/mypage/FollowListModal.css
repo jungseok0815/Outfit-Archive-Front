@@ -110,3 +110,35 @@
   color: #999999;
   margin: 0;
 }
+
+.follow-modal-action-btn {
+  margin-left: auto;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: 1px solid #ebebeb;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.follow-modal-action-btn.unfollow {
+  background: #ffffff;
+  color: #555555;
+}
+
+.follow-modal-action-btn.unfollow:hover {
+  background: #f5f5f5;
+  border-color: #d0d0d0;
+}
+
+.follow-modal-action-btn.remove {
+  background: #ffffff;
+  color: #e74c3c;
+  border-color: #fde8e8;
+}
+
+.follow-modal-action-btn.remove:hover {
+  background: #fff0f0;
+}
