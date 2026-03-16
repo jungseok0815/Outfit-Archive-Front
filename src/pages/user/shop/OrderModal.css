@@ -1,0 +1,253 @@
+.order-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.order-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 460px;
+  max-width: 95%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.order-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 16px 20px;
+  border-bottom: 1px solid #ebebeb;
+  flex-shrink: 0;
+}
+
+.order-modal-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #222222;
+  margin: 0;
+}
+
+.order-modal-close {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #999;
+  cursor: pointer;
+}
+
+.order-modal-close:hover { color: #222; }
+
+.order-modal-body {
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 상품 요약 */
+.order-product-summary {
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+  background: #f8f8f8;
+  border-radius: 10px;
+}
+
+.order-product-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #ebebeb;
+}
+
+.order-product-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.order-product-thumb-empty {
+  width: 100%;
+  height: 100%;
+}
+
+.order-product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  justify-content: center;
+}
+
+.order-product-brand {
+  font-size: 11px;
+  font-weight: 700;
+  color: #888;
+}
+
+.order-product-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
+}
+
+.order-product-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: #222;
+}
+
+/* 폼 */
+.order-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.order-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.order-label {
+  width: 60px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  flex-shrink: 0;
+}
+
+.order-input {
+  flex: 1;
+  padding: 9px 12px;
+  font-size: 13px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  outline: none;
+  color: #222;
+  transition: border-color 0.2s;
+}
+
+.order-input:focus { border-color: #222; }
+
+/* 수량 */
+.order-quantity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.order-qty-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #222;
+  transition: background 0.15s;
+}
+
+.order-qty-btn:hover { background: #f5f5f5; }
+
+.order-qty-value {
+  min-width: 28px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: #222;
+}
+
+.order-qty-stock {
+  font-size: 12px;
+  color: #aaa;
+  margin-left: 4px;
+}
+
+/* 포인트 */
+.order-point-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.order-point-input {
+  flex: 1;
+}
+
+.order-point-available {
+  font-size: 12px;
+  color: #888;
+  white-space: nowrap;
+}
+
+/* 결제 요약 */
+.order-summary {
+  border-top: 1px solid #ebebeb;
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.order-summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #555;
+}
+
+.order-summary-row.discount { color: #e74c3c; }
+
+.order-summary-row.total {
+  font-size: 15px;
+  color: #222;
+  font-weight: 600;
+  padding-top: 8px;
+  border-top: 1px solid #ebebeb;
+}
+
+.order-error {
+  font-size: 13px;
+  color: #e74c3c;
+  margin: 0;
+  text-align: center;
+}
+
+.order-submit-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  background: #222222;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.order-submit-btn:hover:not(:disabled) { opacity: 0.85; }
+.order-submit-btn:disabled { opacity: 0.5; cursor: default; }

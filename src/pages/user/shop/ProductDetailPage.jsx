@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../../components/user/header/Header";
 import AuthModal from "../auth/AuthPage";
+import OrderModal from "./OrderModal";
 import { GetProduct, ListProductReview } from "../../../api/user/product";
+import { useAuth } from "../../../store/context/UserContext";
 import "../../../App.css";
 import "./ProductDetailPage.css";
 
@@ -17,11 +19,13 @@ function ProductDetailPage() {
   const { productId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [product, setProduct] = useState(location.state?.product || null);
   const [loading, setLoading] = useState(!product);
   const [imgIndex, setImgIndex] = useState(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showOrderModal, setShowOrderModal] = useState(false);
   const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
@@ -86,10 +90,22 @@ function ProductDetailPage() {
   const handleNext = () =>
     setImgIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
 
+  const handleBuyClick = () => {
+    if (!user) { setShowAuthModal(true); return; }
+    setShowOrderModal(true);
+  };
+
   return (
     <div className="app">
       <Navbar onLoginClick={() => setShowAuthModal(true)} />
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+      {showOrderModal && (
+        <OrderModal
+          product={product}
+          onClose={() => setShowOrderModal(false)}
+          onSuccess={() => navigate('/mypage')}
+        />
+      )}
 
       <div className="detail-container">
         <button className="detail-back" onClick={() => navigate(-1)}>
@@ -153,6 +169,16 @@ function ProductDetailPage() {
                   {product.productQuantity}개
                 </span>
               </div>
+            </div>
+
+            <div className="detail-buy-wrap">
+              <button
+                className="detail-buy-btn"
+                onClick={handleBuyClick}
+                disabled={product.productQuantity === 0}
+              >
+                {product.productQuantity === 0 ? "품절" : "구매하기"}
+              </button>
             </div>
           </div>
         </div>
