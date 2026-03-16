@@ -7,7 +7,7 @@ const ProductList = ({ product, openModal, id }) => {
     <div key={id} className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105" onClick={() => {openModal(product)}}>
       <div className="relative h-32">
         <img
-          src={product.images.length === 0 ? "/api/placeholder/400/320" :`http://localhost:8080/api/img/get?imgNm=${product.images[0].imgNm}`}
+          src={product.images.length === 0 ? "/api/placeholder/400/320" : product.images[0].imgPath}
           alt={product.productNm}
           className="w-full object-cover h-full"
         />

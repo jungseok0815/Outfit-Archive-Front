@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { GetFollowerList, GetFollowingList, Follow, Unfollow } from "../../../api/user/follow";
 import "./FollowListModal.css";
 
-const IMG_BASE = 'http://localhost:8080/api/img/get?imgNm=';
-
 function FollowListModal({ userId, type, onClose, isOwnPage }) {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
@@ -58,8 +56,8 @@ function FollowListModal({ userId, type, onClose, isOwnPage }) {
             <ul className="follow-modal-list">
               {users.map((u) => (
                 <li key={u.id} className="follow-modal-item" onClick={() => handleUserClick(u.id)}>
-                  {u.profileImgNm ? (
-                    <img className="follow-modal-avatar" src={`${IMG_BASE}${u.profileImgNm}`} alt={u.userNm} />
+                  {u.profileImgPath ? (
+                    <img className="follow-modal-avatar" src={u.profileImgPath} alt={u.userNm} />
                   ) : (
                     <div className="follow-modal-avatar follow-modal-avatar-placeholder">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bcbcbc" strokeWidth="1.5">

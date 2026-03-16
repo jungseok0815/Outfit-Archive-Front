@@ -16,8 +16,6 @@ import { ListMyOrder } from '../../../api/user/order';
 import "../../../App.css";
 import "./MyPage.css";
 
-const IMG_BASE = 'http://localhost:8080/api/img/get?imgNm=';
-
 function MyPage() {
   const { userId: paramUserId } = useParams();
   const { user, login } = useAuth();
@@ -46,7 +44,7 @@ function MyPage() {
     id: p.id,
     userId: p.userId,
     images: p.images?.length > 0
-      ? p.images.map(img => `${IMG_BASE}${img.imgNm}`)
+      ? p.images.map(img => img.imgPath)
       : [''],
     rawImages: p.images || [],
     likes: p.likeCount,
@@ -162,7 +160,7 @@ function MyPage() {
     if (!file || !user?.id) return;
     UpdateProfileImg(user.id, file)
       .then(res => {
-        login({ ...user, profileImgNm: res.data.profileImgNm });
+        login({ ...user, profileImgPath: res.data.profileImgPath });
       })
       .catch(() => alert('프로필 이미지 변경에 실패했습니다.'));
     e.target.value = '';
@@ -184,7 +182,7 @@ function MyPage() {
 
   const currentProfile = isOwnPage ? user : profileUser;
   const displayName = currentProfile?.userNm || "";
-  const avatarSrc = currentProfile?.profileImgNm ? `${IMG_BASE}${currentProfile.profileImgNm}` : null;
+  const avatarSrc = currentProfile?.profileImgPath || null;
 
   return (
     <div className="app">
@@ -368,10 +366,10 @@ function MyPage() {
                     <span className={`mypage-order-status ${cls}`}>{label}</span>
                   </div>
                   <div className="mypage-order-body">
-                    {order.productImgNm ? (
+                    {order.productImgPath ? (
                       <img
                         className="mypage-order-img"
-                        src={`${IMG_BASE}${order.productImgNm}`}
+                        src={order.productImgPath}
                         alt={order.productNm}
                       />
                     ) : (

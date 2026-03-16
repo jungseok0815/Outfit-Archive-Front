@@ -34,9 +34,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
       });
 
       if(product.images && product.images.length > 0){
-        const produtImgs = product.images.map((img) => {
-         return `http://localhost:8080/api/img/get?imgNm=${img.imgNm}`
-        })
+        const produtImgs = product.images.map((img) => img.imgPath)
         setImagePreview(produtImgs)
       } else {
         setImagePreview([])

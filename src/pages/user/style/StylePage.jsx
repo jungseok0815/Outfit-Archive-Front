@@ -7,8 +7,6 @@ import { ListPost } from '../../../api/user/post';
 import "../../../App.css";
 import "./StylePage.css";
 
-const IMG_BASE = 'http://localhost:8080/api/img/get?imgNm=';
-
 function StylePage() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,9 +23,9 @@ function StylePage() {
           id: p.id,
           userId: p.userId,
           user: p.userNm,
-          avatar: p.profileImgNm ? `${IMG_BASE}${p.profileImgNm}` : null,
-          image: p.images?.length > 0 ? `${IMG_BASE}${p.images[0].imgNm}` : '',
-          images: p.images?.length > 0 ? p.images.map(img => `${IMG_BASE}${img.imgNm}`) : [],
+          avatar: p.profileImgPath || null,
+          image: p.images?.length > 0 ? p.images[0].imgPath : '',
+          images: p.images?.length > 0 ? p.images.map(img => img.imgPath) : [],
           title: p.title,
           content: p.content || '',
           likes: p.likeCount,

@@ -17,9 +17,7 @@ const BrandAccordion = ({ brand, id, onRefresh }) => {
     const totalStock = brand.products?.reduce((sum, p) => sum + p.productQuantity, 0) || 0;
     const productCount = brand.products?.length || 0;
 
-    const imgUrl = brand.brandImg?.imgNm
-        ? `http://localhost:8080/api/img/get?imgNm=${brand.brandImg.imgNm}`
-        : null;
+    const imgUrl = brand.brandImg?.imgPath || null;
 
     return (
         <div className="border rounded-lg overflow-hidden shadow-sm">
@@ -103,7 +101,7 @@ const BrandAccordion = ({ brand, id, onRefresh }) => {
                                             <img
                                                 src={
                                                     product.images?.length > 0
-                                                        ? `http://localhost:8080/api/img/get?imgNm=${product.images[0].imgNm}`
+                                                        ? product.images[0].imgPath
                                                         : `https://placehold.co/400x320/f3f4f6/9ca3af?text=${encodeURIComponent(product.productNm)}`
                                                 }
                                                 alt={product.productNm}

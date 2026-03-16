@@ -10,8 +10,6 @@ import "../../../App.css";
 import "./UserMain.css";
 import "../../../styles/user/Hero.css";
 
-const IMG_BASE = 'http://localhost:8080/api/img/get?imgNm=';
-
 const heroSlides = [
   { title: "Define Your", highlight: "Style", description: "Discover curated fashion that speaks to your identity", button: "Explore Now" },
   { title: "New Season", highlight: "Collection", description: "The latest trends from the world's finest designers", button: "Shop Collection" },
@@ -35,7 +33,7 @@ function App() {
           id: p.id,
           user: p.userNm,
           avatar: null,
-          image: p.images?.length > 0 ? `${IMG_BASE}${p.images[0].imgNm}` : '',
+          image: p.images?.length > 0 ? p.images[0].imgPath : '',
           title: p.title,
           tag: '',
           likes: p.likeCount,
@@ -49,7 +47,7 @@ function App() {
         const items = res.data.content || [];
         setPopularProducts(items.map(p => ({
           id: p.id,
-          image: p.images?.length > 0 ? `${IMG_BASE}${p.images[0].imgNm}` : '',
+          image: p.images?.length > 0 ? p.images[0].imgPath : '',
           brand: p.brandNm,
           name: p.productNm,
           price: p.productPrice?.toLocaleString(),

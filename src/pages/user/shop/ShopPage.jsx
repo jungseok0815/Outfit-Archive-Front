@@ -6,7 +6,6 @@ import { ListProduct } from '../../../api/user/product';
 import "../../../App.css";
 import "./ShopPage.css";
 
-const IMG_BASE = 'http://localhost:8080/api/img/get?imgNm=';
 const PAGE_SIZE = 12;
 
 const CATEGORY_MAP = {
@@ -43,7 +42,7 @@ function ShopPage() {
 
   const mapProduct = (p) => ({
     id: p.id,
-    image: p.images?.length > 0 ? `${IMG_BASE}${p.images[0].imgNm}` : '',
+    image: p.images?.length > 0 ? p.images[0].imgPath : '',
     brand: p.brandNm,
     name: p.productNm,
     price: p.productPrice?.toLocaleString(),

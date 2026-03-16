@@ -4,8 +4,6 @@ import "./PostDetailPanel.css";
 import { ListComment, InsertComment, ToggleLike, GetLikeStatus } from '../../../api/user/post';
 import { GetProduct } from '../../../api/user/product';
 
-const IMG_BASE = 'http://localhost:8080/api/img/get?imgNm=';
-
 function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
   const navigate = useNavigate();
   const [imageIndex, setImageIndex] = useState(0);
@@ -57,7 +55,7 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
               if (imgs.length > 0) {
                 setProductImages(prev => ({
                   ...prev,
-                  [product.id]: `${IMG_BASE}${imgs[0].imgNm}`
+                  [product.id]: imgs[0].imgPath
                 }));
               }
             })

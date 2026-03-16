@@ -4,7 +4,6 @@ import { InsertOrder } from "../../../api/user/order";
 import { GetPoint } from "../../../api/user/point";
 import "./OrderModal.css";
 
-const IMG_BASE = "http://localhost:8080/api/img/get?imgNm=";
 const TOSS_CLIENT_KEY = "test_ck_zXLkKEypNArWmo50nX3lmeaxYG5R";
 
 function OrderModal({ product, onClose }) {
@@ -84,9 +83,7 @@ function OrderModal({ product, onClose }) {
     }
   };
 
-  const thumbImg = product.images?.length > 0
-    ? `${IMG_BASE}${product.images[0].imgNm}`
-    : null;
+  const thumbImg = product.images?.length > 0 ? product.images[0].imgPath : null;
 
   return (
     <div className="order-modal-overlay" onClick={onClose}>

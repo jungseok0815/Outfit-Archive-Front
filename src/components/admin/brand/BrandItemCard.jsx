@@ -14,11 +14,7 @@ const BrandItemCard = ({ brand, onSuccess }) => {
         brandDc: brand?.brandDc || "",
         brandLocation: brand?.brandLocation || "",
     });
-    const [preview, setPreview] = useState(
-        brand?.brandImg?.imgNm
-            ? `http://localhost:8080/api/img/get?imgNm=${brand.brandImg.imgNm}`
-            : null
-    );
+    const [preview, setPreview] = useState(brand?.brandImg?.imgPath || null);
 
     const handleChange = (e) => {
         const { name, value } = e.target;

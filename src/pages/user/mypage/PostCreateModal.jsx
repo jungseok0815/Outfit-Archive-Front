@@ -3,8 +3,6 @@ import "./PostCreateModal.css";
 import { ListProduct } from '../../../api/user/product';
 import { InsertPost, UpdatePost } from '../../../api/user/post';
 
-const IMG_BASE = 'http://localhost:8080/api/img/get?imgNm=';
-
 function PostCreateModal({ onClose, onSuccess, editingPost }) {
     const isEditMode = !!editingPost;
 
@@ -12,7 +10,7 @@ function PostCreateModal({ onClose, onSuccess, editingPost }) {
         if (editingPost?.rawImages?.length > 0) {
             return editingPost.rawImages.map(img => ({
                 file: null,
-                preview: `${IMG_BASE}${img.imgNm}`,
+                preview: img.imgPath,
                 isServer: true,
             }));
         }
@@ -62,7 +60,7 @@ function PostCreateModal({ onClose, onSuccess, editingPost }) {
                         brand: p.brandNm,
                         name: p.productNm,
                         price: p.productPrice,
-                        image: p.images?.length > 0 ? `${IMG_BASE}${p.images[0].imgNm}` : '',
+                        image: p.images?.length > 0 ? p.images[0].imgPath : '',
                     })));
                 })
                 .catch(() => setSearchResults([]));

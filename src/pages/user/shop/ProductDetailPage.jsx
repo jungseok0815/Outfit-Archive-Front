@@ -8,8 +8,6 @@ import { useAuth } from "../../../store/context/UserContext";
 import "../../../App.css";
 import "./ProductDetailPage.css";
 
-const IMG_BASE = "http://localhost:8080/api/img/get?imgNm=";
-
 const CATEGORY_KOR = {
   TOP: "상의", BOTTOM: "하의", OUTER: "아우터",
   DRESS: "원피스/세트", SHOES: "신발", BAG: "가방",
@@ -80,10 +78,7 @@ function ProductDetailPage() {
   }
 
   const images = product.images || [];
-  const currentImg =
-    images.length > 0
-      ? `${IMG_BASE}${images[imgIndex].imgNm}`
-      : "";
+  const currentImg = images.length > 0 ? images[imgIndex].imgPath : "";
 
   const handlePrev = () =>
     setImgIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
