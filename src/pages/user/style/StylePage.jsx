@@ -23,7 +23,7 @@ function StylePage() {
           id: p.id,
           userId: p.userId,
           user: p.userNm,
-          avatar: p.profileImgPath || null,
+          avatar: p.profileImgNm || null,
           image: p.images?.length > 0 ? p.images[0].imgPath : '',
           images: p.images?.length > 0 ? p.images.map(img => img.imgPath) : [],
           title: p.title,

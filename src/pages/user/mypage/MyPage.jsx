@@ -116,12 +116,14 @@ function MyPage() {
     setActiveTab("posts");
 
     if (isOwnPage) {
+      console.log('[MyPage] 본인 프로필 (user context):', user);
       setProfileUser(null);
       loadMyPosts();
     } else if (paramUserId) {
       // 프로필 조회 후 해당 유저의 게시물 필터링
       GetUserProfile(paramUserId)
         .then(res => {
+          console.log('[MyPage] 타인 프로필 응답:', res.data);
           setProfileUser(res.data);
           loadUserPosts(res.data.userNm);
         })
@@ -147,6 +149,7 @@ function MyPage() {
     if (isOwnPage && user?.id) {
       GetPoint()
         .then(res => setCurrentPoint(res.data.point))
+        
         .catch(e => console.error('포인트 조회 실패:', e));
       GetPointHistory(0, 20)
         .then(res => setPointHistory(res.data.content || []))
@@ -160,7 +163,8 @@ function MyPage() {
     if (!file || !user?.id) return;
     UpdateProfileImg(user.id, file)
       .then(res => {
-        login({ ...user, profileImgPath: res.data.profileImgPath });
+        console.log('[MyPage] 프로필 이미지 변경 응답:', res.data);
+        login({ ...user, profileImgNm: res.data.profileImgNm });
       })
       .catch(() => alert('프로필 이미지 변경에 실패했습니다.'));
     e.target.value = '';
@@ -182,7 +186,7 @@ function MyPage() {
 
   const currentProfile = isOwnPage ? user : profileUser;
   const displayName = currentProfile?.userNm || "";
-  const avatarSrc = currentProfile?.profileImgPath || null;
+  const avatarSrc = currentProfile?.profileImgNm || null;
 
   return (
     <div className="app">

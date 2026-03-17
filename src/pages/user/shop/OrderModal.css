@@ -251,3 +251,79 @@
 
 .order-submit-btn:hover:not(:disabled) { opacity: 0.85; }
 .order-submit-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* 배송지 주소 */
+.order-field-address { align-items: flex-start; }
+
+.order-address-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.order-address-zip-row {
+  display: flex;
+  gap: 8px;
+}
+
+.order-input-zip {
+  width: 110px;
+  flex: none;
+  background: #f8f8f8;
+  color: #555;
+}
+
+.order-address-search-btn {
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: #222;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.order-address-search-btn:hover { opacity: 0.8; }
+
+/* 주소 검색 팝업 */
+.order-postcode-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.order-postcode-popup {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  width: 460px;
+  max-width: 95%;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+.order-postcode-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #ebebeb;
+  font-size: 14px;
+  font-weight: 700;
+  color: #222;
+}
+
+.order-postcode-header button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #999;
+  cursor: pointer;
+}

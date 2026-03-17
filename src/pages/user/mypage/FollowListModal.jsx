@@ -56,8 +56,8 @@ function FollowListModal({ userId, type, onClose, isOwnPage }) {
             <ul className="follow-modal-list">
               {users.map((u) => (
                 <li key={u.id} className="follow-modal-item" onClick={() => handleUserClick(u.id)}>
-                  {u.profileImgPath ? (
-                    <img className="follow-modal-avatar" src={u.profileImgPath} alt={u.userNm} />
+                  {u.profileImgNm ? (
+                    <img className="follow-modal-avatar" src={u.profileImgNm} alt={u.userNm} />
                   ) : (
                     <div className="follow-modal-avatar follow-modal-avatar-placeholder">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bcbcbc" strokeWidth="1.5">

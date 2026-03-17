@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { loadTossPayments } from "@tosspayments/payment-sdk";
+import DaumPostcode from "react-daum-postcode";
 import { InsertOrder } from "../../../api/user/order";
 import { GetPoint } from "../../../api/user/point";
 import "./OrderModal.css";
@@ -11,12 +12,16 @@ function OrderModal({ product, onClose }) {
     quantity: 1,
     recipientName: "",
     recipientPhone: "",
-    shippingAddress: "",
+    zipCode: "",
+    baseAddress: "",
+    detailAddress: "",
     usePoint: 0,
   });
+  const [showPostcode, setShowPostcode] = useState(false);
   const [availablePoint, setAvailablePoint] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const detailAddressRef = useRef(null);
 
   useEffect(() => {
     GetPoint()
@@ -28,6 +33,13 @@ function OrderModal({ product, onClose }) {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
     setError("");
+  };
+
+  const handlePostcodeComplete = (data) => {
+    const address = data.roadAddress || data.jibunAddress;
+    setForm(prev => ({ ...prev, zipCode: data.zonecode, baseAddress: address, detailAddress: "" }));
+    setShowPostcode(false);
+    setTimeout(() => detailAddressRef.current?.focus(), 100);
   };
 
   const handleQuantityChange = (delta) => {
@@ -45,7 +57,7 @@ function OrderModal({ product, onClose }) {
     e.preventDefault();
     if (!form.recipientName.trim()) { setError("수령인 이름을 입력해주세요."); return; }
     if (!form.recipientPhone.trim()) { setError("연락처를 입력해주세요."); return; }
-    if (!form.shippingAddress.trim()) { setError("배송지를 입력해주세요."); return; }
+    if (!form.baseAddress.trim()) { setError("배송지를 입력해주세요."); return; }
 
     setSubmitting(true);
     setError("");
@@ -57,7 +69,7 @@ function OrderModal({ product, onClose }) {
         quantity: form.quantity,
         recipientName: form.recipientName.trim(),
         recipientPhone: form.recipientPhone.trim(),
-        shippingAddress: form.shippingAddress.trim(),
+        shippingAddress: `[${form.zipCode}] ${form.baseAddress} ${form.detailAddress}`.trim(),
         usePoint,
       });
 
@@ -148,17 +160,56 @@ function OrderModal({ product, onClose }) {
             </div>
 
             {/* 배송지 */}
-            <div className="order-field">
+            <div className="order-field order-field-address">
               <label className="order-label">배송지</label>
-              <input
-                className="order-input"
-                type="text"
-                name="shippingAddress"
-                value={form.shippingAddress}
-                onChange={handleChange}
-                placeholder="배송 받을 주소를 입력해주세요"
-              />
+              <div className="order-address-wrap">
+                <div className="order-address-zip-row">
+                  <input
+                    className="order-input order-input-zip"
+                    type="text"
+                    value={form.zipCode}
+                    readOnly
+                    placeholder="우편번호"
+                  />
+                  <button
+                    type="button"
+                    className="order-address-search-btn"
+                    onClick={() => setShowPostcode(true)}
+                  >
+                    주소 검색
+                  </button>
+                </div>
+                <input
+                  className="order-input"
+                  type="text"
+                  value={form.baseAddress}
+                  readOnly
+                  placeholder="기본 주소"
+                />
+                <input
+                  className="order-input"
+                  type="text"
+                  name="detailAddress"
+                  value={form.detailAddress}
+                  onChange={handleChange}
+                  placeholder="상세 주소 입력 (동, 호수 등)"
+                  ref={detailAddressRef}
+                />
+              </div>
             </div>
+
+            {/* 주소 검색 팝업 */}
+            {showPostcode && (
+              <div className="order-postcode-overlay" onClick={() => setShowPostcode(false)}>
+                <div className="order-postcode-popup" onClick={e => e.stopPropagation()}>
+                  <div className="order-postcode-header">
+                    <span>주소 검색</span>
+                    <button type="button" onClick={() => setShowPostcode(false)}>✕</button>
+                  </div>
+                  <DaumPostcode onComplete={handlePostcodeComplete} autoClose={false} />
+                </div>
+              </div>
+            )}
 
             {/* 포인트 사용 */}
             <div className="order-field">
