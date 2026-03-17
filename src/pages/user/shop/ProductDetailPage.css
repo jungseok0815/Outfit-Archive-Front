@@ -179,8 +179,14 @@
   margin-top: 32px;
 }
 
+.detail-buy-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
 .detail-buy-btn {
-  width: 100%;
+  flex: 1;
   padding: 15px;
   font-size: 15px;
   font-weight: 700;
@@ -197,6 +203,29 @@
 .detail-buy-btn:disabled {
   background: #cccccc;
   cursor: default;
+}
+
+.detail-wishlist-btn {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.detail-wishlist-btn:hover {
+  border-color: #e74c3c;
+}
+
+.detail-wishlist-btn.active {
+  border-color: #e74c3c;
+  background: #fff5f5;
 }
 
 /* 로딩 */

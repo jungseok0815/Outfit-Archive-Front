@@ -4,6 +4,7 @@ import Navbar from "../../../components/user/header/Header";
 import AuthModal from "../auth/AuthPage";
 import OrderModal from "./OrderModal";
 import { GetProduct, ListProductReview } from "../../../api/user/product";
+import { CheckWishlist, ToggleWishlist } from "../../../api/user/wishlist";
 import { useAuth } from "../../../store/context/UserContext";
 import "../../../App.css";
 import "./ProductDetailPage.css";
@@ -25,6 +26,7 @@ function ProductDetailPage() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [reviews, setReviews] = useState([]);
+  const [wishlisted, setWishlisted] = useState(false);
 
   useEffect(() => {
     if (!product) {
@@ -45,6 +47,13 @@ function ProductDetailPage() {
         .catch(() => {});
     }
   }, [productId]);
+
+  useEffect(() => {
+    if (!user || !productId) return;
+    CheckWishlist(productId)
+      .then(res => setWishlisted(res.data.wished))
+      .catch(() => {});
+  }, [user, productId]);
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
@@ -88,6 +97,13 @@ function ProductDetailPage() {
   const handleBuyClick = () => {
     if (!user) { setShowAuthModal(true); return; }
     setShowOrderModal(true);
+  };
+
+  const handleWishlistClick = () => {
+    if (!user) { setShowAuthModal(true); return; }
+    ToggleWishlist(product.id)
+      .then(res => setWishlisted(res.data.wished))
+      .catch(() => {});
   };
 
   return (
@@ -166,13 +182,23 @@ function ProductDetailPage() {
             </div>
 
             <div className="detail-buy-wrap">
-              <button
-                className="detail-buy-btn"
-                onClick={handleBuyClick}
-                disabled={product.productQuantity === 0}
-              >
-                {product.productQuantity === 0 ? "품절" : "구매하기"}
-              </button>
+              <div className="detail-buy-row">
+                <button
+                  className="detail-buy-btn"
+                  onClick={handleBuyClick}
+                  disabled={product.productQuantity === 0}
+                >
+                  {product.productQuantity === 0 ? "품절" : "구매하기"}
+                </button>
+                <button
+                  className={`detail-wishlist-btn ${wishlisted ? 'active' : ''}`}
+                  onClick={handleWishlistClick}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill={wishlisted ? "#e74c3c" : "none"} stroke={wishlisted ? "#e74c3c" : "#222"} strokeWidth="2">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>

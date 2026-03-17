@@ -820,3 +820,104 @@
 .mypage-login-btn:hover {
   background-color: #444444;
 }
+
+/* 관심상품 탭 */
+.mypage-wishlist {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px 20px 60px;
+}
+
+.mypage-wishlist-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mypage-wishlist-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid #ebebeb;
+  border-radius: 12px;
+  transition: background 0.15s;
+}
+
+.mypage-wishlist-item:hover {
+  background: #fafafa;
+}
+
+.mypage-wishlist-img-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #f5f5f5;
+  cursor: pointer;
+}
+
+.mypage-wishlist-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mypage-wishlist-img-empty {
+  width: 100%;
+  height: 100%;
+  background: #f0f0f0;
+}
+
+.mypage-wishlist-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.mypage-wishlist-brand {
+  font-size: 11px;
+  font-weight: 700;
+  color: #999999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mypage-wishlist-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #222222;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mypage-wishlist-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: #222222;
+}
+
+.mypage-wishlist-remove {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: none;
+  background: #fff5f5;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.mypage-wishlist-remove:hover {
+  background: #ffe0e0;
+}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../../../components/user/header/Header";
 import AuthModal from "../auth/AuthPage";
 import PostCreateModal from "./PostCreateModal";
@@ -13,11 +13,13 @@ import { GetFollowCount, CheckFollow, Follow, Unfollow } from '../../../api/user
 import { UpdateProfileImg, GetUserProfile } from '../../../api/user/auth';
 import { GetPoint, GetPointHistory } from '../../../api/user/point';
 import { ListMyOrder } from '../../../api/user/order';
+import { ListWishlist, ToggleWishlist } from '../../../api/user/wishlist';
 import "../../../App.css";
 import "./MyPage.css";
 
 function MyPage() {
   const { userId: paramUserId } = useParams();
+  const navigate = useNavigate();
   const { user, login } = useAuth();
   const profileImgInputRef = useRef(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -35,6 +37,7 @@ function MyPage() {
   const [pointHistory, setPointHistory] = useState([]);
   const [orders, setOrders] = useState([]);
   const [reviewOrder, setReviewOrder] = useState(null);
+  const [wishlist, setWishlist] = useState([]);
 
   // 본인 페이지 여부
   const isOwnPage = !paramUserId || (user && String(user.id) === String(paramUserId));
@@ -155,6 +158,9 @@ function MyPage() {
         .then(res => setPointHistory(res.data.content || []))
         .catch(e => console.error('포인트 내역 조회 실패:', e));
       loadOrders();
+      ListWishlist(0, 50)
+        .then(res => setWishlist(res.data.content || []))
+        .catch(() => {});
     }
   }, [user, paramUserId]);
 
@@ -311,6 +317,14 @@ function MyPage() {
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H11.5v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.65c.1 1.7 1.36 2.66 2.85 2.97V19h1.72v-1.67c1.52-.29 2.72-1.16 2.72-2.74 0-2.22-1.86-2.97-3.63-3.45z" />
             </svg>
             포인트현황
+          </button>
+        )}
+        {isOwnPage && (
+          <button className={`mypage-tab ${activeTab === "wishlist" ? "active" : ""}`} onClick={() => setActiveTab("wishlist")}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+            관심상품
           </button>
         )}
       </div>
@@ -501,6 +515,49 @@ function MyPage() {
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* 관심상품 탭 */}
+      {activeTab === "wishlist" && (
+        <div className="mypage-wishlist">
+          {wishlist.length === 0 ? (
+            <p className="mypage-orders-empty">관심 등록한 상품이 없습니다.</p>
+          ) : (
+            <div className="mypage-wishlist-grid">
+              {wishlist.map((item) => (
+                <div key={item.wishlistId} className="mypage-wishlist-item">
+                  <div
+                    className="mypage-wishlist-img-wrap"
+                    onClick={() => navigate(`/shop/${item.productId}`)}
+                  >
+                    {item.imgPath ? (
+                      <img src={item.imgPath} alt={item.productNm} />
+                    ) : (
+                      <div className="mypage-wishlist-img-empty" />
+                    )}
+                  </div>
+                  <div className="mypage-wishlist-info" onClick={() => navigate(`/shop/${item.productId}`)}>
+                    <span className="mypage-wishlist-brand">{item.brandNm}</span>
+                    <p className="mypage-wishlist-name">{item.productNm}</p>
+                    <span className="mypage-wishlist-price">{item.productPrice?.toLocaleString()}원</span>
+                  </div>
+                  <button
+                    className="mypage-wishlist-remove"
+                    onClick={() => {
+                      ToggleWishlist(item.productId)
+                        .then(() => setWishlist(prev => prev.filter(p => p.wishlistId !== item.wishlistId)))
+                        .catch(() => {});
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#e74c3c" stroke="#e74c3c" strokeWidth="2">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
