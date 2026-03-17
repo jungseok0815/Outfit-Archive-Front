@@ -133,6 +133,30 @@
   margin-bottom: 28px;
 }
 
+/* 평균 별점 (상품 정보 영역) */
+.detail-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.detail-rating-stars {
+  display: flex;
+  gap: 1px;
+}
+
+.detail-rating-score {
+  font-size: 15px;
+  font-weight: 700;
+  color: #222222;
+}
+
+.detail-rating-count {
+  font-size: 13px;
+  color: #999999;
+}
+
 .detail-divider {
   height: 1px;
   background-color: #ebebeb;
@@ -206,8 +230,8 @@
 }
 
 .detail-wishlist-btn {
-  width: 52px;
-  height: 52px;
+  width: 44px;
+  height: 44px;
   flex-shrink: 0;
   border: 1.5px solid #e0e0e0;
   border-radius: 10px;
@@ -237,6 +261,34 @@
 }
 
 /* 상품 후기 */
+.review-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.review-section-header .review-section-title {
+  margin: 0;
+}
+
+.review-avg-summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.review-avg-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.review-avg-score {
+  font-size: 16px;
+  font-weight: 700;
+  color: #222222;
+}
+
 .review-section {
   margin-top: 60px;
   padding-top: 40px;
@@ -247,7 +299,7 @@
   font-size: 18px;
   font-weight: 700;
   color: #222222;
-  margin: 0 0 28px 0;
+  margin: 0;
 }
 
 .review-count {

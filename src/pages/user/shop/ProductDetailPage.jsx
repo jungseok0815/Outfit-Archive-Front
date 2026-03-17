@@ -61,9 +61,19 @@ function ProductDetailPage() {
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   };
 
+  const reviewCount = reviews.length;
+  const avgRating = reviewCount > 0
+    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+    : 0;
+
   const renderStars = (rating) =>
     Array.from({ length: 5 }, (_, i) => (
       <span key={i} className={`review-star ${i < rating ? "filled" : ""}`}>★</span>
+    ));
+
+  const renderAvgStars = (avg) =>
+    Array.from({ length: 5 }, (_, i) => (
+      <span key={i} className={`review-star ${i < Math.round(avg) ? "filled" : ""}`}>★</span>
     ));
 
   if (loading) {
@@ -160,6 +170,16 @@ function ProductDetailPage() {
               {product.productPrice?.toLocaleString()}원
             </div>
 
+            {reviewCount > 0 && (
+              <div className="detail-rating">
+                <div className="detail-rating-stars">
+                  {renderAvgStars(avgRating)}
+                </div>
+                <span className="detail-rating-score">{avgRating.toFixed(1)}</span>
+                <span className="detail-rating-count">({reviewCount}개 리뷰)</span>
+              </div>
+            )}
+
             <div className="detail-divider" />
 
             <div className="detail-meta">
@@ -194,7 +214,7 @@ function ProductDetailPage() {
                   className={`detail-wishlist-btn ${wishlisted ? 'active' : ''}`}
                   onClick={handleWishlistClick}
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill={wishlisted ? "#e74c3c" : "none"} stroke={wishlisted ? "#e74c3c" : "#222"} strokeWidth="2">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill={wishlisted ? "#e74c3c" : "none"} stroke={wishlisted ? "#e74c3c" : "#222"} strokeWidth="2">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                   </svg>
                 </button>
@@ -205,7 +225,17 @@ function ProductDetailPage() {
 
         {/* 상품 후기 */}
         <div className="review-section">
-          <h2 className="review-section-title">상품 후기 <span className="review-count">{reviews.length}</span></h2>
+          <div className="review-section-header">
+            <h2 className="review-section-title">
+              상품 후기 <span className="review-count">{reviewCount}</span>
+            </h2>
+            {reviewCount > 0 && (
+              <div className="review-avg-summary">
+                <div className="review-avg-stars">{renderAvgStars(avgRating)}</div>
+                <span className="review-avg-score">{avgRating.toFixed(1)}</span>
+              </div>
+            )}
+          </div>
 
           {/* 후기 목록 */}
           <div className="review-list">
