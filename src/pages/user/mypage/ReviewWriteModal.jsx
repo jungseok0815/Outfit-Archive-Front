@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { InsertProductReview } from "../../../api/user/product";
 import "./ReviewWriteModal.css";
+import { toast } from "react-toastify";
 
 function ReviewWriteModal({ order, onClose, onSuccess }) {
   const [rating, setRating] = useState(0);
@@ -10,11 +11,11 @@ function ReviewWriteModal({ order, onClose, onSuccess }) {
 
   const handleSubmit = () => {
     if (rating === 0) {
-      alert("별점을 선택해주세요.");
+      toast.warn("별점을 선택해주세요.");
       return;
     }
     if (!content.trim()) {
-      alert("후기 내용을 입력해주세요.");
+      toast.warn("후기 내용을 입력해주세요.");
       return;
     }
 
@@ -30,7 +31,7 @@ function ReviewWriteModal({ order, onClose, onSuccess }) {
       })
       .catch((e) => {
         const msg = e.response?.data?.msg || "후기 등록에 실패했습니다.";
-        alert(msg);
+        toast.error(msg);
       })
       .finally(() => setLoading(false));
   };

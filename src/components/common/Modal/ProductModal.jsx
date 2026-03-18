@@ -2,6 +2,7 @@ import {useState,useEffect } from "react";
 import Modal from "./Modal";
 import { InsertProduct, UpdateProduct, DeleteProduct} from "../../../api/admin/product";
 import { ImagePlus } from 'lucide-react'
+import { toast } from "react-toastify";
 import { CancelButton, DeleteButton, SubmitButton } from "../Button/Button";
 
 const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
@@ -67,7 +68,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    if(files.length > 4) return alert("사진은 최대 4장 등록 가능합니다!") 
+    if(files.length > 4) { toast.warn("사진은 최대 4장 등록 가능합니다!"); return; }
     if (files) {
       setFormData((prev) => ({
         ...prev,
@@ -83,12 +84,12 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
       InsertProduct(formData)
       .then(res => {
         if (res.status === 200) {
-          alert("상품등록 성공!")
+          toast.success("상품등록 성공!")
           updateProduct()
           onClose();
         }
       }).catch((err) => {
-        alert("상품등록 실패")
+        toast.error("상품등록 실패")
         console.log(err)
       })
   };
@@ -98,12 +99,12 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
     UpdateProduct(formData).
       then(res => {
       if (res.status === 200) {
-        alert("상품 수정 성공!")
+        toast.success("상품 수정 성공!")
         updateProduct()
         onClose();
       }
     }).catch((err) => {
-      alert("상품 수정 실패")
+      toast.error("상품 수정 실패")
       console.log(err)
     })
   }
@@ -114,12 +115,12 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
       DeleteProduct(formData.id)
       .then(res => {
         if (res.status === 200) {
-          alert("상품 삭제 성공!")
+          toast.success("상품 삭제 성공!")
           updateProduct()
           onClose();
         }
       }).catch((err) => {
-        alert("상품 삭제 실패")
+        toast.error("상품 삭제 실패")
         console.log(err)
       })
     }

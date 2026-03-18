@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { UpdateUser } from "../../../api/user/auth";
 import { useAuth } from "../../../store/context/UserContext";
 import "./ProfileEditModal.css";
+import { toast } from "react-toastify";
 
 function ProfileEditModal({ onClose, onSuccess }) {
     const { user, login } = useAuth();
@@ -60,7 +61,7 @@ function ProfileEditModal({ onClose, onSuccess }) {
             })
             .catch((err) => {
                 const msg = err.response?.data?.msg || "프로필 수정에 실패했습니다.";
-                alert(msg);
+                toast.error(msg);
             })
             .finally(() => setSubmitting(false));
     };

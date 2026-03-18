@@ -1,6 +1,8 @@
 
 import './App.css';
 import { BrowserRouter,Routes,Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Main from './pages/user/userMain/UserMain';
 import ShopPage from './pages/user/shop/ShopPage';
 import ProductDetailPage from './pages/user/shop/ProductDetailPage';
@@ -21,6 +23,7 @@ function App() {
           <div>
             <AuthProvider>
               <BrowserRouter>
+                <ToastContainer position="top-center" autoClose={2500} hideProgressBar={false} closeOnClick pauseOnHover />
                 <Routes>
                   <Route path='/' element={<Main/>}/>
                   <Route path='/shop' element={<ShopPage/>}/>

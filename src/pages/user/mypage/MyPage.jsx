@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { toast } from "react-toastify";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../../../components/user/header/Header";
 import AuthModal from "../auth/AuthPage";
@@ -99,7 +100,7 @@ function MyPage() {
       })
       .catch(e => {
         const msg = e.response?.data?.msg || '삭제에 실패했습니다.';
-        alert(msg);
+        toast.error(msg);
       });
   };
 
@@ -172,7 +173,7 @@ function MyPage() {
         console.log('[MyPage] 프로필 이미지 변경 응답:', res.data);
         login({ ...user, profileImgNm: res.data.profileImgNm });
       })
-      .catch(() => alert('프로필 이미지 변경에 실패했습니다.'));
+      .catch(() => toast.error('프로필 이미지 변경에 실패했습니다.'));
     e.target.value = '';
   };
 

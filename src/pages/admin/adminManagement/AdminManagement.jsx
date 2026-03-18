@@ -3,6 +3,7 @@ import { AdminJoin, ListAdmin, deleteAdmin } from '../../../api/admin/auth';
 import { ListBrand } from '../../../api/admin/brand';
 import ConfirmModal from '../../../components/common/Modal/ConfirmModal';
 import './AdminManagement.css';
+import { toast } from "react-toastify";
 
 const ROLE_OPTIONS = [
   { value: 'ADMIN', label: '관리자' },
@@ -85,7 +86,7 @@ const AdminManagement = () => {
         setConfirmTarget(null);
         fetchAdminList();
       })
-      .catch((err) => alert(err.response?.data?.msg || '삭제에 실패했습니다.'));
+      .catch((err) => toast.error(err.response?.data?.msg || '삭제에 실패했습니다.'));
   };
 
   const isPartner = form.adminRole === 'PARTNER';

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../auth/loginForm.css"
 import { useAuth } from "../../../store/context/UserContext";
 import { postLogin } from "../../../api/user/auth"
+import { toast } from "react-toastify";
 function LoginForm({ onClose }) {
   const { login } = useAuth()
 
@@ -17,14 +18,13 @@ function LoginForm({ onClose }) {
 
   const handleSubmit = (e) => {
       e.preventDefault();
-      console.log(loginForm)
       postLogin(loginForm).then(res =>{
         const userInfo = res.data;
         login(userInfo)
         onClose();
       }).catch(error => {
           const errorResult = error.response.data
-          alert(errorResult.msg)
+          toast.error(errorResult.msg)
       })
   };
 

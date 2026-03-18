@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Package, Truck, CheckCircle, Clock, ChevronDown, ChevronLeft, ChevronRight, Search, MapPin, Phone, User } from 'lucide-react';
 import './OrderManagement.css';
 import { ListOrder, UpdateOrderStatus, DeleteOrder } from '../../../api/admin/order';
+import { toast } from "react-toastify";
 
 // 백엔드 OrderStatus enum → 한글 매핑
 const STATUS_MAP = {
@@ -114,7 +115,7 @@ const OrderManagement = ({ user }) => {
                 setOrders(prev => prev.map(o => o.id === order.id ? { ...o, status: newStatus } : o));
             })
             .catch(err => {
-                alert(err.response?.data?.msg || '상태 변경에 실패했습니다.');
+                toast.error(err.response?.data?.msg || '상태 변경에 실패했습니다.');
             });
     };
 
@@ -125,7 +126,7 @@ const OrderManagement = ({ user }) => {
                 setOrders(prev => prev.filter(o => o.id !== orderId));
             })
             .catch(err => {
-                alert(err.response?.data?.msg || '삭제에 실패했습니다.');
+                toast.error(err.response?.data?.msg || '삭제에 실패했습니다.');
             });
     };
 

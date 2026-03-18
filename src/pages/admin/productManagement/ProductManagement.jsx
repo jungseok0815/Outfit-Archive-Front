@@ -3,6 +3,7 @@ import SearchBar from "./ProductManagementSearchbar";
 import Content from "./ProductManagementContent"
 import ProducttModal from "../../../components/common/Modal/ProductModal"
 import "../../../styles/admin/productManagement/ProductManagement.css"
+import { toast } from "react-toastify";
 import { ListProduct } from '../../../api/admin/product';
 import useUpdateEffect from '../../../hooks/useDidMountEffect';
 import { FileSpreadsheet, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -100,7 +101,7 @@ const ProductManagement = ({ registerTrigger, user }) => {
   const handleExcelUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    alert(`"${file.name}" 파일이 선택되었습니다.\n(엑셀 일괄 등록 API 연동 후 처리됩니다.)`);
+    toast.info(`"${file.name}" 파일이 선택되었습니다. (엑셀 일괄 등록 API 연동 후 처리됩니다.)`);
     e.target.value = '';
   };
 

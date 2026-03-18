@@ -2,6 +2,7 @@ import React, { useState, useRef, useCallback } from "react";
 import "./PostCreateModal.css";
 import { ListProduct } from '../../../api/user/product';
 import { InsertPost, UpdatePost } from '../../../api/user/post';
+import { toast } from "react-toastify";
 
 function PostCreateModal({ onClose, onSuccess, editingPost }) {
     const isEditMode = !!editingPost;
@@ -106,7 +107,7 @@ function PostCreateModal({ onClose, onSuccess, editingPost }) {
             })
             .catch(err => {
                 const msg = err.response?.data?.msg || (isEditMode ? '게시물 수정에 실패했습니다.' : '게시물 등록에 실패했습니다.');
-                alert(msg);
+                toast.error(msg);
             })
             .finally(() => setSubmitting(false));
     };

@@ -2,6 +2,7 @@ import { React, useState } from 'react';
 import { Phone, MapPin } from 'lucide-react';
 import { SubmitButton, DeleteButton } from '../../common/Button/Button';
 import { InsertBrand, UpdateBrand, DeleteBrand } from '../../../api/admin/brand';
+import { toast } from "react-toastify";
 
 // brand prop이 있으면 수정 모드, 없으면 등록 모드
 const BrandItemCard = ({ brand, onSuccess }) => {
@@ -42,12 +43,12 @@ const BrandItemCard = ({ brand, onSuccess }) => {
         const request = isEdit ? UpdateBrand(fd) : InsertBrand(fd);
         request
             .then(() => {
-                alert(isEdit ? '브랜드가 수정되었습니다.' : '브랜드가 등록되었습니다.');
+                toast.success(isEdit ? '브랜드가 수정되었습니다.' : '브랜드가 등록되었습니다.');
                 if (onSuccess) onSuccess();
             })
             .catch(err => {
                 const msg = err.response?.data?.msg || '처리 중 오류가 발생했습니다.';
-                alert(msg);
+                toast.error(msg);
             });
     };
 
@@ -56,12 +57,12 @@ const BrandItemCard = ({ brand, onSuccess }) => {
         if (!window.confirm('브랜드를 삭제하시겠습니까? 해당 브랜드의 모든 상품도 함께 삭제될 수 있습니다.')) return;
         DeleteBrand(brand.id)
             .then(() => {
-                alert('브랜드가 삭제되었습니다.');
+                toast.success('브랜드가 삭제되었습니다.');
                 if (onSuccess) onSuccess();
             })
             .catch(err => {
                 const msg = err.response?.data?.msg || '삭제 중 오류가 발생했습니다.';
-                alert(msg);
+                toast.error(msg);
             });
     };
 
