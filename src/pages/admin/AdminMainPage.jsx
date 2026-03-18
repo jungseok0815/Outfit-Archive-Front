@@ -6,6 +6,7 @@ import ProductManagement from "../admin/productManagement/ProductManagement";
 import OrderManagement from "../admin/orderManagement/OrderManagement";
 import SalesManagement from "../admin/saleManagement/SalesManagement";
 import AdminManagement from "../admin/adminManagement/AdminManagement";
+import ReviewManagement from "../admin/reviewManagement/ReviewManagement";
 
 const ALL_MENU_ITEMS = [
   {
@@ -46,6 +47,17 @@ const ALL_MENU_ITEMS = [
         <line x1="12" y1="20" x2="12" y2="10" />
         <line x1="18" y1="20" x2="18" y2="4" />
         <line x1="6" y1="20" x2="6" y2="16" />
+      </svg>
+    ),
+  },
+  {
+    key: "리뷰 관리",
+    roles: ["SUPER_ADMIN", "ADMIN", "PARTNER"],
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+        <line x1="9" y1="10" x2="15" y2="10" />
+        <line x1="9" y1="14" x2="13" y2="14" />
       </svg>
     ),
   },
@@ -94,6 +106,8 @@ function Admin() {
         return <OrderManagement user={adminUser} />;
       case "매출 관리":
         return <SalesManagement user={adminUser} />;
+      case "리뷰 관리":
+        return <ReviewManagement user={adminUser} />;
       case "관리자 관리":
         return <AdminManagement />;
       default:

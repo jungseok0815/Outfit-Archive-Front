@@ -13,13 +13,13 @@ export const GetProduct = (id) => {
     return api.get(`/api/usr/product/${id}`);
 }
 
-// GET /api/usr/product/review/list?productId={id}&page=0&size=10 → Spring Page<ReviewDto>
-// ReviewDto: { id, productId, userNm, content, rating, createdAt }
+// GET /api/usr/review/product/{productId} → Spring Page<ResponseReviewDto>
+// ResponseReviewDto: { id, orderId, productId, productNm, userId, userNm, rating, content, createdDate, updatedDate }
 export const ListProductReview = (productId, page = 0, size = 10) => {
-    return api.get('/api/usr/product/review/list', { params: { productId, page, size } });
+    return api.get(`/api/usr/review/product/${productId}`, { params: { page, size } });
 }
 
-// POST /api/usr/product/review/insert - Body: { productId, content, rating }
+// POST /api/usr/review - Body: { orderId, rating, content }
 export const InsertProductReview = (reviewDto) => {
-    return api.post('/api/usr/product/review/insert', reviewDto);
+    return api.post('/api/usr/review', reviewDto);
 }
