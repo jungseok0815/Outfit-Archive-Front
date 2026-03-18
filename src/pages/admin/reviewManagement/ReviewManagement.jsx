@@ -28,7 +28,7 @@ const Stars = ({ rating, size = 14 }) => (
 );
 
 // 리뷰 상세 패널
-const ReviewPanel = ({ productId }) => {
+const ReviewPanel = ({ productId, canDelete }) => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -120,13 +120,15 @@ const ReviewPanel = ({ productId }) => {
               <span className="review-panel-item-date">
                 {formatDate(review.createdDate || review.createdAt)}
               </span>
-              <button
-                className="review-panel-delete-btn"
-                onClick={() => handleDelete(review.id)}
-                title="리뷰 삭제"
-              >
-                <Trash2 size={14} />
-              </button>
+              {canDelete && (
+                <button
+                  className="review-panel-delete-btn"
+                  onClick={() => handleDelete(review.id)}
+                  title="리뷰 삭제"
+                >
+                  <Trash2 size={14} />
+                </button>
+              )}
             </div>
             <p className="review-panel-item-content">{review.content}</p>
           </div>
@@ -159,6 +161,10 @@ const ReviewPanel = ({ productId }) => {
 
 // 메인 컴포넌트
 const ReviewManagement = ({ user }) => {
+  const isSuperAdmin = user?.adminRole === 'SUPER_ADMIN';
+  const isPartner = user?.adminRole === 'PARTNER';
+  const partnerBrandId = isPartner ? user?.brandId : null;
+
   const [products, setProducts] = useState([]);
   const [totalProducts, setTotalProducts] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -172,14 +178,14 @@ const ReviewManagement = ({ user }) => {
 
   const loadProducts = useCallback((keyword, page) => {
     setLoading(true);
-    ListProduct(keyword, null, page, PRODUCT_PAGE_SIZE)
+    ListProduct(keyword, null, page, PRODUCT_PAGE_SIZE, partnerBrandId)
       .then(res => {
         setProducts(res.data.content || []);
         setTotalProducts(res.data.totalElements || 0);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [partnerBrandId]);
 
   useEffect(() => {
     loadProducts(searchTerm, currentPage);
@@ -289,7 +295,7 @@ const ReviewManagement = ({ user }) => {
                   {selectedProductId === product.id && (
                     <tr className="review-mgmt-detail-row">
                       <td colSpan={5}>
-                        <ReviewPanel productId={product.id} />
+                        <ReviewPanel productId={product.id} canDelete={isSuperAdmin} />
                       </td>
                     </tr>
                   )}
