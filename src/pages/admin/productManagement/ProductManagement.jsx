@@ -4,7 +4,7 @@ import Content from "./ProductManagementContent"
 import ProducttModal from "../../../components/common/Modal/ProductModal"
 import "../../../styles/admin/productManagement/ProductManagement.css"
 import { toast } from "react-toastify";
-import { ListProduct } from '../../../api/admin/product';
+import { ListProduct, BulkInsertProduct } from '../../../api/admin/product';
 import useUpdateEffect from '../../../hooks/useDidMountEffect';
 import { FileSpreadsheet, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -101,7 +101,13 @@ const ProductManagement = ({ registerTrigger, user }) => {
   const handleExcelUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    toast.info(`"${file.name}" 파일이 선택되었습니다. (엑셀 일괄 등록 API 연동 후 처리됩니다.)`);
+    toast.info(`"${file.name}" 업로드 중...`);
+    BulkInsertProduct(file)
+      .then(res => {
+        toast.success(res.data);
+        fetchProducts();
+      })
+      .catch(() => toast.error('일괄 등록에 실패했습니다.'));
     e.target.value = '';
   };
 
@@ -115,30 +121,36 @@ const ProductManagement = ({ registerTrigger, user }) => {
         </button>
         <button className="pm-btn-excel" onClick={() => excelInputRef.current?.click()}>
           <FileSpreadsheet size={15}/>
-          엑셀 일괄 등록
+          ZIP 일괄 등록
         </button>
-        <input ref={excelInputRef} type="file" accept=".xlsx,.xls" hidden onChange={handleExcelUpload}/>
+        <input ref={excelInputRef} type="file" accept=".zip" hidden onChange={handleExcelUpload}/>
         <div className="pm-guide-wrap" onMouseEnter={() => setGuideOpen(true)} onMouseLeave={() => setGuideOpen(false)}>
           <button className="pm-btn-guide">?</button>
           {guideOpen && (
         <div className="pm-guide">
-          <h4 className="pm-guide-title">엑셀 파일 작성 방법</h4>
-          <p className="pm-guide-desc">첫 번째 행은 헤더로, 아래 순서에 맞게 열을 구성해주세요.</p>
+          <h4 className="pm-guide-title">ZIP 파일 구성 방법</h4>
+          <p className="pm-guide-desc">ZIP 파일 안에 products.xlsx와 이미지 파일을 함께 넣어주세요.</p>
+          <div className="pm-guide-structure">
+            <code>products.zip</code>
+            <code>├── products.xlsx</code>
+            <code>├── image1.jpg</code>
+            <code>└── image2.jpg</code>
+          </div>
+          <p className="pm-guide-desc" style={{marginTop:'10px'}}>엑셀 열 순서 (1행: 헤더, 2행부터 데이터)</p>
           <table className="pm-guide-table">
             <thead>
               <tr>
-                <th>열 순서</th>
-                <th>항목</th>
-                <th>형식</th>
-                <th>예시</th>
+                <th>열</th><th>항목</th><th>형식</th><th>예시</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td>A열</td><td>상품명</td><td>텍스트</td><td>슬림 데님 팬츠</td></tr>
-              <tr><td>B열</td><td>카테고리</td><td>아래 코드 중 하나</td><td>BOTTOM</td></tr>
-              <tr><td>C열</td><td>상품코드</td><td>텍스트</td><td>P2024-001</td></tr>
-              <tr><td>D열</td><td>수량</td><td>숫자</td><td>100</td></tr>
-              <tr><td>E열</td><td>가격</td><td>숫자 (원)</td><td>59000</td></tr>
+              <tr><td>A</td><td>상품명</td><td>텍스트</td><td>슬림 데님 팬츠</td></tr>
+              <tr><td>B</td><td>상품코드</td><td>텍스트</td><td>P2024-001</td></tr>
+              <tr><td>C</td><td>가격</td><td>숫자(원)</td><td>59000</td></tr>
+              <tr><td>D</td><td>수량</td><td>숫자</td><td>100</td></tr>
+              <tr><td>E</td><td>카테고리</td><td>코드</td><td>BOTTOM</td></tr>
+              <tr><td>F</td><td>브랜드ID</td><td>숫자</td><td>1</td></tr>
+              <tr><td>G</td><td>이미지파일명</td><td>텍스트</td><td>image1.jpg</td></tr>
             </tbody>
           </table>
           <div className="pm-guide-categories">
@@ -147,14 +159,13 @@ const ProductManagement = ({ registerTrigger, user }) => {
               { code: 'TOP', label: '상의' },
               { code: 'BOTTOM', label: '하의' },
               { code: 'OUTER', label: '아우터' },
-              { code: 'DRESS', label: '드레스' },
+              { code: 'DRESS', label: '원피스/세트' },
               { code: 'SHOES', label: '신발' },
               { code: 'BAG', label: '가방' },
             ].map(({ code, label }) => (
               <span key={code} className="pm-guide-badge">{code} ({label})</span>
             ))}
           </div>
-          <p className="pm-guide-note">※ 이미지는 엑셀 등록 후 상품 수정에서 별도 업로드해주세요.</p>
         </div>
           )}
         </div>
