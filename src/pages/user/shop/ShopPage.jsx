@@ -3,6 +3,8 @@ import Navbar from '../../../components/user/header/Header';
 import AuthModal from '../auth/AuthPage';
 import ProductCard from '../../../components/user/card/ProductCard';
 import { ListProduct } from '../../../api/user/product';
+import { GetWishlistProductIds } from '../../../api/user/wishlist';
+import { useAuth } from '../../../store/context/UserContext';
 import "../../../App.css";
 import "./ShopPage.css";
 
@@ -26,6 +28,8 @@ const CATEGORY_KOR = {
 const categories = ["전체", "상의", "하의", "아우터", "원피스", "신발", "가방"];
 
 function ShopPage() {
+  const { user } = useAuth();
+  const [wishlistedIds, setWishlistedIds] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -35,6 +39,13 @@ function ShopPage() {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    GetWishlistProductIds()
+      .then(setWishlistedIds)
+      .catch(() => {});
+  }, [user]);
 
   const debounceRef = useRef(null);
   const observerRef = useRef(null);
@@ -176,7 +187,7 @@ function ShopPage() {
         <>
           <div className="shop-grid">
             {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} isWished={wishlistedIds.includes(product.id)} />
             ))}
           </div>
 

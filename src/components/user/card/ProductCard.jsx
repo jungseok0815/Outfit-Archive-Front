@@ -1,20 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../store/context/UserContext";
-import { CheckWishlist, ToggleWishlist } from "../../../api/user/wishlist";
+import { ToggleWishlist } from "../../../api/user/wishlist";
 import "./Card.css";
 
-function ProductCard({ product, rank }) {
+function ProductCard({ product, rank, isWished = false }) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [wishlisted, setWishlisted] = useState(false);
+  const [wishlisted, setWishlisted] = useState(isWished);
 
   useEffect(() => {
-    if (!user || !product.id) return;
-    CheckWishlist(product.id)
-      .then(res => setWishlisted(res.data.wished))
-      .catch(() => {});
-  }, [user, product.id]);
+    setWishlisted(isWished);
+  }, [isWished]);
 
   const handleClick = () => {
     navigate(`/shop/${product.id}`, { state: { product: product._raw || product } });

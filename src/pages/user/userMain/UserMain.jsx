@@ -6,6 +6,8 @@ import StyleCard from '../../../components/user/card/StyleCard';
 import ProductCard from '../../../components/user/card/ProductCard';
 import { ListPost } from '../../../api/user/post';
 import { ListProduct } from '../../../api/user/product';
+import { GetWishlistProductIds } from '../../../api/user/wishlist';
+import { useAuth } from '../../../store/context/UserContext';
 import "../../../App.css";
 import "./UserMain.css";
 import "../../../styles/user/Hero.css";
@@ -17,6 +19,7 @@ const heroSlides = [
 ];
 
 function App() {
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [heroIndex, setHeroIndex] = useState(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -24,6 +27,14 @@ function App() {
   const [showAllFeed, setShowAllFeed] = useState(false);
   const [feedItems, setFeedItems] = useState([]);
   const [popularProducts, setPopularProducts] = useState([]);
+  const [wishlistedIds, setWishlistedIds] = useState([]);
+
+  useEffect(() => {
+    if (!user) return;
+    GetWishlistProductIds()
+      .then(setWishlistedIds)
+      .catch(() => {});
+  }, [user]);
 
   useEffect(() => {
     ListPost('', 0, 12)
@@ -139,7 +150,7 @@ function App() {
         </div>
         <div className="popular-grid">
           {visibleProducts.map((product, index) => (
-            <ProductCard key={product.id} product={product} rank={index + 1} />
+            <ProductCard key={product.id} product={product} rank={index + 1} isWished={wishlistedIds.includes(product.id)} />
           ))}
         </div>
         {!showAllProducts && popularProducts.length > 8 && (
