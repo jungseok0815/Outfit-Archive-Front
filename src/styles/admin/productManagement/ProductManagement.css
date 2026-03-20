@@ -131,6 +131,22 @@
   margin: 0;
 }
 
+.pm-guide-structure {
+  background: #1e1e1e;
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pm-guide-structure code {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #a8d8a8;
+}
+
 /* ===== 페이징 ===== */
 .pm-pagination {
   display: flex;

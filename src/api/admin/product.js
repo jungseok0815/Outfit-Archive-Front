@@ -22,3 +22,11 @@ export const UpdateProduct = (updateForm) => {
 export const DeleteProduct = (productId) => {
     return api.delete('/api/admin/product/delete', { params: { id: productId } });
 }
+
+export const BulkInsertProduct = (zipFile) => {
+    const form = new FormData();
+    form.append('file', zipFile);
+    return api.post('/api/admin/product/bulk', form, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
+}
