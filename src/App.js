@@ -11,6 +11,8 @@ import Admin from './pages/admin/AdminMainPage';
 import PrivateMasterRoute from './routes/PrivateMasterRoute';
 import PrivateUserRoute from './routes/PrivateUserRoute';
 import MyPage from './pages/user/mypage/MyPage';
+import SearchPage from './pages/user/search/SearchPage';
+import BrandPage from './pages/user/brand/BrandPage';
 import PaymentSuccessPage from './pages/user/payment/PaymentSuccessPage';
 import PaymentFailPage from './pages/user/payment/PaymentFailPage';
 import { AuthProvider } from './store/context/UserContext';
@@ -29,6 +31,8 @@ function App() {
                   <Route path='/shop' element={<ShopPage/>}/>
                   <Route path='/shop/:productId' element={<ProductDetailPage/>}/>
                   <Route path='/style' element={<StylePage/>}/>
+                  <Route path='/search' element={<SearchPage/>}/>
+                  <Route path='/brand/:brandId' element={<BrandPage/>}/>
                   <Route path='/mypage' element={<PrivateUserRoute component={<MyPage/>}/>}/>
                   <Route path='/mypage/:userId' element={<MyPage/>}/>
                   <Route path='/payment/success' element={<PaymentSuccessPage/>}/>

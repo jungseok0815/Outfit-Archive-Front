@@ -40,6 +40,11 @@ export const GetLikeStatus = (postId) => {
     return api.get('/api/usr/post/like/status', { params: { postId } });
 }
 
+// GET /api/usr/post/search?keyword={keyword} → 브랜드명 또는 제목으로 검색 (비로그인 가능)
+export const SearchPost = (keyword, page = 0, size = 12) => {
+    return api.get('/api/usr/post/search', { params: { keyword, page, size } });
+}
+
 // GET /api/usr/post/comment/list?postId={id}
 export const ListComment = (postId, page = 0, size = 10) => {
     return api.get('/api/usr/post/comment/list', { params: { postId, page, size } });
