@@ -25,6 +25,7 @@ jobs:
         run: npm run build
         env:
           REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+          CI: false
 
       - name: S3 배포
         run: aws s3 sync build/ s3://jungseok-outfit-frontend --delete
