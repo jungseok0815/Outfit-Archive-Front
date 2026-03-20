@@ -13,10 +13,60 @@
 }
 
 .search-form {
+  position: relative;
   display: flex;
+  align-items: center;
   width: 100%;
   max-width: 560px;
   gap: 0;
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.search-result-section {
+  padding: 0 20px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.search-result-tabs {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 24px;
+}
+
+.search-result-tab {
+  flex: 1;
+  padding: 12px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #999;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.search-result-tab.active {
+  color: #222;
+  border-bottom-color: #222;
+}
+
+.search-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+  font-size: 0.95rem;
 }
 
 .search-input {
