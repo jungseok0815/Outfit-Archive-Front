@@ -164,7 +164,11 @@ function ProductDetailPage() {
 
           {/* 상품 정보 */}
           <div className="detail-info">
-            <div className="detail-brand">{product.brandNm}</div>
+            <div
+              className="detail-brand"
+              style={{ cursor: product.brandId ? 'pointer' : 'default' }}
+              onClick={() => { if (product.brandId) navigate(`/brand/${product.brandId}`); }}
+            >{product.brandNm}</div>
             <h1 className="detail-name">{product.productNm}</h1>
             <div className="detail-price">
               {product.productPrice?.toLocaleString()}원

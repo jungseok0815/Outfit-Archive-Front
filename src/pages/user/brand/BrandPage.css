@@ -1,0 +1,118 @@
+/* 히어로 섹션 */
+.brand-hero {
+  width: 100%;
+  height: 360px;
+  position: relative;
+  background-color: #111;
+  overflow: hidden;
+}
+
+.brand-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.6;
+}
+
+.brand-hero-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+}
+
+.brand-hero-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+}
+
+.brand-hero-name {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+
+.brand-hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.8);
+}
+
+/* 소개 섹션 */
+.brand-intro {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.brand-intro-desc {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.8;
+  white-space: pre-line;
+}
+
+.brand-intro-divider {
+  width: 40px;
+  height: 2px;
+  background: #222;
+  margin: 0 auto 24px;
+}
+
+/* 상품 섹션 */
+.brand-products-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+  border-top: 1px solid #eee;
+}
+
+/* 카테고리 탭 */
+.brand-category-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 24px 0 20px;
+  flex-wrap: wrap;
+}
+
+.brand-category-tab {
+  padding: 8px 18px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.brand-category-tab:hover {
+  border-color: #222;
+  color: #222;
+}
+
+.brand-category-tab.active {
+  background: #222;
+  border-color: #222;
+  color: #fff;
+  font-weight: 600;
+}
+
+.brand-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+  font-size: 0.95rem;
+}

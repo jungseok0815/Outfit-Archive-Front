@@ -39,7 +39,15 @@ function ProductCard({ product, rank, isWished = false }) {
         <img src={product.image} alt={product.name} />
       </div>
       <div className="card-body">
-        <span className="card-brand">{product.brand}</span>
+        <span
+          className="card-brand"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (product._raw?.brandId) navigate(`/brand/${product._raw.brandId}`);
+          }}
+        >
+          {product.brand}
+        </span>
         <p className="card-name">{product.name}</p>
         <span className="card-price">{product.price}원</span>
       </div>
