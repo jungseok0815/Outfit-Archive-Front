@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { Logout } from '../../api/user/auth';
+import { AdminLogout } from '../../api/admin/auth';
 
 const AuthContext = createContext(null);
 
@@ -32,7 +34,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   // 일반 유저 로그아웃 함수
-  const logout = () => {
+  const logout = async () => {
+    try { await Logout(); } catch (e) { /* 쿠키는 서버가 삭제하므로 실패해도 진행 */ }
     setUser(null);
     localStorage.removeItem('user');
   };
@@ -44,7 +47,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   // 관리자 로그아웃 함수
-  const adminLogout = () => {
+  const adminLogout = async () => {
+    try { await AdminLogout(); } catch (e) { /* 쿠키는 서버가 삭제하므로 실패해도 진행 */ }
     setAdminUser(null);
     localStorage.removeItem('adminUser');
   };

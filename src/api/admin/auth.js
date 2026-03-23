@@ -22,3 +22,8 @@ export const ListAdmin = () => {
 export const deleteAdmin = (id) => {
   return api.delete(`/api/admin/auth/members/${id}`);
 }
+
+// 관리자 로그아웃 - 서버측 쿠키 삭제 + Redis Refresh Token 삭제
+export const AdminLogout = () => {
+    return api.post("/api/admin/auth/logout");
+}
