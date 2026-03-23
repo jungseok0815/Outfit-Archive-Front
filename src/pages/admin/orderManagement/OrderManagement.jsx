@@ -214,9 +214,13 @@ const OrderManagement = ({ user }) => {
                                             >
                                                 <div className="order-item-product">
                                                     <div className="order-item-thumb">
-                                                        <div className="order-item-thumb-placeholder">
-                                                            <Package className="w-5 h-5" />
-                                                        </div>
+                                                        {order.productImgPath ? (
+                                                            <img src={order.productImgPath} alt={order.productNm} className="order-item-thumb-img" />
+                                                        ) : (
+                                                            <div className="order-item-thumb-placeholder">
+                                                                <Package className="w-5 h-5" />
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div className="order-item-product-info">
                                                         <span className="order-item-brand">{order.userNm}</span>
