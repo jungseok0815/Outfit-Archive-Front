@@ -103,9 +103,8 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
           updateProduct()
           onClose();
         }
-      }).catch((err) => {
+      }).catch(() => {
         toast.error("상품등록 실패")
-        console.log(err)
       });
   };
 
@@ -122,9 +121,8 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
           updateProduct()
           onClose();
         }
-      }).catch((err) => {
+      }).catch(() => {
         toast.error("상품 수정 실패")
-        console.log(err)
       });
   };
 
@@ -138,9 +136,8 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
           updateProduct()
           onClose();
         }
-      }).catch((err) => {
+      }).catch(() => {
         toast.error("상품 삭제 실패")
-        console.log(err)
       })
     }
   };

@@ -20,7 +20,6 @@ function AdminLoginPage({ onLoginSuccess }) {
     postAdminLogin(loginForm)
       .then((res) => {
         const userInfo = res.data;
-        console.log("로그인 유저 정보는 : " , userInfo)
         if (userInfo.adminRole) {
           adminLogin(userInfo);
           onLoginSuccess();

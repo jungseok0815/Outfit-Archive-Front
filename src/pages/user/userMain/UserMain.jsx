@@ -74,7 +74,7 @@ function App() {
           products: p.products || [],
         })));
       })
-      .catch(e => console.error('피드 조회 실패:', e));
+      .catch(() => {});
 
     ListProduct('', null, 0, 12)
       .then(res => {
@@ -88,7 +88,7 @@ function App() {
           _raw: p,
         })));
       })
-      .catch(e => console.error('상품 조회 실패:', e));
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -135,7 +135,7 @@ function App() {
           products: p.products || [],
         })));
       })
-      .catch(e => console.error('검색 실패:', e))
+      .catch(() => {})
       .finally(() => setSearchLoading(false));
   }, [searchKeyword]);
 

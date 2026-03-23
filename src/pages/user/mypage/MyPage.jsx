@@ -64,7 +64,7 @@ function MyPage() {
   const loadMyPosts = () => {
     ListMyPost(0, 100)
       .then(res => setPosts(mapPosts(res.data.content || [])))
-      .catch(e => console.error('게시물 조회 실패:', e));
+      .catch(() => {});
   };
 
   const loadUserPosts = (userNm) => {
@@ -74,13 +74,13 @@ function MyPage() {
         const filtered = all.filter(p => p.userNm === userNm);
         setPosts(mapPosts(filtered));
       })
-      .catch(e => console.error('게시물 조회 실패:', e));
+      .catch(() => {});
   };
 
   const loadOrders = () => {
     ListMyOrder(0, 50)
       .then(res => setOrders(res.data.content || []))
-      .catch(e => console.error('구매내역 조회 실패:', e));
+      .catch(() => {});
   };
 
   const handleTabChange = (tab) => {
@@ -93,10 +93,10 @@ function MyPage() {
     } else if (tab === 'points') {
       GetPoint()
         .then(res => setCurrentPoint(res.data.point))
-        .catch(e => console.error('포인트 조회 실패:', e));
+        .catch(() => {});
       GetPointHistory(0, 20)
         .then(res => setPointHistory(res.data.content || []))
-        .catch(e => console.error('포인트 내역 조회 실패:', e));
+        .catch(() => {});
     } else if (tab === 'wishlist') {
       ListWishlist(0, 50)
         .then(res => setWishlist(res.data.content || []))
@@ -142,14 +142,12 @@ function MyPage() {
     setActiveTab("posts");
 
     if (isOwnPage) {
-      console.log('[MyPage] 본인 프로필 (user context):', user);
       setProfileUser(null);
       loadMyPosts();
     } else if (paramUserId) {
       // 프로필 조회 후 해당 유저의 게시물 필터링
       GetUserProfile(paramUserId)
         .then(res => {
-          console.log('[MyPage] 타인 프로필 응답:', res.data);
           setProfileUser(res.data);
           loadUserPosts(res.data.userNm);
         })
@@ -161,7 +159,7 @@ function MyPage() {
     if (targetId) {
       GetFollowCount(targetId)
         .then(res => setFollowCount(res.data))
-        .catch(e => console.error('팔로우 수 조회 실패:', e));
+        .catch(() => {});
     }
 
     // 팔로우 여부 확인 (다른 유저 페이지이고 로그인된 경우)
@@ -180,7 +178,6 @@ function MyPage() {
     if (!file || !user?.id) return;
     UpdateProfileImg(user.id, file)
       .then(res => {
-        console.log('[MyPage] 프로필 이미지 변경 응답:', res.data);
         login({ ...user, profileImgNm: res.data.profileImgNm });
       })
       .catch(() => toast.error('프로필 이미지 변경에 실패했습니다.'));
@@ -198,7 +195,7 @@ function MyPage() {
           followerCount: isFollowing ? prev.followerCount - 1 : prev.followerCount + 1,
         }));
       })
-      .catch(e => console.error('팔로우 처리 실패:', e));
+      .catch(() => {});
   };
 
   const currentProfile = isOwnPage ? user : profileUser;

@@ -39,7 +39,7 @@ function ProductDetailPage() {
         .then((res) => {
           setProduct(res.data);
         })
-        .catch((e) => console.error("상품 조회 실패:", e))
+        .catch(() => {})
         .finally(() => setLoading(false));
     }
   }, [productId, product]);

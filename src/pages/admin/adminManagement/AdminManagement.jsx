@@ -37,10 +37,9 @@ const AdminManagement = () => {
     setListLoading(true);
     ListAdmin()
       .then((res) => {
-        console.log("res admin  :" , res.data)
         setAdminList(Array.isArray(res.data) ? res.data : [])
       })
-      .catch((err) => console.error('관리자 목록 조회 실패:', err))
+      .catch(() => {})
       .finally(() => setListLoading(false));
   };
 
@@ -48,7 +47,7 @@ const AdminManagement = () => {
     fetchAdminList();
     ListBrand('', 0, 100)
       .then((res) => setBrandList(res.data.content || []))
-      .catch((err) => console.error('브랜드 목록 조회 실패:', err));
+      .catch(() => {});
   }, []);
 
   const handleChange = (e) => {
@@ -92,7 +91,6 @@ const AdminManagement = () => {
   const isPartner = form.adminRole === 'PARTNER';
 
   const getBrandName = (admin) => {
-    console.log("getbarandName : ", admin.brandNm)
     if (admin.brandNm) return admin.brandNm;
     if (admin.brandId) {
       const brand = brandList.find((b) => b.id === admin.brandId);

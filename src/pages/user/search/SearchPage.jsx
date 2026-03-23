@@ -87,7 +87,7 @@ function SearchPage() {
         setProducts((data.content || []).map(mapProduct));
         setProductHasMore(!data.last);
       })
-      .catch(e => console.error('상품 검색 실패:', e))
+      .catch(() => {})
       .finally(() => { setProductLoading(false); productLoadingRef.current = false; });
   }, [keyword]);
 
@@ -106,7 +106,7 @@ function SearchPage() {
         setPosts((data.content || []).map(mapPost));
         setPostHasMore(!data.last);
       })
-      .catch(e => console.error('스타일 검색 실패:', e))
+      .catch(() => {})
       .finally(() => { setPostLoading(false); postLoadingRef.current = false; });
   }, [keyword]);
 

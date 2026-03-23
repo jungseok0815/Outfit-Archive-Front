@@ -77,7 +77,7 @@ function ShopPage() {
         setProducts((data.content || []).map(mapProduct));
         setHasMore(!data.last);
       })
-      .catch(e => console.error('상품 조회 실패:', e))
+      .catch(() => {})
       .finally(() => {
         setLoading(false);
         loadingRef.current = false;
@@ -99,7 +99,7 @@ function ShopPage() {
         setProducts(prev => [...prev, ...(data.content || []).map(mapProduct)]);
         setHasMore(!data.last);
       })
-      .catch(e => console.error('상품 추가 로드 실패:', e))
+      .catch(() => {})
       .finally(() => {
         loadingRef.current = false;
       });

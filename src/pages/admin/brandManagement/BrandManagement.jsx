@@ -20,7 +20,6 @@ const BrandManagement = ({ registerTrigger }) => {
             setBrands(brandsRes.data.content || []);
             setProducts(productsRes.data.content || []);
         } catch (e) {
-            console.error('데이터 로딩 실패:', e);
         } finally {
             setLoading(false);
         }

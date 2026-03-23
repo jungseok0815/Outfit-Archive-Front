@@ -54,7 +54,7 @@ function StylePage() {
         setPosts((data.content || []).map(mapPost));
         setHasMore(!data.last);
       })
-      .catch(e => console.error('스타일 피드 조회 실패:', e))
+      .catch(() => {})
       .finally(() => {
         setLoading(false);
         loadingRef.current = false;
@@ -75,7 +75,7 @@ function StylePage() {
         setPosts(prev => [...prev, ...(data.content || []).map(mapPost)]);
         setHasMore(!data.last);
       })
-      .catch(e => console.error('스타일 피드 추가 로드 실패:', e))
+      .catch(() => {})
       .finally(() => {
         loadingRef.current = false;
       });

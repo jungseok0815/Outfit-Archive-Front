@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./PostDetailPanel.css";
 import { ListComment, InsertComment, ToggleLike, GetLikeStatus } from '../../../api/user/post';
@@ -40,7 +40,7 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
     if (showComments && post?.id) {
       ListComment(post.id, 0, 20)
         .then(res => setComments(res.data.content || []))
-        .catch(e => console.error('댓글 조회 실패:', e));
+        .catch(() => {});
     }
   }, [showComments, post?.id]);
 
@@ -84,7 +84,7 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
         setComments(res.data.content || []);
         setNewComment("");
       })
-      .catch(e => console.error('댓글 등록 실패:', e))
+      .catch(() => {})
       .finally(() => setSubmittingComment(false));
   };
 
@@ -94,7 +94,7 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
         setLiked(res.data.liked);
         setLikeCount(res.data.likeCount);
       })
-      .catch(e => console.error('좋아요 처리 실패:', e));
+      .catch(() => {});
   };
 
   const formatDate = (dateStr) => {
