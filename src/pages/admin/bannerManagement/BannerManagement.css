@@ -1,0 +1,290 @@
+.banner-mgmt { padding: 0; }
+
+.banner-mgmt-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.banner-mgmt-count {
+    font-size: 13px;
+    color: #888;
+}
+
+/* 폼 카드 */
+.banner-mgmt-form-card {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.banner-mgmt-form-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 20px 0;
+}
+
+.banner-mgmt-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.banner-mgmt-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.banner-mgmt-field--full {
+    grid-column: 1 / -1;
+}
+
+.banner-mgmt-field > label:first-child {
+    font-size: 11px;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.banner-mgmt-field input[type="text"],
+.banner-mgmt-field input[type="number"] {
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1a1a1a;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.banner-mgmt-field input[type="text"]:focus,
+.banner-mgmt-field input[type="number"]:focus {
+    border-color: #1a1a1a;
+}
+
+/* 토글 */
+.banner-mgmt-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    margin-top: 4px;
+}
+
+.banner-mgmt-toggle input[type="checkbox"] {
+    display: none;
+}
+
+.banner-mgmt-toggle-slider {
+    width: 40px;
+    height: 22px;
+    background: #e0e0e0;
+    border-radius: 11px;
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.banner-mgmt-toggle-slider::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    transition: left 0.2s;
+}
+
+.banner-mgmt-toggle input:checked + .banner-mgmt-toggle-slider {
+    background: #1a1a1a;
+}
+
+.banner-mgmt-toggle input:checked + .banner-mgmt-toggle-slider::after {
+    left: 21px;
+}
+
+.banner-mgmt-toggle-label {
+    font-size: 14px;
+    color: #333;
+}
+
+/* 폼 액션 버튼 */
+.banner-mgmt-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.banner-mgmt-btn-cancel,
+.banner-mgmt-btn-save {
+    height: 36px;
+    padding: 0 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s;
+}
+
+.banner-mgmt-btn-cancel {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.banner-mgmt-btn-cancel:hover:not(:disabled) { background: #ebebeb; }
+
+.banner-mgmt-btn-save {
+    background: #1a1a1a;
+    color: #fff;
+}
+
+.banner-mgmt-btn-save:hover:not(:disabled) { background: #333; }
+
+.banner-mgmt-btn-save:disabled,
+.banner-mgmt-btn-cancel:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 테이블 */
+.banner-mgmt-table-wrap {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.banner-mgmt-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.banner-mgmt-table thead tr {
+    background: #fafafa;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.banner-mgmt-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.banner-mgmt-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.banner-mgmt-row:last-child td {
+    border-bottom: none;
+}
+
+.banner-mgmt-row:hover {
+    background: #fafafa;
+}
+
+.banner-mgmt-order {
+    font-weight: 600;
+    color: #aaa;
+    width: 60px;
+    text-align: center;
+}
+
+.banner-mgmt-title {
+    font-weight: 500;
+    color: #1a1a1a;
+}
+
+.banner-mgmt-highlight {
+    background: #f0f0f0;
+    color: #333;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.banner-mgmt-desc {
+    color: #666;
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.banner-mgmt-status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.banner-mgmt-status.active {
+    background: #e6f4ea;
+    color: #2d7a3a;
+}
+
+.banner-mgmt-status.inactive {
+    background: #f5f5f5;
+    color: #999;
+}
+
+.banner-mgmt-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.banner-mgmt-edit-btn,
+.banner-mgmt-delete-btn {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.banner-mgmt-edit-btn {
+    background: #f5f5f5;
+    color: #555;
+}
+
+.banner-mgmt-edit-btn:hover { background: #ebebeb; }
+
+.banner-mgmt-delete-btn {
+    background: #fff0f0;
+    color: #d32f2f;
+}
+
+.banner-mgmt-delete-btn:hover { background: #ffe0e0; }
+
+.banner-mgmt-empty {
+    text-align: center;
+    color: #aaa;
+    padding: 48px;
+    font-size: 14px;
+}
