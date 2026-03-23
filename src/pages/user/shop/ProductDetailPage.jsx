@@ -5,6 +5,8 @@ import AuthModal from "../auth/AuthPage";
 import OrderModal from "./OrderModal";
 import { GetProduct, ListProductReview } from "../../../api/user/product";
 import { CheckWishlist, ToggleWishlist } from "../../../api/user/wishlist";
+import { ListPostByProduct } from "../../../api/user/post";
+import PostDetailPanel from "../../user/mypage/PostDetailPanel";
 import { useAuth } from "../../../store/context/UserContext";
 import "../../../App.css";
 import "./ProductDetailPage.css";
@@ -27,6 +29,8 @@ function ProductDetailPage() {
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [wishlisted, setWishlisted] = useState(false);
+  const [productPosts, setProductPosts] = useState([]);
+  const [selectedPost, setSelectedPost] = useState(null);
 
   useEffect(() => {
     if (!product) {
@@ -44,6 +48,14 @@ function ProductDetailPage() {
     if (productId) {
       ListProductReview(productId, 0, 20)
         .then((res) => setReviews(res.data.content || []))
+        .catch(() => {});
+    }
+  }, [productId]);
+
+  useEffect(() => {
+    if (productId) {
+      ListPostByProduct(productId, 0, 12)
+        .then(res => setProductPosts(res.data.content || []))
         .catch(() => {});
     }
   }, [productId]);
@@ -227,6 +239,13 @@ function ProductDetailPage() {
           </div>
         </div>
 
+        {selectedPost && (
+          <PostDetailPanel
+            post={selectedPost}
+            onClose={() => setSelectedPost(null)}
+          />
+        )}
+
         {/* 상품 후기 */}
         <div className="review-section">
           <div className="review-section-header">
@@ -259,6 +278,42 @@ function ProductDetailPage() {
             )}
           </div>
         </div>
+
+        {/* 이 상품을 담은 게시글 */}
+        {productPosts.length > 0 && (
+          <div className="product-posts-section">
+            <div className="product-posts-header">
+              <h2 className="product-posts-title">
+                이 상품을 담은 게시글 <span className="product-posts-count">{productPosts.length}</span>
+              </h2>
+            </div>
+            <div className="product-posts-grid">
+              {productPosts.map(post => (
+                <div
+                  key={post.id}
+                  className="product-post-card"
+                  onClick={() => setSelectedPost(post)}
+                >
+                  <div className="product-post-thumb">
+                    {post.images?.length > 0 ? (
+                      <img src={post.images[0].imgPath} alt={post.title} />
+                    ) : (
+                      <div className="product-post-thumb-empty" />
+                    )}
+                  </div>
+                  <div className="product-post-info">
+                    <span className="product-post-user">{post.userNm}</span>
+                    <p className="product-post-title-text">{post.title}</p>
+                    <div className="product-post-meta">
+                      <span>♥ {post.likeCount || 0}</span>
+                      <span>💬 {post.commentCount || 0}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

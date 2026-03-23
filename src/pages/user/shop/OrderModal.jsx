@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
-import { loadTossPayments } from "@tosspayments/payment-sdk";
+import { useState, useEffect, useRef } from "react";
+// import { loadTossPayments } from "@tosspayments/payment-sdk"; // 토스 결제 비활성화
 import DaumPostcode from "react-daum-postcode";
 import { InsertOrder } from "../../../api/user/order";
+import { DirectCompleteOrder } from "../../../api/user/payment";
 import { GetPoint } from "../../../api/user/point";
 import "./OrderModal.css";
 
-const TOSS_CLIENT_KEY = "test_ck_zXLkKEypNArWmo50nX3lmeaxYG5R";
+// const TOSS_CLIENT_KEY = "test_ck_zXLkKEypNArWmo50nX3lmeaxYG5R"; // 토스 결제 비활성화
 
 function OrderModal({ product, onClose }) {
   const [form, setForm] = useState({
@@ -21,6 +22,7 @@ function OrderModal({ product, onClose }) {
   const [availablePoint, setAvailablePoint] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [orderResult, setOrderResult] = useState(null); // 결제 완료 결과
   const detailAddressRef = useRef(null);
 
   useEffect(() => {
@@ -73,21 +75,24 @@ function OrderModal({ product, onClose }) {
         usePoint,
       });
 
-      const { tossOrderId, actualPayment, productNm } = res.data;
+      const { tossOrderId } = res.data;
 
-      // 2단계: 토스 결제창 열기
-      const tossPayments = await loadTossPayments(TOSS_CLIENT_KEY);
-      await tossPayments.requestPayment("카드", {
-        amount: actualPayment,
-        orderId: tossOrderId,
-        orderName: productNm,
-        customerName: form.recipientName.trim(),
-        successUrl: `${window.location.origin}/payment/success`,
-        failUrl: `${window.location.origin}/payment/fail`,
-      });
+      // 2단계: 토스 결제창 (비활성화)
+      // const tossPayments = await loadTossPayments(TOSS_CLIENT_KEY);
+      // await tossPayments.requestPayment("카드", {
+      //   amount: actualPayment,
+      //   orderId: tossOrderId,
+      //   orderName: productNm,
+      //   customerName: form.recipientName.trim(),
+      //   successUrl: `${window.location.origin}/payment/success`,
+      //   failUrl: `${window.location.origin}/payment/fail`,
+      // });
+
+      // 2단계: 서버에 직접 결제 완료 저장 (PG 없이)
+      const completeRes = await DirectCompleteOrder(tossOrderId);
+      setOrderResult(completeRes.data);
 
     } catch (err) {
-      // 토스 결제창 닫기(취소)는 에러를 던지지 않고 그냥 종료됨
       const msg = err?.response?.data?.msg || err?.message || "";
       if (msg) setError(msg);
     } finally {
@@ -96,6 +101,53 @@ function OrderModal({ product, onClose }) {
   };
 
   const thumbImg = product.images?.length > 0 ? product.images[0].imgPath : null;
+
+  // 결제 완료 화면
+  if (orderResult) {
+    return (
+      <div className="order-modal-overlay" onClick={onClose}>
+        <div className="order-modal" onClick={e => e.stopPropagation()}>
+          <div className="order-modal-header">
+            <h3 className="order-modal-title">주문 완료</h3>
+            <button className="order-modal-close" onClick={onClose}>✕</button>
+          </div>
+          <div className="order-modal-body order-success-body">
+            <div className="order-success-icon">✓</div>
+            <p className="order-success-title">결제가 완료되었습니다</p>
+            <div className="order-success-info">
+              <div className="order-success-row">
+                <span>주문 상품</span>
+                <span>{orderResult.productNm}</span>
+              </div>
+              <div className="order-success-row">
+                <span>수량</span>
+                <span>{orderResult.quantity}개</span>
+              </div>
+              <div className="order-success-row">
+                <span>결제 금액</span>
+                <span>{orderResult.actualPayment?.toLocaleString()}원</span>
+              </div>
+              {orderResult.usedPoint > 0 && (
+                <div className="order-success-row">
+                  <span>포인트 사용</span>
+                  <span>− {orderResult.usedPoint?.toLocaleString()}P</span>
+                </div>
+              )}
+              {orderResult.earnedPoint > 0 && (
+                <div className="order-success-row earn">
+                  <span>적립 포인트</span>
+                  <span>+ {orderResult.earnedPoint?.toLocaleString()}P</span>
+                </div>
+              )}
+            </div>
+            <button className="order-submit-btn" onClick={onClose}>
+              확인
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="order-modal-overlay" onClick={onClose}>

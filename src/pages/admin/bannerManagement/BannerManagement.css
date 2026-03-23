@@ -504,9 +504,12 @@
     line-height: 1.2;
 }
 
-.banner-preview-hero .banner-preview-overlay-dim ~ .banner-preview-content .banner-preview-title,
-.banner-preview-hero[style] .banner-preview-content .banner-preview-title {
+.banner-preview-hero.has-image .banner-preview-title {
     color: #fff;
+}
+
+.banner-preview-hero.has-image .banner-preview-desc {
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .banner-preview-title em {

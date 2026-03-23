@@ -1,7 +1,7 @@
 import {useState,useEffect } from "react";
 import Modal from "./Modal";
 import { InsertProduct, UpdateProduct, DeleteProduct} from "../../../api/admin/product";
-import { ImagePlus } from 'lucide-react'
+import { ImagePlus, X } from 'lucide-react'
 import { toast } from "react-toastify";
 import { CancelButton, DeleteButton, SubmitButton } from "../Button/Button";
 
@@ -15,10 +15,14 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
     brandId : "",
     productCode : "",
     category: "",
-    image: []
   });
 
-  const [imagePreview, setImagePreview] = useState([]);
+  // 기존 이미지 (수정 모드)
+  const [existingImages, setExistingImages] = useState([]); // [{id, imgPath}]
+  const [removedImageIds, setRemovedImageIds] = useState([]); // 삭제할 이미지 ID 목록
+  // 새로 추가할 파일
+  const [newFiles, setNewFiles] = useState([]);
+  const [newPreviews, setNewPreviews] = useState([]);
 
   useEffect(() => {
     const autoBrandId = user?.brandId || "";
@@ -31,17 +35,14 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
         brandId: product.brandId || autoBrandId,
         productCode: product.productCode || "",
         category: product.category || "",
-        image: []
       });
-
-      if(product.images && product.images.length > 0){
-        const produtImgs = product.images.map((img) => img.imgPath)
-        setImagePreview(produtImgs)
-      } else {
-        setImagePreview([])
-      }
-
-    }else{
+      setExistingImages(
+        product.images?.map(img => ({ id: img.id, imgPath: img.imgPath })) || []
+      );
+      setRemovedImageIds([]);
+      setNewFiles([]);
+      setNewPreviews([]);
+    } else {
       setFormData({
         id : "",
         productNm: "",
@@ -50,11 +51,13 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
         brandId: autoBrandId,
         productCode: "",
         category:  "",
-        image: []
       });
-      setImagePreview([])
+      setExistingImages([]);
+      setRemovedImageIds([]);
+      setNewFiles([]);
+      setNewPreviews([]);
     }
-}, [product, user])
+  }, [product, user]);
 
 
   const handleChange = (e) => {
@@ -65,25 +68,37 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
     }));
   };
 
-
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    if(files.length > 4) { toast.warn("사진은 최대 4장 등록 가능합니다!"); return; }
-    if (files) {
-      setFormData((prev) => ({
-        ...prev,
-        image: files
-      }));
-      const previewUrls = files.map((file) => URL.createObjectURL(file));
-      setImagePreview(previewUrls);
+    const totalCount = existingImages.length + newFiles.length + files.length;
+    if (totalCount > 4) {
+      toast.warn("사진은 최대 4장 등록 가능합니다!");
+      return;
     }
+    setNewFiles(prev => [...prev, ...files]);
+    const previews = files.map(f => URL.createObjectURL(f));
+    setNewPreviews(prev => [...prev, ...previews]);
+    e.target.value = "";
   };
-  
+
+  const handleRemoveExisting = (imgId) => {
+    setExistingImages(prev => prev.filter(img => img.id !== imgId));
+    setRemovedImageIds(prev => [...prev, imgId]);
+  };
+
+  const handleRemoveNew = (index) => {
+    setNewFiles(prev => prev.filter((_, i) => i !== index));
+    setNewPreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-      InsertProduct(formData)
+    const form = new FormData();
+    Object.entries(formData).forEach(([k, v]) => { if (v !== "") form.append(k, v); });
+    newFiles.forEach(f => form.append('image', f));
+    InsertProduct(form)
       .then(res => {
-        if (res.status === 200) {
+        if (res.status === 200 || res.status === 201) {
           toast.success("상품등록 성공!")
           updateProduct()
           onClose();
@@ -91,23 +106,27 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
       }).catch((err) => {
         toast.error("상품등록 실패")
         console.log(err)
-      })
+      });
   };
 
   const handleUpdate = (e) => {
     e.preventDefault();
-    UpdateProduct(formData).
-      then(res => {
-      if (res.status === 200) {
-        toast.success("상품 수정 성공!")
-        updateProduct()
-        onClose();
-      }
-    }).catch((err) => {
-      toast.error("상품 수정 실패")
-      console.log(err)
-    })
-  }
+    const form = new FormData();
+    Object.entries(formData).forEach(([k, v]) => { if (v !== "") form.append(k, v); });
+    newFiles.forEach(f => form.append('image', f));
+    removedImageIds.forEach(id => form.append('deleteImageIds', id));
+    UpdateProduct(form)
+      .then(res => {
+        if (res.status === 200) {
+          toast.success("상품 수정 성공!")
+          updateProduct()
+          onClose();
+        }
+      }).catch((err) => {
+        toast.error("상품 수정 실패")
+        console.log(err)
+      });
+  };
 
   const handlerDeleteProduct = (e) => {
     e.preventDefault();
@@ -124,9 +143,8 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
         console.log(err)
       })
     }
+  };
 
-  }
-  
   return (
     <div >
       <Modal
@@ -135,8 +153,8 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
         width="800px"
         height="500px">
         <div className="bg-white rounded-lg w-full max-w-4xl">
-         <form  onSubmit={product ? handleUpdate : handleSubmit} className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">상품 등록</h2>
+         <form onSubmit={product ? handleUpdate : handleSubmit} className="p-6">
+            <h2 className="text-2xl font-semibold mb-4">상품 {product ? "수정" : "등록"}</h2>
 
             <div className="flex gap-6">
               {/* 왼쪽: 이미지 업로드 섹션 */}
@@ -157,7 +175,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
                     />
                     <label
                       htmlFor="imageUpload"
-                      className="block w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors"
+                      className="block w-full h-40 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors"
                     >
                       <div className="flex flex-col items-center justify-center h-full">
                         <ImagePlus className="w-8 h-8 text-gray-400" />
@@ -168,20 +186,51 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
                       </div>
                     </label>
                   </div>
-                  <div className="preview-container flex" style={{ marginTop: "20px" }}>
-                    {imagePreview.map((url, index)=>{
-                      return(
-                        <div className="h-16 mr-4 w-16 bg-gray-50 rounded-lg overflow-hidden">
-                        <img
-                          src={url}
-                          key={"productImg"+index}
-                          alt={`preview-${index}`}
-                          className="w-full h-full object-cover"
-                        />
+
+                  {/* 이미지 미리보기 */}
+                  {(existingImages.length > 0 || newPreviews.length > 0) && (
+                    <div className="flex flex-wrap gap-2" style={{ marginTop: "8px" }}>
+                      {/* 기존 이미지 */}
+                      {existingImages.map((img) => (
+                        <div key={"exist-" + img.id} className="relative h-16 w-16">
+                          <div className="h-16 w-16 bg-gray-50 rounded-lg overflow-hidden border border-gray-200">
+                            <img
+                              src={img.imgPath}
+                              alt="기존이미지"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveExisting(img.id)}
+                            className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-700 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors"
+                          >
+                            <X size={11} />
+                          </button>
                         </div>
-                        )
-                    })}
-                  </div>
+                      ))}
+                      {/* 새로 추가한 이미지 */}
+                      {newPreviews.map((url, index) => (
+                        <div key={"new-" + index} className="relative h-16 w-16">
+                          <div className="h-16 w-16 bg-gray-50 rounded-lg overflow-hidden border border-gray-200">
+                            <img
+                              src={url}
+                              alt={`새이미지-${index}`}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveNew(index)}
+                            className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-700 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors"
+                          >
+                            <X size={11} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   <p className="text-xs text-gray-500">
                     * 이미지는 최대 4장까지 등록 가능합니다.
                   </p>
@@ -226,7 +275,6 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
                       <option value="BAG">가방</option>
                     </select>
                   </div>
-
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -286,16 +334,16 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
                 <DeleteButton onClick={handlerDeleteProduct} children={"삭제"}/>
               )}
               <CancelButton onClick={onClose} children={"취소"}/>
-  
+
             </div>
               </div>
             </div>
 
-           
+
           </form>
         </div>
       </Modal>
-      
+
     </div>
   );
 }

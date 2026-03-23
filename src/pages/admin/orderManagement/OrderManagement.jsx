@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Package, Truck, CheckCircle, Clock, ChevronDown, ChevronLeft, ChevronRight, Search, MapPin, Phone, User } from 'lucide-react';
 import './OrderManagement.css';
-import { ListOrder, UpdateOrderStatus, DeleteOrder } from '../../../api/admin/order';
+import { ListOrder, UpdateOrderStatus, RegisterShipping, DeleteOrder } from '../../../api/admin/order';
 import { toast } from "react-toastify";
 
 // 백엔드 OrderStatus enum → 한글 매핑
@@ -47,6 +47,7 @@ const OrderManagement = ({ user }) => {
     const [statusFilter, setStatusFilter] = useState('전체');
     const [expandedOrder, setExpandedOrder] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [trackingInputs, setTrackingInputs] = useState({}); // { orderId: trackingNumber }
 
     const loadOrders = async () => {
         setLoading(true);
@@ -117,6 +118,21 @@ const OrderManagement = ({ user }) => {
             .catch(err => {
                 toast.error(err.response?.data?.msg || '상태 변경에 실패했습니다.');
             });
+    };
+
+    const handleRegisterShipping = (order) => {
+        const trackingNumber = trackingInputs[order.id]?.trim();
+        if (!trackingNumber) { toast.warn('운송장 번호를 입력해주세요.'); return; }
+        RegisterShipping({ id: order.id, trackingNumber })
+            .then(() => {
+                setOrders(prev => prev.map(o => o.id === order.id
+                    ? { ...o, status: 'SHIPPING', trackingNumber }
+                    : o
+                ));
+                setTrackingInputs(prev => ({ ...prev, [order.id]: '' }));
+                toast.success('발송 등록이 완료되었습니다.');
+            })
+            .catch(err => toast.error(err.response?.data?.msg || '발송 등록에 실패했습니다.'));
     };
 
     const handleDelete = (orderId) => {
@@ -214,9 +230,13 @@ const OrderManagement = ({ user }) => {
                                             >
                                                 <div className="order-item-product">
                                                     <div className="order-item-thumb">
-                                                        <div className="order-item-thumb-placeholder">
-                                                            <Package className="w-5 h-5" />
-                                                        </div>
+                                                        {order.productImgPath ? (
+                                                            <img src={order.productImgPath} alt={order.productNm} className="order-item-thumb-img" />
+                                                        ) : (
+                                                            <div className="order-item-thumb-placeholder">
+                                                                <Package className="w-5 h-5" />
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div className="order-item-product-info">
                                                         <span className="order-item-brand">{order.userNm}</span>
@@ -294,6 +314,29 @@ const OrderManagement = ({ user }) => {
                                                                 </div>
                                                             </div>
                                                         </div>
+
+                                                        {/* 발송 등록 - 결제완료 상태일 때만 표시 */}
+                                                        {order.status === 'PAYMENT_COMPLETE' && (
+                                                            <div className="order-detail-section order-shipping-register">
+                                                                <h4 className="order-detail-title">발송 등록</h4>
+                                                                <div className="order-shipping-input-row">
+                                                                    <input
+                                                                        type="text"
+                                                                        className="order-tracking-input"
+                                                                        placeholder="운송장 번호 입력"
+                                                                        value={trackingInputs[order.id] || ''}
+                                                                        onChange={e => setTrackingInputs(prev => ({ ...prev, [order.id]: e.target.value }))}
+                                                                        onKeyDown={e => e.key === 'Enter' && handleRegisterShipping(order)}
+                                                                    />
+                                                                    <button
+                                                                        className="order-shipping-btn"
+                                                                        onClick={() => handleRegisterShipping(order)}
+                                                                    >
+                                                                        발송 등록
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        )}
 
                                                         {/* 배송 상태 관리 */}
                                                         <div className="order-detail-section">
