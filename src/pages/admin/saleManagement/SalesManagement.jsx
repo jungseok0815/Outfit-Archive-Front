@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { TrendingUp, TrendingDown, DollarSign, ShoppingBag, Users, ArrowUpRight } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
+import { TrendingUp, TrendingDown, DollarSign, ShoppingBag, Users, ArrowUpRight, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import './SalesManagement.css';
 import { ListOrder } from '../../../api/admin/order';
 
@@ -64,12 +65,65 @@ const getPeriodKey = (dateStr, period) => {
     return String(y);
 };
 
+// 기간별 전체 키 목록 생성 (데이터 없는 구간도 표시)
+const generatePeriodKeys = (period) => {
+    const now = new Date();
+    const y = now.getFullYear();
+    const keys = [];
+
+    if (period === 'monthly') {
+        for (let mo = 1; mo <= 12; mo++) {
+            keys.push(`${y}.${String(mo).padStart(2, '0')}`);
+        }
+    } else if (period === 'yearly') {
+        for (let i = y - 5; i <= y; i++) {
+            keys.push(String(i));
+        }
+    } else if (period === 'weekly') {
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(now);
+            d.setDate(d.getDate() - i * 7);
+            const dy = d.getFullYear();
+            const startOfYear = new Date(dy, 0, 1);
+            const week = Math.ceil(((d - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+            keys.push(`${dy}-${week}주`);
+        }
+    } else {
+        // daily: 최근 30일
+        for (let i = 29; i >= 0; i--) {
+            const d = new Date(now);
+            d.setDate(d.getDate() - i);
+            const mo = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            keys.push(`${mo}/${day}`);
+        }
+    }
+    return keys;
+};
+
+// 현재 시점의 기본 기간 키
+const getCurrentPeriodKey = (period) => {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    if (period === 'daily') return `${m}/${day}`;
+    if (period === 'weekly') {
+        const startOfYear = new Date(y, 0, 1);
+        const week = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+        return `${y}-${week}주`;
+    }
+    if (period === 'monthly') return `${y}.${m}`;
+    return String(y);
+};
+
 const SalesManagement = ({ user }) => {
     const brandId = user?.adminRole === 'PARTNER' ? user?.brandId : null;
 
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
     const [period, setPeriod] = useState('monthly');
+    const [selectedPeriodKey, setSelectedPeriodKey] = useState(() => getCurrentPeriodKey('monthly'));
 
     useEffect(() => {
         setLoading(true);
@@ -84,19 +138,36 @@ const SalesManagement = ({ user }) => {
 
     // 기간별 집계
     const chartData = useMemo(() => {
+        const allKeys = generatePeriodKeys(period);
         const map = new Map();
+        allKeys.forEach(k => map.set(k, { period: k, 매출: 0, 주문: 0 }));
         validOrders.forEach(order => {
             const key = getPeriodKey(order.orderDate, period);
-            if (!key) return;
-            if (!map.has(key)) map.set(key, { period: key, 매출: 0, 주문: 0 });
+            if (!key || !map.has(key)) return;
             map.get(key).매출 += order.totalPrice || 0;
             map.get(key).주문 += 1;
         });
-        return Array.from(map.entries())
-            .sort((a, b) => a[0].localeCompare(b[0]))
-            .map(([, v]) => v)
-            .slice(-30); // 최근 30개 기간
+        return allKeys.map(k => map.get(k));
     }, [validOrders, period]);
+
+    // 기간 변경 시 selectedPeriodKey 초기화
+    const handlePeriodChange = (val) => {
+        setPeriod(val);
+        setSelectedPeriodKey(getCurrentPeriodKey(val));
+    };
+
+    // 선택된 기간의 상품별 집계
+    const periodProductStats = useMemo(() => {
+        const filtered = validOrders.filter(o => getPeriodKey(o.orderDate, period) === selectedPeriodKey);
+        const map = new Map();
+        filtered.forEach(o => {
+            const nm = o.productNm || '알 수 없음';
+            if (!map.has(nm)) map.set(nm, { productNm: nm, productImgPath: o.productImgPath || null, quantity: 0, revenue: 0 });
+            map.get(nm).quantity += o.quantity || 1;
+            map.get(nm).revenue += o.totalPrice || 0;
+        });
+        return Array.from(map.values()).sort((a, b) => b.revenue - a.revenue);
+    }, [validOrders, period, selectedPeriodKey]);
 
     // 상태별 집계
     const statusStats = useMemo(() => {
@@ -111,12 +182,62 @@ const SalesManagement = ({ user }) => {
         const total = validOrders.reduce((sum, o) => sum + (o.totalPrice || 0), 0);
         const totalOrders = validOrders.length;
         const avg = totalOrders > 0 ? Math.floor(total / totalOrders) : 0;
-        const lastTwo = chartData.slice(-2);
-        const current = lastTwo[1]?.매출 || 0;
-        const previous = lastTwo[0]?.매출 || 1;
+        const currentKey = getCurrentPeriodKey(period);
+        const currentIdx = chartData.findIndex(d => d.period === currentKey);
+        const current = chartData[currentIdx]?.매출 || 0;
+        const previous = currentIdx > 0 ? (chartData[currentIdx - 1]?.매출 || 0) : 0;
         const growthRate = previous > 0 ? parseFloat(((current - previous) / previous * 100).toFixed(1)) : 0;
         return { total, totalOrders, avg, growthRate, current };
-    }, [validOrders, chartData]);
+    }, [validOrders, chartData, period]);
+
+    const handleDownload = () => {
+        const wb = XLSX.utils.book_new();
+        const periodLabel = PERIOD_OPTIONS.find(o => o.value === period)?.label || period;
+        const rows = [];
+
+        // ── 요약 통계 ──────────────────────────────
+        rows.push(['[ 요약 통계 ]']);
+        rows.push(['총 매출', `₩${stats.total.toLocaleString()}`, '', '총 주문', `${stats.totalOrders}건`]);
+        rows.push(['평균 주문금액', `₩${stats.avg.toLocaleString()}`, '', '전기 대비', `${stats.growthRate >= 0 ? '+' : ''}${stats.growthRate}%`]);
+        rows.push([]);
+
+        // ── 기간별 매출 추이 ───────────────────────
+        rows.push([`[ ${periodLabel} 매출 추이 ]`]);
+        rows.push(['기간', '매출액', '주문건수']);
+        chartData.forEach(d => rows.push([d.period, d.매출, d.주문]));
+        rows.push([]);
+
+        // ── 상품별 매출 (선택 기간) ────────────────
+        rows.push([`[ 상품별 매출 — ${selectedPeriodKey} ]`]);
+        rows.push(['순위', '상품명', '판매수량', '매출액']);
+        periodProductStats.forEach((item, idx) =>
+            rows.push([idx + 1, item.productNm, item.quantity, item.revenue])
+        );
+        rows.push([]);
+
+        // ── 주문 상태별 현황 ───────────────────────
+        rows.push(['[ 주문 상태별 현황 ]']);
+        rows.push(['상태', '건수', '비율(%)']);
+        Object.entries(STATUS_MAP).forEach(([key, label]) => {
+            const count = (orders.filter(o => o.status === key)).length;
+            const pct = orders.length > 0 ? ((count / orders.length) * 100).toFixed(1) : '0.0';
+            rows.push([label, count, pct]);
+        });
+        rows.push([]);
+
+        // ── 전체 주문 목록 ─────────────────────────
+        rows.push(['[ 전체 주문 목록 ]']);
+        rows.push(['주문ID', '주문자', '상품명', '수량', '결제금액', '상태', '주문일시']);
+        orders.forEach(o => rows.push([
+            o.id, o.userNm, o.productNm, o.quantity, o.totalPrice,
+            STATUS_MAP[o.status] || o.status, o.orderDate,
+        ]));
+
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!cols'] = [{ wch: 16 }, { wch: 20 }, { wch: 12 }, { wch: 20 }, { wch: 16 }, { wch: 12 }, { wch: 22 }];
+        XLSX.utils.book_append_sheet(wb, ws, '매출관리');
+        XLSX.writeFile(wb, `매출관리_${periodLabel}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    };
 
     if (loading) {
         return <div className="sales-management"><div className="flex justify-center py-16 text-gray-400">데이터를 불러오는 중...</div></div>;
@@ -178,11 +299,15 @@ const SalesManagement = ({ user }) => {
                             <button
                                 key={opt.value}
                                 className={`sales-filter-btn ${period === opt.value ? 'active' : ''}`}
-                                onClick={() => setPeriod(opt.value)}
+                                onClick={() => handlePeriodChange(opt.value)}
                             >{opt.label}</button>
                         ))}
                     </div>
                 </div>
+                <button className="sales-download-btn" onClick={handleDownload}>
+                    <Download size={15} />
+                    엑셀 다운로드
+                </button>
             </div>
 
             {/* 메인 차트 */}
@@ -204,15 +329,86 @@ const SalesManagement = ({ user }) => {
                         <div className="flex justify-center items-center h-48 text-gray-400 text-sm">매출 데이터가 없습니다.</div>
                     ) : (
                         <ResponsiveContainer width="100%" height={360}>
-                            <BarChart data={chartData} barCategoryGap="20%">
+                            <BarChart
+                                data={chartData}
+                                barCategoryGap="20%"
+                                onClick={(e) => { if (e?.activeLabel) setSelectedPeriodKey(e.activeLabel); }}
+                                style={{ cursor: 'pointer' }}
+                            >
                                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                                 <XAxis dataKey="period" tick={{ fontSize: 12, fill: '#999' }} axisLine={{ stroke: '#e8e8e8' }} tickLine={false} />
                                 <YAxis tick={{ fontSize: 12, fill: '#999' }} axisLine={false} tickLine={false} tickFormatter={formatCurrency} />
                                 <Tooltip content={<CustomTooltip />} />
                                 <Legend wrapperStyle={{ fontSize: 12, paddingTop: 12 }} />
-                                <Bar dataKey="매출" fill="#6c5ce7" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="매출" radius={[4, 4, 0, 0]}>
+                                    {chartData.map((entry) => (
+                                        <Cell
+                                            key={entry.period}
+                                            fill={entry.period === selectedPeriodKey ? '#4834d4' : '#6c5ce7'}
+                                            opacity={entry.period === selectedPeriodKey ? 1 : 0.65}
+                                        />
+                                    ))}
+                                </Bar>
                             </BarChart>
                         </ResponsiveContainer>
+                    )}
+                </div>
+            </div>
+
+            {/* 기간별 상품 매출 */}
+            <div className="sales-chart-card sales-product-table-card">
+                <div className="sales-chart-header">
+                    <div>
+                        <h3 className="sales-chart-title">
+                            상품별 매출
+                            <span className="sales-period-badge">{selectedPeriodKey}</span>
+                        </h3>
+                        <p className="sales-chart-subtitle">차트 막대를 클릭하면 해당 기간으로 변경됩니다</p>
+                    </div>
+                    <span className="sales-chart-current-label">{periodProductStats.length}개 상품</span>
+                </div>
+                <div className="sales-chart-body">
+                    {periodProductStats.length === 0 ? (
+                        <p className="sales-product-empty">해당 기간에 판매 데이터가 없습니다.</p>
+                    ) : (
+                        <table className="sales-product-table">
+                            <thead>
+                                <tr>
+                                    <th>순위</th>
+                                    <th>상품</th>
+                                    <th>판매수량</th>
+                                    <th>매출액</th>
+                                    <th>비율</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {periodProductStats.map((item, idx) => {
+                                    const totalRevenue = periodProductStats.reduce((s, i) => s + i.revenue, 0);
+                                    const pct = totalRevenue > 0 ? ((item.revenue / totalRevenue) * 100).toFixed(1) : '0.0';
+                                    return (
+                                        <tr key={item.productNm}>
+                                            <td className="sales-product-rank">
+                                                <span className={`sales-rank-badge ${idx < 3 ? `top${idx + 1}` : ''}`}>{idx + 1}</span>
+                                            </td>
+                                            <td className="sales-product-name-cell">
+                                                {item.productImgPath && (
+                                                    <img src={item.productImgPath} alt={item.productNm} className="sales-product-thumb" />
+                                                )}
+                                                <span>{item.productNm}</span>
+                                            </td>
+                                            <td className="sales-product-qty">{item.quantity.toLocaleString()}개</td>
+                                            <td className="sales-product-revenue">₩{item.revenue.toLocaleString()}</td>
+                                            <td className="sales-product-pct-cell">
+                                                <div className="sales-product-pct-bar-bg">
+                                                    <div className="sales-product-pct-bar-fill" style={{ width: `${pct}%` }} />
+                                                </div>
+                                                <span className="sales-product-pct-text">{pct}%</span>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
                     )}
                 </div>
             </div>

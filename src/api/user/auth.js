@@ -21,6 +21,11 @@ export const GetUserProfile = (userId) => {
     return api.get(`/api/usr/profile/${userId}`);
 }
 
+// 로그아웃 - 서버측 쿠키 삭제 + Redis Refresh Token 삭제
+export const Logout = () => {
+    return api.post("/api/usr/logout");
+}
+
 // 프로필 이미지 수정
 export const UpdateProfileImg = (id, file) => {
     const fd = new FormData();
