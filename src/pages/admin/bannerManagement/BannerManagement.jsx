@@ -17,7 +17,7 @@ const BannerPreviewModal = ({ banner, onClose }) => {
                     <button className="banner-preview-close" onClick={onClose}><X size={18} /></button>
                 </div>
                 <div
-                    className="banner-preview-hero"
+                    className={`banner-preview-hero ${banner.imgPath ? 'has-image' : ''}`}
                     style={banner.imgPath ? {
                         backgroundImage: `url(${banner.imgPath})`,
                         backgroundSize: 'cover',
