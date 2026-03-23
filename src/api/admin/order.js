@@ -14,6 +14,11 @@ export const UpdateOrderStatus = (statusForm) => {
     return api.put("/api/admin/order/status", statusForm);
 }
 
+// PUT /api/admin/order/shipping - Body: { id: Long, trackingNumber: String }
+export const RegisterShipping = (shippingForm) => {
+    return api.put("/api/admin/order/shipping", shippingForm);
+}
+
 export const DeleteOrder = (orderId) => {
     return api.delete('/api/admin/order/delete', { params: { id: orderId } });
 }
