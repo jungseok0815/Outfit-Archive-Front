@@ -9,15 +9,16 @@ import PostDetailPanel from '../mypage/PostDetailPanel';
 import { ListPost, SearchPost, ToggleLike } from '../../../api/user/post';
 import { ListProduct } from '../../../api/user/product';
 import { GetWishlistProductIds } from '../../../api/user/wishlist';
+import { ListBanner } from '../../../api/user/banner';
 import { useAuth } from '../../../store/context/UserContext';
 import "../../../App.css";
 import "./UserMain.css";
 import "../../../styles/user/Hero.css";
 
-const heroSlides = [
-  { title: "Define Your", highlight: "Style", description: "Discover curated fashion that speaks to your identity", button: "Explore Now" },
-  { title: "New Season", highlight: "Collection", description: "The latest trends from the world's finest designers", button: "Shop Collection" },
-  { title: "Timeless", highlight: "Elegance", description: "Classic pieces that transcend every season", button: "View Lookbook" }
+const DEFAULT_HERO_SLIDES = [
+  { title: "Define Your", highlight: "Style", description: "Discover curated fashion that speaks to your identity", buttonText: "Explore Now" },
+  { title: "New Season", highlight: "Collection", description: "The latest trends from the world's finest designers", buttonText: "Shop Collection" },
+  { title: "Timeless", highlight: "Elegance", description: "Classic pieces that transcend every season", buttonText: "View Lookbook" }
 ];
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
   const { user } = useAuth();
   const [inputValue, setInputValue] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [heroSlides, setHeroSlides] = useState(DEFAULT_HERO_SLIDES);
   const [heroIndex, setHeroIndex] = useState(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [feedItems, setFeedItems] = useState([]);
@@ -41,6 +43,15 @@ function App() {
   const debounceRef = useRef(null);
 
   const isSearching = searchKeyword.trim().length > 0;
+
+  useEffect(() => {
+    ListBanner()
+      .then(res => {
+        const active = (res.data || []).filter(b => b.active);
+        if (active.length > 0) setHeroSlides(active);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -166,7 +177,7 @@ function App() {
             <div key={index} className={`hero-slide ${index === heroIndex ? 'active' : ''}`}>
               <h1>{slide.title} <span>{slide.highlight}</span></h1>
               <p>{slide.description}</p>
-              <button>{slide.button}</button>
+              <button>{slide.buttonText}</button>
             </div>
           ))}
         </div>

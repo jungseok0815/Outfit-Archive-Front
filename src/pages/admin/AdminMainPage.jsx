@@ -7,6 +7,7 @@ import OrderManagement from "../admin/orderManagement/OrderManagement";
 import SalesManagement from "../admin/saleManagement/SalesManagement";
 import AdminManagement from "../admin/adminManagement/AdminManagement";
 import ReviewManagement from "../admin/reviewManagement/ReviewManagement";
+import BannerManagement from "../admin/bannerManagement/BannerManagement";
 
 const ALL_MENU_ITEMS = [
   {
@@ -62,6 +63,16 @@ const ALL_MENU_ITEMS = [
     ),
   },
   {
+    key: "배너 관리",
+    roles: ["SUPER_ADMIN", "ADMIN"],
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="5" width="20" height="14" rx="2" />
+        <line x1="2" y1="10" x2="22" y2="10" />
+      </svg>
+    ),
+  },
+  {
     key: "관리자 관리",
     roles: ["SUPER_ADMIN"],
     icon: (
@@ -83,6 +94,7 @@ const ROLE_LABELS = {
 
 const registerLabels = {
   "브랜드 관리": "브랜드 등록",
+  "배너 관리": "배너 등록",
 };
 
 function Admin() {
@@ -108,6 +120,8 @@ function Admin() {
         return <SalesManagement user={adminUser} />;
       case "리뷰 관리":
         return <ReviewManagement user={adminUser} />;
+      case "배너 관리":
+        return <BannerManagement registerTrigger={registerTrigger} />;
       case "관리자 관리":
         return <AdminManagement />;
       default:
