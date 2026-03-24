@@ -61,7 +61,6 @@ const ProductManagement = ({ registerTrigger, user }) => {
         const response = await ListProduct(null);
         setProducts(filterByBrand(response.data.content));
     } catch (error) {
-        console.error("상품 목록 조회 실패:", error);
     }
   };
 

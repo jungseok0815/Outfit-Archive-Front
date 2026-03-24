@@ -921,3 +921,157 @@
 .mypage-wishlist-remove:hover {
   background: #ffe0e0;
 }
+
+/* 쿠폰 탭 */
+.mypage-coupons {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 24px 20px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.mypage-coupon-issue {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+
+.mypage-coupon-issue-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 14px 0;
+}
+
+.mypage-coupon-issue-row {
+  display: flex;
+  gap: 10px;
+}
+
+.mypage-coupon-input {
+  flex: 1;
+  height: 42px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  outline: none;
+  background: #fff;
+  transition: border-color 0.15s;
+}
+
+.mypage-coupon-input:focus {
+  border-color: #111827;
+}
+
+.mypage-coupon-issue-btn {
+  height: 42px;
+  padding: 0 22px;
+  background: #111827;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.mypage-coupon-issue-btn:hover:not(:disabled) {
+  background: #1f2937;
+}
+
+.mypage-coupon-issue-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 쿠폰 목록 */
+.mypage-coupon-list-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 14px 0;
+}
+
+.mypage-coupon-empty {
+  text-align: center;
+  padding: 40px 0;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.mypage-coupon-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #111827 0%, #374151 100%);
+  border-radius: 12px;
+  padding: 18px 22px;
+  color: #fff;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.mypage-coupon-card::before {
+  content: '';
+  position: absolute;
+  right: 108px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: repeating-linear-gradient(to bottom, transparent 0, transparent 6px, rgba(255,255,255,0.2) 6px, rgba(255,255,255,0.2) 12px);
+}
+
+.mypage-coupon-card-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mypage-coupon-card-name {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.mypage-coupon-card-code {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.06em;
+}
+
+.mypage-coupon-card-min {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 4px;
+}
+
+.mypage-coupon-card-expire {
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+}
+
+.mypage-coupon-card-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 90px;
+}
+
+.mypage-coupon-card-discount {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.mypage-coupon-card-discount-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.65);
+  margin-top: 2px;
+}

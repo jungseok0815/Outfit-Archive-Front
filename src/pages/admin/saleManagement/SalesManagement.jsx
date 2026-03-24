@@ -129,7 +129,7 @@ const SalesManagement = ({ user }) => {
         setLoading(true);
         ListOrder('', 0, 1000, brandId)
             .then(res => setOrders(res.data.content || []))
-            .catch(e => console.error('주문 데이터 조회 실패:', e))
+            .catch(() => {})
             .finally(() => setLoading(false));
     }, []);
 

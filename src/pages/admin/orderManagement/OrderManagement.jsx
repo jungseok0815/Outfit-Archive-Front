@@ -55,7 +55,6 @@ const OrderManagement = ({ user }) => {
             const res = await ListOrder('', 0, 200, brandId);
             setOrders(res.data.content || []);
         } catch (e) {
-            console.error('주문 조회 실패:', e);
         } finally {
             setLoading(false);
         }

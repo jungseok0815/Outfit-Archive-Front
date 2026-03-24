@@ -1,8 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Edit2, Trash2, Upload, X, Eye } from 'lucide-react';
 import { ListBanner, InsertBanner, UpdateBanner, DeleteBanner } from '../../../api/admin/banner';
+import ConfirmModal from '../../../components/common/Modal/ConfirmModal';
+import Pagination from '../../../components/common/Pagination/Pagination';
 import { toast } from 'react-toastify';
 import './BannerManagement.css';
+
+const PAGE_SIZE = 10;
 
 const EMPTY_FORM = { title: '', highlight: '', description: '', buttonText: '', sortOrder: 1, active: true };
 
@@ -55,7 +59,16 @@ const BannerManagement = ({ registerTrigger }) => {
     const [saving, setSaving] = useState(false);
     const [dragOver, setDragOver] = useState(false);
     const [previewBanner, setPreviewBanner] = useState(null);
+    const [confirmTarget, setConfirmTarget] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
     const fileInputRef = useRef(null);
+    const isMounted = useRef(false);
+
+    const totalPages = Math.max(1, Math.ceil(banners.length / PAGE_SIZE));
+    const pagedBanners = useMemo(
+        () => banners.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+        [banners, currentPage]
+    );
 
     const load = () => {
         setLoading(true);
@@ -68,6 +81,10 @@ const BannerManagement = ({ registerTrigger }) => {
     useEffect(() => { load(); }, []);
 
     useEffect(() => {
+        if (!isMounted.current) {
+            isMounted.current = true;
+            return;
+        }
         if (registerTrigger > 0) openAdd();
     }, [registerTrigger]);
 
@@ -93,6 +110,8 @@ const BannerManagement = ({ registerTrigger }) => {
         setImagePreview(banner.imgPath || null);
         setShowForm(true);
     };
+
+    const closeForm = () => setShowForm(false);
 
     const handleImageSelect = (file) => {
         if (!file || !file.type.startsWith('image/')) {
@@ -129,21 +148,22 @@ const BannerManagement = ({ registerTrigger }) => {
         req
             .then(() => {
                 toast.success(editTarget ? '배너가 수정되었습니다.' : '배너가 등록되었습니다.');
-                setShowForm(false);
+                closeForm();
                 load();
             })
             .catch(() => toast.error('저장에 실패했습니다.'))
             .finally(() => setSaving(false));
     };
 
-    const handleDelete = (id) => {
-        if (!window.confirm('이 배너를 삭제하시겠습니까?')) return;
+    const handleDeleteConfirm = () => {
+        if (!confirmTarget) return;
+        const id = confirmTarget.id;
+        setConfirmTarget(null);
         DeleteBanner(id)
             .then(() => { toast.success('배너가 삭제되었습니다.'); load(); })
             .catch(() => toast.error('삭제에 실패했습니다.'));
     };
 
-    /* 폼 상태를 미리보기로 표시 */
     const handleFormPreview = () => {
         setPreviewBanner({ ...form, imgPath: imagePreview });
     };
@@ -154,112 +174,120 @@ const BannerManagement = ({ registerTrigger }) => {
                 <span className="banner-mgmt-count">전체 배너 {banners.length}개</span>
             </div>
 
+            {/* 등록/수정 모달 */}
             {showForm && (
-                <div className="banner-mgmt-form-card">
-                    <div className="banner-mgmt-form-top">
-                        <h3 className="banner-mgmt-form-title">{editTarget ? '배너 수정' : '배너 등록'}</h3>
-                        <button className="banner-mgmt-preview-btn" onClick={handleFormPreview} type="button">
-                            <Eye size={14} />
-                            미리보기
-                        </button>
-                    </div>
-
-                    <div className="banner-mgmt-form-body">
-                        {/* 이미지 업로드 */}
-                        <div className="banner-mgmt-image-section">
-                            <span className="banner-mgmt-field-label">배너 이미지</span>
-                            {imagePreview ? (
-                                <div className="banner-mgmt-image-preview-wrap">
-                                    <img src={imagePreview} alt="preview" className="banner-mgmt-image-preview" />
-                                    <button className="banner-mgmt-image-remove" onClick={removeImage} type="button">
-                                        <X size={14} />
-                                    </button>
-                                </div>
-                            ) : (
-                                <div
-                                    className={`banner-mgmt-dropzone ${dragOver ? 'drag-over' : ''}`}
-                                    onClick={() => fileInputRef.current?.click()}
-                                    onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-                                    onDragLeave={() => setDragOver(false)}
-                                    onDrop={handleDrop}
-                                >
-                                    <Upload size={24} className="banner-mgmt-dropzone-icon" />
-                                    <p className="banner-mgmt-dropzone-text">클릭하거나 이미지를 드래그하세요</p>
-                                    <p className="banner-mgmt-dropzone-hint">JPG, PNG, WEBP</p>
-                                </div>
-                            )}
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept="image/*"
-                                style={{ display: 'none' }}
-                                onChange={handleFileChange}
-                            />
+                <div className="banner-modal-overlay" onClick={closeForm}>
+                    <div className="banner-modal" onClick={e => e.stopPropagation()}>
+                        <div className="banner-modal-header">
+                            <h3 className="banner-modal-title">{editTarget ? '배너 수정' : '배너 등록'}</h3>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <button className="banner-mgmt-preview-btn" onClick={handleFormPreview} type="button">
+                                    <Eye size={14} />
+                                    미리보기
+                                </button>
+                                <button className="banner-modal-close" onClick={closeForm}><X size={16} /></button>
+                            </div>
                         </div>
 
-                        {/* 텍스트 필드 */}
-                        <div className="banner-mgmt-form-grid">
-                            <div className="banner-mgmt-field">
-                                <label>제목</label>
-                                <input
-                                    value={form.title}
-                                    onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
-                                    placeholder="예) Define Your"
-                                />
-                            </div>
-                            <div className="banner-mgmt-field">
-                                <label>강조 텍스트</label>
-                                <input
-                                    value={form.highlight}
-                                    onChange={e => setForm(p => ({ ...p, highlight: e.target.value }))}
-                                    placeholder="예) Style"
-                                />
-                            </div>
-                            <div className="banner-mgmt-field banner-mgmt-field--full">
-                                <label>설명</label>
-                                <input
-                                    value={form.description}
-                                    onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
-                                    placeholder="배너 설명 텍스트"
-                                />
-                            </div>
-                            <div className="banner-mgmt-field">
-                                <label>버튼 텍스트</label>
-                                <input
-                                    value={form.buttonText}
-                                    onChange={e => setForm(p => ({ ...p, buttonText: e.target.value }))}
-                                    placeholder="예) Explore Now"
-                                />
-                            </div>
-                            <div className="banner-mgmt-field">
-                                <label>순서</label>
-                                <input
-                                    type="number"
-                                    min="1"
-                                    value={form.sortOrder}
-                                    onChange={e => setForm(p => ({ ...p, sortOrder: Number(e.target.value) }))}
-                                />
-                            </div>
-                            <div className="banner-mgmt-field">
-                                <label>활성화</label>
-                                <label className="banner-mgmt-toggle">
+                        <div className="banner-modal-body">
+                            <div className="banner-mgmt-form-body">
+                                {/* 이미지 업로드 */}
+                                <div className="banner-mgmt-image-section">
+                                    <span className="banner-mgmt-field-label">배너 이미지</span>
+                                    {imagePreview ? (
+                                        <div className="banner-mgmt-image-preview-wrap">
+                                            <img src={imagePreview} alt="preview" className="banner-mgmt-image-preview" />
+                                            <button className="banner-mgmt-image-remove" onClick={removeImage} type="button">
+                                                <X size={14} />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div
+                                            className={`banner-mgmt-dropzone ${dragOver ? 'drag-over' : ''}`}
+                                            onClick={() => fileInputRef.current?.click()}
+                                            onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                                            onDragLeave={() => setDragOver(false)}
+                                            onDrop={handleDrop}
+                                        >
+                                            <Upload size={24} className="banner-mgmt-dropzone-icon" />
+                                            <p className="banner-mgmt-dropzone-text">클릭하거나 이미지를 드래그하세요</p>
+                                            <p className="banner-mgmt-dropzone-hint">JPG, PNG, WEBP</p>
+                                        </div>
+                                    )}
                                     <input
-                                        type="checkbox"
-                                        checked={form.active}
-                                        onChange={e => setForm(p => ({ ...p, active: e.target.checked }))}
+                                        ref={fileInputRef}
+                                        type="file"
+                                        accept="image/*"
+                                        style={{ display: 'none' }}
+                                        onChange={handleFileChange}
                                     />
-                                    <span className="banner-mgmt-toggle-slider" />
-                                    <span className="banner-mgmt-toggle-label">{form.active ? '활성' : '비활성'}</span>
-                                </label>
+                                </div>
+
+                                {/* 텍스트 필드 */}
+                                <div className="banner-mgmt-form-grid">
+                                    <div className="banner-mgmt-field">
+                                        <label>제목</label>
+                                        <input
+                                            value={form.title}
+                                            onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
+                                            placeholder="예) Define Your"
+                                        />
+                                    </div>
+                                    <div className="banner-mgmt-field">
+                                        <label>강조 텍스트</label>
+                                        <input
+                                            value={form.highlight}
+                                            onChange={e => setForm(p => ({ ...p, highlight: e.target.value }))}
+                                            placeholder="예) Style"
+                                        />
+                                    </div>
+                                    <div className="banner-mgmt-field banner-mgmt-field--full">
+                                        <label>설명</label>
+                                        <input
+                                            value={form.description}
+                                            onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
+                                            placeholder="배너 설명 텍스트"
+                                        />
+                                    </div>
+                                    <div className="banner-mgmt-field">
+                                        <label>버튼 텍스트</label>
+                                        <input
+                                            value={form.buttonText}
+                                            onChange={e => setForm(p => ({ ...p, buttonText: e.target.value }))}
+                                            placeholder="예) Explore Now"
+                                        />
+                                    </div>
+                                    <div className="banner-mgmt-field">
+                                        <label>순서</label>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            value={form.sortOrder}
+                                            onChange={e => setForm(p => ({ ...p, sortOrder: Number(e.target.value) }))}
+                                        />
+                                    </div>
+                                    <div className="banner-mgmt-field">
+                                        <label>활성화</label>
+                                        <label className="banner-mgmt-toggle">
+                                            <input
+                                                type="checkbox"
+                                                checked={form.active}
+                                                onChange={e => setForm(p => ({ ...p, active: e.target.checked }))}
+                                            />
+                                            <span className="banner-mgmt-toggle-slider" />
+                                            <span className="banner-mgmt-toggle-label">{form.active ? '활성' : '비활성'}</span>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="banner-mgmt-form-actions">
-                        <button className="banner-mgmt-btn-cancel" onClick={() => setShowForm(false)} disabled={saving}>취소</button>
-                        <button className="banner-mgmt-btn-save" onClick={handleSave} disabled={saving}>
-                            {saving ? '저장 중...' : '저장'}
-                        </button>
+                        <div className="banner-modal-footer">
+                            <button className="banner-mgmt-btn-cancel" onClick={closeForm} disabled={saving}>취소</button>
+                            <button className="banner-mgmt-btn-save" onClick={handleSave} disabled={saving}>
+                                {saving ? '저장 중...' : '저장'}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -283,7 +311,7 @@ const BannerManagement = ({ registerTrigger }) => {
                         ) : banners.length === 0 ? (
                             <tr><td colSpan={7} className="banner-mgmt-empty">등록된 배너가 없습니다.</td></tr>
                         ) : (
-                            banners.map(banner => (
+                            pagedBanners.map(banner => (
                                 <tr key={banner.id} className="banner-mgmt-row">
                                     <td>
                                         {banner.imgPath
@@ -315,7 +343,7 @@ const BannerManagement = ({ registerTrigger }) => {
                                             <button className="banner-mgmt-edit-btn" onClick={() => openEdit(banner)} title="수정">
                                                 <Edit2 size={15} />
                                             </button>
-                                            <button className="banner-mgmt-delete-btn" onClick={() => handleDelete(banner.id)} title="삭제">
+                                            <button className="banner-mgmt-delete-btn" onClick={() => setConfirmTarget(banner)} title="삭제">
                                                 <Trash2 size={15} />
                                             </button>
                                         </div>
@@ -327,7 +355,27 @@ const BannerManagement = ({ registerTrigger }) => {
                 </table>
             </div>
 
+            {banners.length > 0 && (
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalCount={banners.length}
+                    pageSize={PAGE_SIZE}
+                    onPageChange={setCurrentPage}
+                />
+            )}
+
             <BannerPreviewModal banner={previewBanner} onClose={() => setPreviewBanner(null)} />
+
+            <ConfirmModal
+                isOpen={!!confirmTarget}
+                title="배너 삭제"
+                message={`'${confirmTarget?.title}' 배너를 삭제하시겠습니까?`}
+                confirmText="삭제"
+                type="danger"
+                onConfirm={handleDeleteConfirm}
+                onCancel={() => setConfirmTarget(null)}
+            />
         </div>
     );
 };

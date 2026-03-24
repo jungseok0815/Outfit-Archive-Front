@@ -22,7 +22,6 @@ function JoinForm(){
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(joinForm)
     postJoin(joinForm).then(res =>{
         if(res.status === 200) setToast({ message: "회원가입이 완료되었습니다!", type: "success" });
     }).catch(error => {

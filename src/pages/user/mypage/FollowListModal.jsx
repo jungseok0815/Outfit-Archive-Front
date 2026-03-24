@@ -31,7 +31,7 @@ function FollowListModal({ userId, type, onClose, isOwnPage }) {
     e.stopPropagation();
     Unfollow(targetId)
       .then(() => setUsers(prev => prev.filter(u => u.id !== targetId)))
-      .catch(err => console.error('언팔로우 실패:', err));
+      .catch(() => {});
   };
 
   const handleRemoveFollower = (e, targetId) => {

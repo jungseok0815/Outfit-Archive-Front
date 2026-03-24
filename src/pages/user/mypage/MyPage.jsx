@@ -15,6 +15,7 @@ import { UpdateProfileImg, GetUserProfile } from '../../../api/user/auth';
 import { GetPoint, GetPointHistory } from '../../../api/user/point';
 import { ListMyOrder } from '../../../api/user/order';
 import { ListWishlist, ToggleWishlist } from '../../../api/user/wishlist';
+import { IssueCoupon, GetMyCoupons } from '../../../api/user/coupon';
 import "../../../App.css";
 import "./MyPage.css";
 
@@ -39,6 +40,9 @@ function MyPage() {
   const [orders, setOrders] = useState([]);
   const [reviewOrder, setReviewOrder] = useState(null);
   const [wishlist, setWishlist] = useState([]);
+  const [coupons, setCoupons] = useState([]);
+  const [couponCode, setCouponCode] = useState('');
+  const [couponIssuing, setCouponIssuing] = useState(false);
   const [loadedTabs, setLoadedTabs] = useState(new Set());
 
   // 본인 페이지 여부
@@ -64,7 +68,7 @@ function MyPage() {
   const loadMyPosts = () => {
     ListMyPost(0, 100)
       .then(res => setPosts(mapPosts(res.data.content || [])))
-      .catch(e => console.error('게시물 조회 실패:', e));
+      .catch(() => {});
   };
 
   const loadUserPosts = (userNm) => {
@@ -74,13 +78,13 @@ function MyPage() {
         const filtered = all.filter(p => p.userNm === userNm);
         setPosts(mapPosts(filtered));
       })
-      .catch(e => console.error('게시물 조회 실패:', e));
+      .catch(() => {});
   };
 
   const loadOrders = () => {
     ListMyOrder(0, 50)
       .then(res => setOrders(res.data.content || []))
-      .catch(e => console.error('구매내역 조회 실패:', e));
+      .catch(() => {});
   };
 
   const handleTabChange = (tab) => {
@@ -93,15 +97,41 @@ function MyPage() {
     } else if (tab === 'points') {
       GetPoint()
         .then(res => setCurrentPoint(res.data.point))
-        .catch(e => console.error('포인트 조회 실패:', e));
+        .catch(() => {});
       GetPointHistory(0, 20)
         .then(res => setPointHistory(res.data.content || []))
-        .catch(e => console.error('포인트 내역 조회 실패:', e));
+        .catch(() => {});
     } else if (tab === 'wishlist') {
       ListWishlist(0, 50)
         .then(res => setWishlist(res.data.content || []))
         .catch(() => {});
+    } else if (tab === 'coupons') {
+      GetMyCoupons()
+        .then(res => setCoupons(res.data || []))
+        .catch(() => {});
     }
+  };
+
+  const loadCoupons = () => {
+    GetMyCoupons()
+      .then(res => setCoupons(res.data || []))
+      .catch(() => {});
+  };
+
+  const handleCouponIssue = () => {
+    if (!couponCode.trim()) { toast.error('쿠폰 코드를 입력해주세요.'); return; }
+    setCouponIssuing(true);
+    IssueCoupon(couponCode.trim())
+      .then(() => {
+        toast.success('쿠폰이 등록되었습니다.');
+        setCouponCode('');
+        loadCoupons();
+      })
+      .catch((e) => {
+        const msg = e.response?.data?.msg || '쿠폰 등록에 실패했습니다.';
+        toast.error(msg);
+      })
+      .finally(() => setCouponIssuing(false));
   };
 
   const isReviewEligible = (order) => {
@@ -142,14 +172,12 @@ function MyPage() {
     setActiveTab("posts");
 
     if (isOwnPage) {
-      console.log('[MyPage] 본인 프로필 (user context):', user);
       setProfileUser(null);
       loadMyPosts();
     } else if (paramUserId) {
       // 프로필 조회 후 해당 유저의 게시물 필터링
       GetUserProfile(paramUserId)
         .then(res => {
-          console.log('[MyPage] 타인 프로필 응답:', res.data);
           setProfileUser(res.data);
           loadUserPosts(res.data.userNm);
         })
@@ -161,7 +189,7 @@ function MyPage() {
     if (targetId) {
       GetFollowCount(targetId)
         .then(res => setFollowCount(res.data))
-        .catch(e => console.error('팔로우 수 조회 실패:', e));
+        .catch(() => {});
     }
 
     // 팔로우 여부 확인 (다른 유저 페이지이고 로그인된 경우)
@@ -180,7 +208,6 @@ function MyPage() {
     if (!file || !user?.id) return;
     UpdateProfileImg(user.id, file)
       .then(res => {
-        console.log('[MyPage] 프로필 이미지 변경 응답:', res.data);
         login({ ...user, profileImgNm: res.data.profileImgNm });
       })
       .catch(() => toast.error('프로필 이미지 변경에 실패했습니다.'));
@@ -198,7 +225,7 @@ function MyPage() {
           followerCount: isFollowing ? prev.followerCount - 1 : prev.followerCount + 1,
         }));
       })
-      .catch(e => console.error('팔로우 처리 실패:', e));
+      .catch(() => {});
   };
 
   const currentProfile = isOwnPage ? user : profileUser;
@@ -336,6 +363,14 @@ function MyPage() {
               <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
             </svg>
             관심상품
+          </button>
+        )}
+        {isOwnPage && (
+          <button className={`mypage-tab ${activeTab === "coupons" ? "active" : ""}`} onClick={() => handleTabChange("coupons")}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82zM7 7h.01" />
+            </svg>
+            쿠폰
           </button>
         )}
       </div>
@@ -569,6 +604,62 @@ function MyPage() {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* 쿠폰 탭 */}
+      {activeTab === "coupons" && (
+        <div className="mypage-coupons">
+          {/* 쿠폰 코드 등록 */}
+          <div className="mypage-coupon-issue">
+            <h4 className="mypage-coupon-issue-title">쿠폰 코드 등록</h4>
+            <div className="mypage-coupon-issue-row">
+              <input
+                className="mypage-coupon-input"
+                type="text"
+                placeholder="쿠폰 코드를 입력하세요"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                onKeyDown={(e) => e.key === 'Enter' && handleCouponIssue()}
+              />
+              <button
+                className="mypage-coupon-issue-btn"
+                onClick={handleCouponIssue}
+                disabled={couponIssuing}
+              >
+                {couponIssuing ? '등록 중...' : '등록'}
+              </button>
+            </div>
+          </div>
+
+          {/* 보유 쿠폰 목록 */}
+          <div className="mypage-coupon-list">
+            <h4 className="mypage-coupon-list-title">보유 쿠폰 ({coupons.length})</h4>
+            {coupons.length === 0 ? (
+              <p className="mypage-coupon-empty">보유한 쿠폰이 없습니다.</p>
+            ) : (
+              coupons.map((c) => (
+                <div key={c.userCouponId} className="mypage-coupon-card">
+                  <div className="mypage-coupon-card-left">
+                    <span className="mypage-coupon-card-name">{c.couponName}</span>
+                    <span className="mypage-coupon-card-code">{c.couponCode}</span>
+                    <span className="mypage-coupon-card-min">{c.minOrderPrice.toLocaleString()}원 이상 구매 시</span>
+                    <span className="mypage-coupon-card-expire">
+                      ~{c.expiredAt?.substring(0, 10)} 까지
+                    </span>
+                  </div>
+                  <div className="mypage-coupon-card-right">
+                    <span className="mypage-coupon-card-discount">
+                      {c.discountType === 'FIXED'
+                        ? `${c.discountValue.toLocaleString()}원`
+                        : `${c.discountValue}%`}
+                    </span>
+                    <span className="mypage-coupon-card-discount-label">할인</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       )}
     </div>
