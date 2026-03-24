@@ -1,0 +1,199 @@
+.coupon-mgmt {
+    padding: 24px;
+}
+
+.coupon-mgmt-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 80px 0;
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+.coupon-mgmt-empty strong {
+    color: #374151;
+}
+
+/* 폼 카드 */
+.coupon-mgmt-form-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 28px 32px;
+    max-width: 760px;
+}
+
+.coupon-mgmt-form-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 24px 0;
+}
+
+/* 그리드 레이아웃 */
+.coupon-mgmt-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 24px;
+}
+
+.coupon-mgmt-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.coupon-mgmt-field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.coupon-mgmt-field input,
+.coupon-mgmt-field select {
+    height: 38px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    padding: 0 12px;
+    font-size: 13px;
+    color: #111827;
+    background: #f9fafb;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.coupon-mgmt-field input:focus,
+.coupon-mgmt-field select:focus {
+    border-color: #111827;
+    background: #fff;
+}
+
+.coupon-mgmt-field .required {
+    color: #ef4444;
+}
+
+.coupon-mgmt-hint {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+/* 미리보기 */
+.coupon-preview {
+    margin-top: 24px;
+}
+
+.coupon-preview-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #111827 0%, #374151 100%);
+    border-radius: 12px;
+    padding: 20px 24px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    max-width: 380px;
+}
+
+.coupon-preview-card::before {
+    content: '';
+    position: absolute;
+    right: 110px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: repeating-linear-gradient(to bottom, transparent 0, transparent 6px, rgba(255,255,255,0.25) 6px, rgba(255,255,255,0.25) 12px);
+}
+
+.coupon-preview-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.coupon-preview-name {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.coupon-preview-code {
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.05em;
+}
+
+.coupon-preview-min {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+}
+
+.coupon-preview-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 90px;
+}
+
+.coupon-preview-discount {
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.coupon-preview-discount-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 2px;
+}
+
+/* 버튼 */
+.coupon-mgmt-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 28px;
+}
+
+.coupon-mgmt-btn-cancel {
+    height: 38px;
+    padding: 0 20px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.coupon-mgmt-btn-cancel:hover {
+    background: #f3f4f6;
+}
+
+.coupon-mgmt-btn-save {
+    height: 38px;
+    padding: 0 24px;
+    border: none;
+    border-radius: 7px;
+    background: #111827;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.coupon-mgmt-btn-save:hover:not(:disabled) {
+    background: #1f2937;
+}
+
+.coupon-mgmt-btn-save:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
