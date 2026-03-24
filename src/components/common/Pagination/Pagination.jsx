@@ -25,10 +25,10 @@ const Pagination = ({ currentPage, totalPages, totalCount, pageSize, onPageChang
             </div>
             <div className="admin-pagination-controls">
                 <button className="admin-page-btn admin-page-arrow" disabled={safePage <= 1} onClick={() => onPageChange(1)}>
-                    <ChevronLeft size={15} /><ChevronLeft size={15} className="admin-page-double" />
+                    <ChevronLeft size={12} /><ChevronLeft size={12} className="admin-page-double" />
                 </button>
                 <button className="admin-page-btn admin-page-arrow" disabled={safePage <= 1} onClick={() => onPageChange(safePage - 1)}>
-                    <ChevronLeft size={15} />
+                    <ChevronLeft size={12} />
                 </button>
                 {getPageNumbers().map(num => (
                     <button key={num} className={`admin-page-btn ${safePage === num ? 'active' : ''}`} onClick={() => onPageChange(num)}>
@@ -36,10 +36,10 @@ const Pagination = ({ currentPage, totalPages, totalCount, pageSize, onPageChang
                     </button>
                 ))}
                 <button className="admin-page-btn admin-page-arrow" disabled={safePage >= totalPages} onClick={() => onPageChange(safePage + 1)}>
-                    <ChevronRight size={15} />
+                    <ChevronRight size={12} />
                 </button>
                 <button className="admin-page-btn admin-page-arrow" disabled={safePage >= totalPages} onClick={() => onPageChange(totalPages)}>
-                    <ChevronRight size={15} /><ChevronRight size={15} className="admin-page-double" />
+                    <ChevronRight size={12} /><ChevronRight size={12} className="admin-page-double" />
                 </button>
             </div>
         </div>
