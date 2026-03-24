@@ -67,13 +67,32 @@
   background: #f5f5f5;
 }
 
-.confirm-modal-confirm {
+.confirm-modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+  text-align: center;
+}
+
+.confirm-modal-confirm--danger {
   background: #e74c3c;
   color: #fff;
   border-color: #e74c3c;
 }
 
-.confirm-modal-confirm:hover {
+.confirm-modal-confirm--danger:hover {
   background: #c0392b;
   border-color: #c0392b;
+}
+
+.confirm-modal-confirm--primary {
+  background: #111827;
+  color: #fff;
+  border-color: #111827;
+}
+
+.confirm-modal-confirm--primary:hover {
+  background: #1f2937;
+  border-color: #1f2937;
 }
