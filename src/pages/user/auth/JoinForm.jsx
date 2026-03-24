@@ -3,7 +3,7 @@ import "../auth/loginForm.css"
 import { postJoin } from '../../../api/user/auth';
 import Toast from '../../../components/common/Toast/Toast';
 
-function JoinForm(){
+function JoinForm({ onSuccess }){
   const [joinForm, setJoinForm] = useState({
     userId: "",
     userPwd: "",
@@ -22,12 +22,13 @@ function JoinForm(){
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    postJoin(joinForm).then(res =>{
-        if(res.status === 200) setToast({ message: "회원가입이 완료되었습니다!", type: "success" });
+    postJoin(joinForm).then(() => {
+        setToast({ message: "회원가입이 완료되었습니다! 로그인해주세요.", type: "success" });
+        setTimeout(() => { if (onSuccess) onSuccess(); }, 1500);
     }).catch(error => {
         const msg = error.response?.data?.msg || '회원가입에 실패했습니다.';
         setToast({ message: msg, type: "error" });
-    })
+    });
   };
     return (
       <>

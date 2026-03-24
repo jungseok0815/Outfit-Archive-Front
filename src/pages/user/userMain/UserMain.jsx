@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from '../../../components/user/header/Header';
 import AuthModal from '../auth/AuthPage';
@@ -64,10 +64,13 @@ function App() {
         const posts = res.data.content || [];
         setFeedItems(posts.map(p => ({
           id: p.id,
+          userId: p.userId,
           user: p.userNm,
-          avatar: null,
+          avatar: p.profileImgNm || null,
           image: p.images?.length > 0 ? p.images[0].imgPath : '',
+          images: p.images?.map(img => img.imgPath) || [],
           title: p.title,
+          content: p.content || '',
           likes: p.likeCount,
           liked: p.liked || false,
           comments: p.commentCount,
@@ -262,7 +265,7 @@ function App() {
           <div className="feed-container">
             <div className="feed-static-grid">
               {visibleFeed.map((item) => (
-                <StyleCard key={item.id} card={item} />
+                <StyleCard key={item.id} card={item} onClick={() => setSelectedPost(item)} />
               ))}
             </div>
             <div className="feed-more">

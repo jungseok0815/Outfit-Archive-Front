@@ -45,15 +45,15 @@ function ProductDetailPage() {
   }, [productId, product]);
 
   useEffect(() => {
-    if (productId) {
+    if (productId && user) {
       ListProductReview(productId, 0, 20)
         .then((res) => setReviews(res.data.content || []))
         .catch(() => {});
     }
-  }, [productId]);
+  }, [productId, user]);
 
   useEffect(() => {
-    if (productId) {
+    if (productId && user) {
       ListPostByProduct(productId, 0, 12)
         .then(res => setProductPosts(res.data.content || []))
         .catch(() => {});
