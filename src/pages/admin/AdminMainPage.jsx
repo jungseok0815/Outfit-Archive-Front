@@ -32,7 +32,7 @@ const ALL_MENU_ITEMS = [
   },
   {
     key: "주문 관리",
-    roles: ["PARTNER"],
+    roles: ["SUPER_ADMIN", "ADMIN", "PARTNER"],
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
@@ -54,7 +54,7 @@ const ALL_MENU_ITEMS = [
   },
   {
     key: "리뷰 관리",
-    roles: ["PARTNER"],
+    roles: ["SUPER_ADMIN", "ADMIN", "PARTNER"],
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />

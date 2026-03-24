@@ -39,7 +39,7 @@ function AuthModal({ onClose }) {
                         </button>
                     </div>
                     <div className="form-content" key={isLogin ? "login" : "join"}>
-                        {isLogin ? (<LoginForm onClose={onClose} />) : (<JoinForm />)}
+                        {isLogin ? (<LoginForm onClose={onClose} />) : (<JoinForm onSuccess={() => setIsLogin(true)} />)}
                     </div>
                 </div>
                 <div className="auth-footer">
