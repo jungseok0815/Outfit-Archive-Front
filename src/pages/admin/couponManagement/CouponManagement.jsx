@@ -1,8 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { CreateCoupon, ListCoupon, UpdateCoupon, DeleteCoupon } from '../../../api/admin/coupon';
 import ConfirmModal from '../../../components/common/Modal/ConfirmModal';
+import Pagination from '../../../components/common/Pagination/Pagination';
 import { toast } from 'react-toastify';
 import './CouponManagement.css';
+
+const PAGE_SIZE = 10;
 
 const INITIAL_FORM = {
     code: '',
@@ -30,7 +33,14 @@ const CouponManagement = ({ registerTrigger }) => {
     const [saving, setSaving] = useState(false);
     const [deletingId, setDeletingId] = useState(null);
     const [confirmTarget, setConfirmTarget] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
     const isMounted = useRef(false);
+
+    const totalPages = Math.max(1, Math.ceil(coupons.length / PAGE_SIZE));
+    const pagedCoupons = useMemo(
+        () => coupons.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+        [coupons, currentPage]
+    );
 
     const loadCoupons = () => {
         setLoading(true);
@@ -371,7 +381,7 @@ const CouponManagement = ({ registerTrigger }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {coupons.map((c) => (
+                            {pagedCoupons.map((c) => (
                                 <tr key={c.id}>
                                     <td><code className="coupon-code-badge">{c.code}</code></td>
                                     <td>{c.name}</td>
@@ -427,6 +437,15 @@ const CouponManagement = ({ registerTrigger }) => {
                     </table>
                 )}
             </div>
+            {coupons.length > 0 && (
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalCount={coupons.length}
+                    pageSize={PAGE_SIZE}
+                    onPageChange={setCurrentPage}
+                />
+            )}
         </div>
     );
 };

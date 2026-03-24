@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { AdminJoin, ListAdmin, deleteAdmin } from '../../../api/admin/auth';
 import { ListBrand } from '../../../api/admin/brand';
 import ConfirmModal from '../../../components/common/Modal/ConfirmModal';
+import Pagination from '../../../components/common/Pagination/Pagination';
 import './AdminManagement.css';
 import { toast } from "react-toastify";
+
+const PAGE_SIZE = 10;
 
 const ROLE_OPTIONS = [
   { value: 'ADMIN', label: '관리자' },
@@ -32,6 +35,13 @@ const AdminManagement = () => {
   const [brandList, setBrandList] = useState([]);
   const [listLoading, setListLoading] = useState(false);
   const [confirmTarget, setConfirmTarget] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.max(1, Math.ceil(adminList.length / PAGE_SIZE));
+  const pagedAdminList = useMemo(
+    () => adminList.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+    [adminList, currentPage]
+  );
 
   const fetchAdminList = () => {
     setListLoading(true);
@@ -190,7 +200,7 @@ const AdminManagement = () => {
                 </tr>
               </thead>
               <tbody>
-                {adminList.map((admin) => (
+                {pagedAdminList.map((admin) => (
                   <tr key={admin.id}>
                     <td>
                       <div className="admin-mgmt-member">
@@ -233,6 +243,15 @@ const AdminManagement = () => {
                 ))}
               </tbody>
             </table>
+          )}
+          {adminList.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalCount={adminList.length}
+              pageSize={PAGE_SIZE}
+              onPageChange={setCurrentPage}
+            />
           )}
         </div>
       </div>

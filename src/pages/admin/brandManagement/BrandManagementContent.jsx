@@ -1,9 +1,19 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import BrandAccordion from "../../../components/admin/brand/BrandAccordion";
 import BrandInsertAccordion from "../../../components/admin/brand/BrandInsertAccordion";
+import Pagination from "../../../components/common/Pagination/Pagination";
+
+const PAGE_SIZE = 10;
 
 const BrandManagementContent = ({ brands, loading, registerTrigger, onRefresh }) => {
     const [insertOpen, setInsertOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const totalPages = Math.max(1, Math.ceil(brands.length / PAGE_SIZE));
+    const pagedBrands = useMemo(
+        () => brands.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+        [brands, currentPage]
+    );
 
     useEffect(() => {
         if (registerTrigger > 0) {
@@ -39,7 +49,7 @@ const BrandManagementContent = ({ brands, loading, registerTrigger, onRefresh })
                             등록된 브랜드가 없습니다.
                         </div>
                     ) : (
-                        brands.map((brand) => (
+                        pagedBrands.map((brand) => (
                             <BrandAccordion
                                 brand={brand}
                                 id={brand.id}
@@ -47,6 +57,15 @@ const BrandManagementContent = ({ brands, loading, registerTrigger, onRefresh })
                                 onRefresh={onRefresh}
                             />
                         ))
+                    )}
+                    {brands.length > 0 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            totalCount={brands.length}
+                            pageSize={PAGE_SIZE}
+                            onPageChange={setCurrentPage}
+                        />
                     )}
                 </div>
             </div>
