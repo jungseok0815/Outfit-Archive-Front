@@ -1,16 +1,33 @@
 import {React} from 'react';
 
 
-const ProductList = ({ product, openModal, id }) => {
+const ProductList = ({ product, openModal, id, selected, onToggleSelect }) => {
 
   return (
-    <div key={id} className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105" onClick={() => {openModal(product)}}>
+    <div
+      key={id}
+      className={`bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105 ${selected ? 'ring-2 ring-red-400' : ''}`}
+      onClick={() => openModal(product)}
+    >
       <div className="relative h-32">
         <img
           src={product.images.length === 0 ? "/api/placeholder/400/320" : product.images[0].imgPath}
           alt={product.productNm}
           className="w-full object-cover h-full"
         />
+        {onToggleSelect && (
+          <div
+            className="absolute top-1.5 left-1.5"
+            onClick={e => { e.stopPropagation(); onToggleSelect(product.id); }}
+          >
+            <input
+              type="checkbox"
+              checked={!!selected}
+              onChange={() => {}}
+              className="w-4 h-4 accent-red-500 cursor-pointer"
+            />
+          </div>
+        )}
       </div>
       <div className="p-2">
         <h3 className="text-sm font-semibold text-gray-800 mb-1 truncate">

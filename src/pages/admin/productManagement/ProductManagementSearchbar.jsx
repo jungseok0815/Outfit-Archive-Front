@@ -16,7 +16,6 @@ const ProductManagerSearchbar = ({searchTerm, onChange}) => {
             onChange={handleCategoryChange}
           >
             <option value="productNm">상품명</option>
-            <option value="productBrand">브랜드</option>
             <option value="productCode">상품코드</option>
           </select>
 

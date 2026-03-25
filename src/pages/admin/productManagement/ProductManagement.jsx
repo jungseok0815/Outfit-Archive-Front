@@ -1,12 +1,13 @@
-import React,{useState, useEffect, useRef} from 'react';
+import { useState, useEffect, useRef } from 'react';
 import SearchBar from "./ProductManagementSearchbar";
 import Content from "./ProductManagementContent"
 import ProducttModal from "../../../components/common/Modal/ProductModal"
 import "../../../styles/admin/productManagement/ProductManagement.css"
 import { toast } from "react-toastify";
-import { ListProduct, BulkInsertProduct } from '../../../api/admin/product';
+import { ListProduct, BulkInsertProduct, DeleteProduct } from '../../../api/admin/product';
 import useUpdateEffect from '../../../hooks/useDidMountEffect';
-import { FileSpreadsheet, ChevronLeft, ChevronRight } from 'lucide-react';
+import ConfirmModal from '../../../components/common/Modal/ConfirmModal';
+import { FileSpreadsheet, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const PAGE_SIZE = 24;
 
@@ -20,7 +21,18 @@ const ProductManagement = ({ registerTrigger, user }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [guideOpen, setGuideOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const excelInputRef = useRef(null);
+  const guideRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (guideRef.current && !guideRef.current.contains(e.target)) setGuideOpen(false);
+    };
+    if (guideOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [guideOpen]);
 
   const filterByBrand = (list) => {
     if (!Array.isArray(list)) return [];
@@ -81,11 +93,50 @@ const ProductManagement = ({ registerTrigger, user }) => {
 
   const handleChangeSearchTerm = (e) => setSearchTerm(e.target.value)
 
+  const handleToggleSelect = (id) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const handleBulkDelete = async () => {
+    try {
+      await Promise.all([...selectedIds].map(id => DeleteProduct(id)));
+      toast.success(`${selectedIds.size}개 상품이 삭제되었습니다.`);
+      setSelectedIds(new Set());
+      fetchProducts();
+    } catch {
+      toast.error('일부 상품 삭제에 실패했습니다.');
+    } finally {
+      setBulkDeleteOpen(false);
+    }
+  };
+
   // 페이징 계산
   const totalProducts = products.length;
   const totalPages = Math.max(1, Math.ceil(totalProducts / PAGE_SIZE));
   const safePage = Math.min(currentPage, totalPages);
   const pagedProducts = products.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  const isAllPageSelected = pagedProducts.length > 0 && pagedProducts.every(p => selectedIds.has(p.id));
+
+  const handleSelectAll = () => {
+    if (isAllPageSelected) {
+      setSelectedIds(prev => {
+        const next = new Set(prev);
+        pagedProducts.forEach(p => next.delete(p.id));
+        return next;
+      });
+    } else {
+      setSelectedIds(prev => {
+        const next = new Set(prev);
+        pagedProducts.forEach(p => next.add(p.id));
+        return next;
+      });
+    }
+  };
 
   const getPageNumbers = () => {
     const pages = [];
@@ -101,7 +152,7 @@ const ProductManagement = ({ registerTrigger, user }) => {
     const file = e.target.files[0];
     if (!file) return;
     toast.info(`"${file.name}" 업로드 중...`);
-    BulkInsertProduct(file)
+    BulkInsertProduct(file, user?.brandId || null)
       .then(res => {
         toast.success(res.data);
         fetchProducts();
@@ -115,6 +166,16 @@ const ProductManagement = ({ registerTrigger, user }) => {
 
       {/* 액션 툴바 */}
       <div className="pm-toolbar">
+        {selectedIds.size > 0 && (
+          <button className="pm-btn-bulk-delete" onClick={() => setBulkDeleteOpen(true)}>
+            <Trash2 size={14}/>
+            {selectedIds.size}개 삭제
+          </button>
+        )}
+        <label className="pm-select-all">
+          <input type="checkbox" checked={isAllPageSelected} onChange={handleSelectAll}/>
+          전체 선택
+        </label>
         <button className="pm-btn-register" onClick={() => handleOpenModal(false)}>
           + 상품 등록
         </button>
@@ -123,8 +184,8 @@ const ProductManagement = ({ registerTrigger, user }) => {
           ZIP 일괄 등록
         </button>
         <input ref={excelInputRef} type="file" accept=".zip" hidden onChange={handleExcelUpload}/>
-        <div className="pm-guide-wrap" onMouseEnter={() => setGuideOpen(true)} onMouseLeave={() => setGuideOpen(false)}>
-          <button className="pm-btn-guide">?</button>
+        <div className="pm-guide-wrap" ref={guideRef}>
+          <button className="pm-btn-guide" onClick={() => setGuideOpen(prev => !prev)}>?</button>
           {guideOpen && (
         <div className="pm-guide">
           <h4 className="pm-guide-title">ZIP 파일 구성 방법</h4>
@@ -148,8 +209,7 @@ const ProductManagement = ({ registerTrigger, user }) => {
               <tr><td>C</td><td>가격</td><td>숫자(원)</td><td>59000</td></tr>
               <tr><td>D</td><td>수량</td><td>숫자</td><td>100</td></tr>
               <tr><td>E</td><td>카테고리</td><td>코드</td><td>BOTTOM</td></tr>
-              <tr><td>F</td><td>브랜드ID</td><td>숫자</td><td>1</td></tr>
-              <tr><td>G</td><td>이미지파일명</td><td>텍스트</td><td>image1.jpg</td></tr>
+              <tr><td>F</td><td>이미지파일명</td><td>텍스트</td><td>image1.jpg</td></tr>
             </tbody>
           </table>
           <div className="pm-guide-categories">
@@ -170,7 +230,7 @@ const ProductManagement = ({ registerTrigger, user }) => {
         </div>
       </div>
 
-      <Content products={pagedProducts} openModal={handleOpenModal}/>
+      <Content products={pagedProducts} openModal={handleOpenModal} selectedIds={selectedIds} onToggleSelect={handleToggleSelect}/>
 
       {/* 페이징 */}
       {totalProducts > 0 && (
@@ -201,6 +261,12 @@ const ProductManagement = ({ registerTrigger, user }) => {
         </div>
       )}
 
+      <ConfirmModal
+        isOpen={bulkDeleteOpen}
+        message={`선택한 ${selectedIds.size}개 상품을 삭제하시겠습니까?`}
+        onConfirm={handleBulkDelete}
+        onCancel={() => setBulkDeleteOpen(false)}
+      />
       <ProducttModal isOpen={isModalOpen} onClose={handleCloseModal} updateProduct={handleUpdateProduct} product={product} user={user}/>
     </div>;
 };

@@ -298,13 +298,18 @@ const ReviewManagement = ({ user }) => {
                     </td>
                     <td>{product.productPrice?.toLocaleString()}원</td>
                     <td>
-                      <button className="review-mgmt-toggle-btn">
-                        {selectedProductId === product.id
-                          ? <ChevronUp size={16} />
-                          : <ChevronDown size={16} />
-                        }
-                        <span>{selectedProductId === product.id ? '접기' : '보기'}</span>
-                      </button>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                        {product.reviewCount > 0 && (
+                          <span className="review-mgmt-count-badge">{product.reviewCount}개</span>
+                        )}
+                        <button className="review-mgmt-toggle-btn">
+                          {selectedProductId === product.id
+                            ? <ChevronUp size={16} />
+                            : <ChevronDown size={16} />
+                          }
+                          <span>{selectedProductId === product.id ? '접기' : '보기'}</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                   {selectedProductId === product.id && (

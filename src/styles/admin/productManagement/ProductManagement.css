@@ -20,6 +20,34 @@
 }
 .pm-btn-register:hover { background-color: #2d2d4e; }
 
+.pm-btn-bulk-delete {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background-color: #e74c3c;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.pm-btn-bulk-delete:hover { background-color: #c0392b; }
+
+.pm-select-all {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  user-select: none;
+}
+.pm-select-all input { cursor: pointer; accent-color: #e74c3c; }
+
 .pm-btn-excel {
   display: flex;
   align-items: center;
