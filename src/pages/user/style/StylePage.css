@@ -77,14 +77,21 @@
   color: #555555;
 }
 
-/* 스타일 카드 그리드 - 4열 (상품과 동일) */
+/* 스타일 카드 그리드 - 4열 */
 .style-grid {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px 60px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .style-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
 }
 
 /* 결과 없음 */

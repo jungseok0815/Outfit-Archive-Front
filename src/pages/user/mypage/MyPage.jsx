@@ -54,6 +54,8 @@ function MyPage() {
   const mapPosts = (all) => all.map(p => ({
     id: p.id,
     userId: p.userId,
+    user: p.userNm,
+    avatar: p.profileImgNm || null,
     images: p.images?.length > 0
       ? p.images.map(img => img.imgPath)
       : [''],

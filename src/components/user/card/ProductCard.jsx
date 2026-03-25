@@ -4,6 +4,13 @@ import { useAuth } from "../../../store/context/UserContext";
 import { ToggleWishlist } from "../../../api/user/wishlist";
 import "./Card.css";
 
+const formatCount = (n) => {
+  if (!n) return '0';
+  if (n >= 10000) return (n / 10000).toFixed(1).replace(/\.0$/, '') + '만';
+  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + '천';
+  return n.toLocaleString();
+};
+
 function ProductCard({ product, rank, isWished = false }) {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -28,28 +35,42 @@ function ProductCard({ product, rank, isWished = false }) {
   return (
     <div className="card" onClick={handleClick}>
       {rank && <div className="card-rank">{rank}</div>}
-      {user && (
-        <button className={`card-wishlist-btn ${wishlisted ? 'active' : ''}`} onClick={handleWishlistClick}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill={wishlisted ? "#e74c3c" : "none"} stroke={wishlisted ? "#e74c3c" : "#ffffff"} strokeWidth="2.5">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-          </svg>
-        </button>
-      )}
+
       <div className="card-image">
-        <img src={product.image} alt={product.name} />
+        <img src={product.image || '/api/placeholder/400/400'} alt={product.name} />
       </div>
+
       <div className="card-body">
-        <span
-          className="card-brand"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (product._raw?.brandId) navigate(`/brand/${product._raw.brandId}`);
-          }}
-        >
-          {product.brand}
-        </span>
-        <p className="card-name">{product.name}</p>
+        <div className="card-body-top">
+          <div className="card-body-info">
+            <span
+              className="card-brand"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (product._raw?.brandId) navigate(`/brand/${product._raw.brandId}`);
+              }}
+            >
+              {product.brand}
+            </span>
+            <p className="card-name">{product.name}</p>
+          </div>
+          <button
+            className={`card-wishlist-btn ${wishlisted ? 'active' : ''}`}
+            onClick={handleWishlistClick}
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill={wishlisted ? "#222" : "none"} stroke="#222" strokeWidth="1.8">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+            </svg>
+          </button>
+        </div>
         <span className="card-price">{product.price}원</span>
+        {(product.reviewCount > 0 || product.orderCount > 0) && (
+          <div className="card-stats">
+            <span>리뷰 {formatCount(product.reviewCount)}</span>
+            <span className="card-stats-dot">·</span>
+            <span>거래 {formatCount(product.orderCount)}</span>
+          </div>
+        )}
       </div>
     </div>
   );

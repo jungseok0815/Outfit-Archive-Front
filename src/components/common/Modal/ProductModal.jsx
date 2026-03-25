@@ -1,6 +1,7 @@
 import {useState,useEffect } from "react";
 import Modal from "./Modal";
 import ConfirmModal from "./ConfirmModal";
+import "./ProductModal.css";
 import { InsertProduct, UpdateProduct, DeleteProduct} from "../../../api/admin/product";
 import { ImagePlus, X } from 'lucide-react'
 import { toast } from "react-toastify";
@@ -9,6 +10,7 @@ import { CancelButton, DeleteButton, SubmitButton } from "../Button/Button";
 const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
 
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     id : "",
     productNm: "",
@@ -95,6 +97,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setSubmitting(true);
     const form = new FormData();
     Object.entries(formData).forEach(([k, v]) => { if (v !== "") form.append(k, v); });
     newFiles.forEach(f => form.append('image', f));
@@ -107,11 +110,12 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
         }
       }).catch(() => {
         toast.error("상품등록 실패")
-      });
+      }).finally(() => setSubmitting(false));
   };
 
   const handleUpdate = (e) => {
     e.preventDefault();
+    setSubmitting(true);
     const form = new FormData();
     Object.entries(formData).forEach(([k, v]) => { if (v !== "") form.append(k, v); });
     newFiles.forEach(f => form.append('image', f));
@@ -125,7 +129,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
         }
       }).catch(() => {
         toast.error("상품 수정 실패")
-      });
+      }).finally(() => setSubmitting(false));
   };
 
   const handlerDeleteProduct = (e) => {
@@ -160,6 +164,11 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
         onClose={onClose}
         width="800px"
         height="500px">
+        {submitting && (
+          <div className="product-modal-progress">
+            <div className="product-modal-progress-bar" />
+          </div>
+        )}
         <div className="bg-white rounded-lg w-full max-w-4xl">
          <form onSubmit={product ? handleUpdate : handleSubmit} className="p-6">
             <h2 className="text-2xl font-semibold mb-4">상품 {product ? "수정" : "등록"}</h2>

@@ -23,6 +23,7 @@ const ProductManagement = ({ registerTrigger, user }) => {
   const [guideOpen, setGuideOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const excelInputRef = useRef(null);
   const guideRef = useRef(null);
 
@@ -151,17 +152,23 @@ const ProductManagement = ({ registerTrigger, user }) => {
   const handleExcelUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    toast.info(`"${file.name}" 업로드 중...`);
+    setUploading(true);
     BulkInsertProduct(file, user?.brandId || null)
       .then(res => {
         toast.success(res.data);
         fetchProducts();
       })
-      .catch(() => toast.error('일괄 등록에 실패했습니다.'));
+      .catch(() => toast.error('일괄 등록에 실패했습니다.'))
+      .finally(() => setUploading(false));
     e.target.value = '';
   };
 
-  return <div>
+  return <div style={{ position: 'relative' }}>
+      {uploading && (
+        <div className="pm-upload-progress">
+          <div className="pm-upload-progress-bar" />
+        </div>
+      )}
       <SearchBar searchTerm={searchTerm} onChange={handleChangeSearchTerm}/>
 
       {/* 액션 툴바 */}
@@ -179,9 +186,9 @@ const ProductManagement = ({ registerTrigger, user }) => {
         <button className="pm-btn-register" onClick={() => handleOpenModal(false)}>
           + 상품 등록
         </button>
-        <button className="pm-btn-excel" onClick={() => excelInputRef.current?.click()}>
+        <button className="pm-btn-excel" onClick={() => excelInputRef.current?.click()} disabled={uploading}>
           <FileSpreadsheet size={15}/>
-          ZIP 일괄 등록
+          {uploading ? '등록 중...' : 'ZIP 일괄 등록'}
         </button>
         <input ref={excelInputRef} type="file" accept=".zip" hidden onChange={handleExcelUpload}/>
         <div className="pm-guide-wrap" ref={guideRef}>

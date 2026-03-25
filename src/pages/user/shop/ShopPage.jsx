@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Navbar from '../../../components/user/header/Header';
 import AuthModal from '../auth/AuthPage';
 import ProductCard from '../../../components/user/card/ProductCard';
@@ -8,7 +8,7 @@ import { useAuth } from '../../../store/context/UserContext';
 import "../../../App.css";
 import "./ShopPage.css";
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 15;
 
 const CATEGORY_MAP = {
   "전체": null,
@@ -59,6 +59,8 @@ function ShopPage() {
     name: p.productNm,
     price: p.productPrice?.toLocaleString(),
     category: CATEGORY_KOR[p.category] || p.category,
+    reviewCount: p.reviewCount || 0,
+    orderCount: p.orderCount || 0,
     _raw: p,
   });
 
