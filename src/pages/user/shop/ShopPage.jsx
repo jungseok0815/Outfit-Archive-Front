@@ -47,6 +47,7 @@ function ShopPage() {
       .catch(() => {});
   }, [user]);
 
+
   const debounceRef = useRef(null);
   const observerRef = useRef(null);
   const loadingRef = useRef(false);

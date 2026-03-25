@@ -3,6 +3,7 @@ import { Search, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Trash2 } fro
 import { ListProduct } from '../../../api/user/product';
 import { AdminListProductReview, AdminDeleteReview } from '../../../api/admin/review';
 import { toast } from 'react-toastify';
+import ConfirmModal from '../../../components/common/Modal/ConfirmModal';
 import './ReviewManagement.css';
 
 const CATEGORY_KOR = {
@@ -34,6 +35,7 @@ const ReviewPanel = ({ productId, canDelete }) => {
   const [page, setPage] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [confirmTarget, setConfirmTarget] = useState(null);
 
   const load = useCallback((p) => {
     setLoading(true);
@@ -50,13 +52,20 @@ const ReviewPanel = ({ productId, canDelete }) => {
   }, [productId]);
 
   const handleDelete = (reviewId) => {
-    if (!window.confirm('이 리뷰를 삭제하시겠습니까?')) return;
-    AdminDeleteReview(reviewId)
+    setConfirmTarget(reviewId);
+  };
+
+  const handleConfirmDelete = () => {
+    AdminDeleteReview(confirmTarget)
       .then(() => {
         toast.success('리뷰가 삭제되었습니다.');
+        setConfirmTarget(null);
         load(page);
       })
-      .catch(() => toast.error('삭제에 실패했습니다.'));
+      .catch(() => {
+        toast.error('삭제에 실패했습니다.');
+        setConfirmTarget(null);
+      });
   };
 
   useEffect(() => { load(0); }, [load]);
@@ -86,6 +95,12 @@ const ReviewPanel = ({ productId, canDelete }) => {
 
   return (
     <div className="review-panel">
+      <ConfirmModal
+        isOpen={confirmTarget !== null}
+        message="이 리뷰를 삭제하시겠습니까?"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmTarget(null)}
+      />
       {/* 요약 */}
       <div className="review-panel-summary">
         <div className="review-panel-avg-box">

@@ -1,5 +1,6 @@
 import {useState,useEffect } from "react";
 import Modal from "./Modal";
+import ConfirmModal from "./ConfirmModal";
 import { InsertProduct, UpdateProduct, DeleteProduct} from "../../../api/admin/product";
 import { ImagePlus, X } from 'lucide-react'
 import { toast } from "react-toastify";
@@ -7,6 +8,7 @@ import { CancelButton, DeleteButton, SubmitButton } from "../Button/Button";
 
 const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
 
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [formData, setFormData] = useState({
     id : "",
     productNm: "",
@@ -128,8 +130,12 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
 
   const handlerDeleteProduct = (e) => {
     e.preventDefault();
-    if(window.confirm("해당 상품을 삭제 하시겠습니까?")){
-      DeleteProduct(formData.id)
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    setConfirmOpen(false);
+    DeleteProduct(formData.id)
       .then(res => {
         if (res.status === 200) {
           toast.success("상품 삭제 성공!")
@@ -138,12 +144,17 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
         }
       }).catch(() => {
         toast.error("상품 삭제 실패")
-      })
-    }
+      });
   };
 
   return (
-    <div >
+    <div>
+      <ConfirmModal
+        isOpen={confirmOpen}
+        message="해당 상품을 삭제하시겠습니까?"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmOpen(false)}
+      />
       <Modal
         isOpen={isOpen}
         onClose={onClose}
