@@ -1,7 +1,8 @@
-import { React, useState } from 'react';
-import { ChevronDown, Edit2, Package } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronDown, Edit2, Package, X } from 'lucide-react';
 import BrandItemCard from './BrandItemCard';
 import ProductModal from '../../common/Modal/ProductModal';
+import '../../../pages/admin/brandManagement/BrandManagementContent.css';
 
 const CATEGORY_KOR = {
     TOP: '상의', BOTTOM: '하의', OUTER: '아우터',
@@ -17,7 +18,7 @@ const BrandAccordion = ({ brand, id, onRefresh }) => {
     const totalStock = brand.products?.reduce((sum, p) => sum + p.productQuantity, 0) || 0;
     const productCount = brand.products?.length || 0;
 
-    const imgUrl = brand.brandImg?.imgPath || null;
+    const imgUrl = brand.imgPath || null;
 
     return (
         <div className="border rounded-lg overflow-hidden shadow-sm">
@@ -27,9 +28,9 @@ const BrandAccordion = ({ brand, id, onRefresh }) => {
                 onClick={() => setIsOpen(!isOpen)}
             >
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0 overflow-hidden">
+                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-800 font-bold text-sm flex-shrink-0 overflow-hidden border border-gray-200">
                         {imgUrl
-                            ? <img src={imgUrl} alt={brand.brandNm} className="w-full h-full object-cover" />
+                            ? <img src={imgUrl} alt={brand.brandNm} className="w-full h-full object-contain p-1" />
                             : brand.brandNm?.charAt(0)
                         }
                     </div>
@@ -67,25 +68,12 @@ const BrandAccordion = ({ brand, id, onRefresh }) => {
                         </div>
                         <button
                             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-500 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                            onClick={(e) => { e.stopPropagation(); setShowEditForm(!showEditForm); }}
+                            onClick={(e) => { e.stopPropagation(); setShowEditForm(true); }}
                         >
                             <Edit2 className="w-3.5 h-3.5" />
                             브랜드 수정
                         </button>
                     </div>
-
-                    {/* 브랜드 수정 폼 */}
-                    {showEditForm && (
-                        <div className="p-3 border-b">
-                            <BrandItemCard
-                                brand={brand}
-                                onSuccess={() => {
-                                    setShowEditForm(false);
-                                    onRefresh();
-                                }}
-                            />
-                        </div>
-                    )}
 
                     {/* 상품 그리드 */}
                     <div className="p-4">
@@ -157,6 +145,29 @@ const BrandAccordion = ({ brand, id, onRefresh }) => {
                 product={selectedProduct}
                 user={{ brandNm: brand.brandNm, brandId: id }}
             />
+
+            {/* 브랜드 수정 모달 */}
+            {showEditForm && (
+                <div className="brand-modal-overlay" onClick={() => setShowEditForm(false)}>
+                    <div className="brand-modal" onClick={e => e.stopPropagation()}>
+                        <div className="brand-modal-header">
+                            <h3 className="brand-modal-title">브랜드 수정</h3>
+                            <button className="brand-modal-close" onClick={() => setShowEditForm(false)}>
+                                <X size={16} />
+                            </button>
+                        </div>
+                        <div className="brand-modal-body">
+                            <BrandItemCard
+                                brand={brand}
+                                onSuccess={() => {
+                                    setShowEditForm(false);
+                                    onRefresh();
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

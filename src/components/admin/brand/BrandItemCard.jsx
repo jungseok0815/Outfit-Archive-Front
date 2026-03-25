@@ -3,10 +3,12 @@ import { Phone, MapPin } from 'lucide-react';
 import { SubmitButton, DeleteButton } from '../../common/Button/Button';
 import { InsertBrand, UpdateBrand, DeleteBrand } from '../../../api/admin/brand';
 import { toast } from "react-toastify";
+import ConfirmModal from '../../common/Modal/ConfirmModal';
 
 // brand prop이 있으면 수정 모드, 없으면 등록 모드
 const BrandItemCard = ({ brand, onSuccess }) => {
     const isEdit = !!brand;
+    const [confirmOpen, setConfirmOpen] = useState(false);
 
     const [formData, setFormData] = useState({
         brandNm: brand?.brandNm || "",
@@ -54,7 +56,11 @@ const BrandItemCard = ({ brand, onSuccess }) => {
 
     const handleDelete = () => {
         if (!brand) return;
-        if (!window.confirm('브랜드를 삭제하시겠습니까? 해당 브랜드의 모든 상품도 함께 삭제될 수 있습니다.')) return;
+        setConfirmOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        setConfirmOpen(false);
         DeleteBrand(brand.id)
             .then(() => {
                 toast.success('브랜드가 삭제되었습니다.');
@@ -68,6 +74,12 @@ const BrandItemCard = ({ brand, onSuccess }) => {
 
     return (
         <div className="max-w-4xl mx-auto">
+            <ConfirmModal
+                isOpen={confirmOpen}
+                message="브랜드를 삭제하시겠습니까? 해당 브랜드의 모든 상품도 함께 삭제될 수 있습니다."
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setConfirmOpen(false)}
+            />
             <form onSubmit={handleSubmit} className="bg-white rounded-xl overflow-hidden">
                 <div className="flex">
                     {/* 왼쪽 로고 섹션 */}

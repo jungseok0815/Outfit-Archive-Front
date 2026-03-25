@@ -3,6 +3,7 @@ import { Package, Truck, CheckCircle, Clock, ChevronDown, ChevronLeft, ChevronRi
 import './OrderManagement.css';
 import { ListOrder, UpdateOrderStatus, RegisterShipping, DeleteOrder } from '../../../api/admin/order';
 import { toast } from "react-toastify";
+import ConfirmModal from '../../../components/common/Modal/ConfirmModal';
 
 // 백엔드 OrderStatus enum → 한글 매핑
 const STATUS_MAP = {
@@ -47,7 +48,8 @@ const OrderManagement = ({ user }) => {
     const [statusFilter, setStatusFilter] = useState('전체');
     const [expandedOrder, setExpandedOrder] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [trackingInputs, setTrackingInputs] = useState({}); // { orderId: trackingNumber }
+    const [trackingInputs, setTrackingInputs] = useState({});
+    const [confirmTarget, setConfirmTarget] = useState(null);
 
     const loadOrders = async () => {
         setLoading(true);
@@ -135,13 +137,18 @@ const OrderManagement = ({ user }) => {
     };
 
     const handleDelete = (orderId) => {
-        if (!window.confirm('주문을 삭제하시겠습니까?')) return;
-        DeleteOrder(orderId)
+        setConfirmTarget(orderId);
+    };
+
+    const handleConfirmDelete = () => {
+        DeleteOrder(confirmTarget)
             .then(() => {
-                setOrders(prev => prev.filter(o => o.id !== orderId));
+                setOrders(prev => prev.filter(o => o.id !== confirmTarget));
+                setConfirmTarget(null);
             })
             .catch(err => {
                 toast.error(err.response?.data?.msg || '삭제에 실패했습니다.');
+                setConfirmTarget(null);
             });
     };
 
@@ -161,21 +168,34 @@ const OrderManagement = ({ user }) => {
 
     return (
         <div className="order-management">
-            {/* 요약 카드 */}
+            <ConfirmModal
+                isOpen={confirmTarget !== null}
+                message="주문을 삭제하시겠습니까?"
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setConfirmTarget(null)}
+            />
+            {/* 요약 카드 (클릭 시 필터) */}
             <div className="order-summary-cards">
-                <div className="order-summary-card order-summary-total">
+                <button
+                    className={`order-summary-card order-summary-total ${statusFilter === '전체' ? 'order-summary-active' : ''}`}
+                    onClick={() => handleFilterChange('전체')}
+                >
                     <p className="order-summary-label">전체 주문</p>
                     <p className="order-summary-value">{totalOrders}</p>
-                </div>
+                </button>
                 {Object.entries(STATUS_MAP).map(([key, { label, color }]) => (
-                    <div className="order-summary-card" key={key}>
+                    <button
+                        className={`order-summary-card ${statusFilter === key ? 'order-summary-active' : ''}`}
+                        key={key}
+                        onClick={() => handleFilterChange(key)}
+                    >
                         <p className="order-summary-label">{label}</p>
                         <p className="order-summary-value" style={{ color }}>{statusCounts[key] || 0}</p>
-                    </div>
+                    </button>
                 ))}
             </div>
 
-            {/* 검색 & 필터 */}
+            {/* 검색 */}
             <div className="order-toolbar">
                 <div className="order-search-box">
                     <Search className="order-search-icon" />
@@ -186,19 +206,6 @@ const OrderManagement = ({ user }) => {
                         onChange={handleSearchChange}
                         className="order-search-input"
                     />
-                </div>
-                <div className="order-filter-btns">
-                    <button
-                        className={`order-filter-btn ${statusFilter === '전체' ? 'active' : ''}`}
-                        onClick={() => handleFilterChange('전체')}
-                    >전체</button>
-                    {Object.entries(STATUS_MAP).map(([key, { label }]) => (
-                        <button
-                            key={key}
-                            className={`order-filter-btn ${statusFilter === key ? 'active' : ''}`}
-                            onClick={() => handleFilterChange(key)}
-                        >{label}</button>
-                    ))}
                 </div>
             </div>
 

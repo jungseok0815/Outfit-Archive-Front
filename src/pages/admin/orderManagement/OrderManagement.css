@@ -17,11 +17,27 @@
   border-radius: 12px;
   padding: 16px 18px;
   text-align: center;
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
+}
+
+.order-summary-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.order-summary-card.order-summary-active {
+  border-color: #111827;
+  box-shadow: 0 0 0 2px #111827;
 }
 
 .order-summary-card.order-summary-total {
   background: #1a1a2e;
   border-color: #1a1a2e;
+}
+
+.order-summary-card.order-summary-total.order-summary-active {
+  box-shadow: 0 0 0 2px #6c5ce7;
 }
 
 .order-summary-card.order-summary-total .order-summary-label {

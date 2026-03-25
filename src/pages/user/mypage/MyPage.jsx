@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
+import ConfirmModal from "../../../components/common/Modal/ConfirmModal";
 import { toast } from "react-toastify";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../../../components/user/header/Header";
@@ -44,6 +45,7 @@ function MyPage() {
   const [couponCode, setCouponCode] = useState('');
   const [couponIssuing, setCouponIssuing] = useState(false);
   const [loadedTabs, setLoadedTabs] = useState(new Set());
+  const [confirmTarget, setConfirmTarget] = useState(null);
 
   // 본인 페이지 여부
   const isOwnPage = !paramUserId || (user && String(user.id) === String(paramUserId));
@@ -144,13 +146,18 @@ function MyPage() {
   };
 
   const handleDelete = (postId) => {
-    if (!window.confirm('정말 삭제하시겠습니까?')) return;
-    DeletePost(postId)
+    setConfirmTarget(postId);
+  };
+
+  const handleConfirmDelete = () => {
+    DeletePost(confirmTarget)
       .then(() => {
+        setConfirmTarget(null);
         setSelectedPost(null);
         loadMyPosts();
       })
       .catch(e => {
+        setConfirmTarget(null);
         const msg = e.response?.data?.msg || '삭제에 실패했습니다.';
         toast.error(msg);
       });
@@ -234,6 +241,12 @@ function MyPage() {
 
   return (
     <div className="app">
+      <ConfirmModal
+        isOpen={confirmTarget !== null}
+        message="정말 삭제하시겠습니까?"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmTarget(null)}
+      />
       <Navbar onLoginClick={() => setShowAuthModal(true)} />
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
       {showPostModal && (

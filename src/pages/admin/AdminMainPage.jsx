@@ -143,8 +143,8 @@ function Admin() {
     }
   };
 
-  const handleLogout = () => {
-    adminLogout();
+  const handleLogout = async () => {
+    await adminLogout();
     window.location.href = "/admin";
   };
 
