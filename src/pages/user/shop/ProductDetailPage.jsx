@@ -176,65 +176,81 @@ function ProductDetailPage() {
 
           {/* 상품 정보 */}
           <div className="detail-info">
+            {/* 브랜드 + 상품명 */}
             <div
               className="detail-brand"
               style={{ cursor: product.brandId ? 'pointer' : 'default' }}
               onClick={() => { if (product.brandId) navigate(`/brand/${product.brandId}`); }}
             >{product.brandNm}</div>
             <h1 className="detail-name">{product.productNm}</h1>
+
+            {/* 가격 */}
             <div className="detail-price">
               {product.productPrice?.toLocaleString()}원
             </div>
 
+            {/* 평점 */}
             {reviewCount > 0 && (
               <div className="detail-rating">
-                <div className="detail-rating-stars">
-                  {renderAvgStars(avgRating)}
-                </div>
+                <span className="detail-rating-star-icon">★</span>
                 <span className="detail-rating-score">{avgRating.toFixed(1)}</span>
-                <span className="detail-rating-count">({reviewCount}개 리뷰)</span>
+                <span className="detail-rating-count">리뷰 {reviewCount.toLocaleString()}</span>
               </div>
             )}
 
+            {/* 카테고리 태그 */}
+            <div className="detail-tags">
+              <span className="detail-tag">{CATEGORY_KOR[product.category] || product.category}</span>
+            </div>
+
             <div className="detail-divider" />
 
+            {/* 상품 메타 */}
             <div className="detail-meta">
-              <div className="detail-meta-row">
-                <span className="detail-meta-label">카테고리</span>
-                <span className="detail-category-badge">
-                  {CATEGORY_KOR[product.category] || product.category}
-                </span>
-              </div>
               <div className="detail-meta-row">
                 <span className="detail-meta-label">상품코드</span>
                 <span className="detail-meta-value">{product.productCode}</span>
               </div>
               <div className="detail-meta-row">
                 <span className="detail-meta-label">재고</span>
-                <span className="detail-meta-value">
-                  {product.productQuantity}개
-                </span>
+                <span className="detail-meta-value">{product.productQuantity}개</span>
               </div>
             </div>
 
-            <div className="detail-buy-wrap">
-              <div className="detail-buy-row">
-                <button
-                  className="detail-buy-btn"
-                  onClick={handleBuyClick}
-                  disabled={product.productQuantity === 0}
-                >
-                  {product.productQuantity === 0 ? "품절" : "구매하기"}
-                </button>
-                <button
-                  className={`detail-wishlist-btn ${wishlisted ? 'active' : ''}`}
-                  onClick={handleWishlistClick}
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill={wishlisted ? "#e74c3c" : "none"} stroke={wishlisted ? "#e74c3c" : "#222"} strokeWidth="2">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                  </svg>
-                </button>
-              </div>
+            <div className="detail-divider" />
+
+            {/* 액션 버튼 */}
+            <div className="detail-action-bar">
+              <button
+                className={`detail-icon-btn ${wishlisted ? 'active' : ''}`}
+                onClick={handleWishlistClick}
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill={wishlisted ? "#222" : "none"} stroke="#222" strokeWidth="1.8">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                </svg>
+                <span>{wishlisted ? '저장됨' : '저장'}</span>
+              </button>
+              <button className="detail-icon-btn" onClick={() => {
+                if (navigator.share) {
+                  navigator.share({ title: product.productNm, url: window.location.href });
+                } else {
+                  navigator.clipboard.writeText(window.location.href);
+                }
+              }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#222" strokeWidth="1.8">
+                  <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                </svg>
+                <span>공유</span>
+              </button>
+              <button
+                className="detail-buy-btn"
+                onClick={handleBuyClick}
+                disabled={product.productQuantity === 0}
+              >
+                {product.productQuantity === 0 ? "품절" : "구매하기"}
+              </button>
             </div>
           </div>
         </div>

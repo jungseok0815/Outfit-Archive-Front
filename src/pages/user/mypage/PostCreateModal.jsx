@@ -114,8 +114,9 @@ function PostCreateModal({ onClose, onSuccess, editingPost }) {
 
     return (
         <div className="post-overlay" onClick={handleOverlayClick}>
-            <div className="post-modal">
-                <button className="post-close" onClick={onClose}>✕</button>
+            <div className="post-modal" style={{ position: 'relative' }}>
+                {submitting && <div className="post-progress-bar" />}
+                <button className="post-close" onClick={onClose} disabled={submitting}>✕</button>
                 <h2>{isEditMode ? '게시물 수정' : '새 게시물'}</h2>
 
                 <input
