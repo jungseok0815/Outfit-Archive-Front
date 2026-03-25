@@ -73,8 +73,12 @@
   font-size: 12px;
   font-weight: 600;
   color: #999999;
-  text-align: left;
+  text-align: center;
   white-space: nowrap;
+}
+
+.review-mgmt-table th:first-child {
+  text-align: left;
 }
 
 .review-mgmt-row {
@@ -100,6 +104,11 @@
   font-size: 14px;
   color: #444444;
   vertical-align: middle;
+  text-align: center;
+}
+
+.review-mgmt-table td:first-child {
+  text-align: left;
 }
 
 .review-mgmt-empty {
@@ -148,6 +157,17 @@
   color: #555;
   background: #f4f4f4;
   border-radius: 12px;
+}
+
+/* 리뷰 건수 뱃지 */
+.review-mgmt-count-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2563eb;
+  background: #eff6ff;
+  border-radius: 10px;
 }
 
 /* 리뷰 보기 버튼 */

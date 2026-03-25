@@ -23,10 +23,12 @@ export const DeleteProduct = (productId) => {
     return api.delete('/api/admin/product/delete', { params: { id: productId } });
 }
 
-export const BulkInsertProduct = (zipFile) => {
+export const BulkInsertProduct = (zipFile, brandId = null) => {
     const form = new FormData();
     form.append('file', zipFile);
+    const params = brandId ? { brandId } : {};
     return api.post('/api/admin/product/bulk', form, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 'Content-Type': 'multipart/form-data' },
+        params,
     });
 }
