@@ -442,6 +442,14 @@
     text-overflow: ellipsis;
 }
 
+.detail-product-name-en {
+    font-size: 11px;
+    color: #aaaaaa;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .detail-product-price {
     font-size: 13px;
     font-weight: 700;

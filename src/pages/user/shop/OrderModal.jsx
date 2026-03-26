@@ -8,7 +8,7 @@ import "./OrderModal.css";
 
 // const TOSS_CLIENT_KEY = "test_ck_zXLkKEypNArWmo50nX3lmeaxYG5R"; // 토스 결제 비활성화
 
-function OrderModal({ product, onClose }) {
+function OrderModal({ product, selectedSize, onClose }) {
   const [form, setForm] = useState({
     quantity: 1,
     recipientName: "",
@@ -44,10 +44,12 @@ function OrderModal({ product, onClose }) {
     setTimeout(() => detailAddressRef.current?.focus(), 100);
   };
 
+  const maxQuantity = selectedSize ? selectedSize.quantity : product.productQuantity;
+
   const handleQuantityChange = (delta) => {
     setForm(prev => ({
       ...prev,
-      quantity: Math.max(1, Math.min(product.productQuantity, prev.quantity + delta)),
+      quantity: Math.max(1, Math.min(maxQuantity, prev.quantity + delta)),
     }));
   };
 
@@ -73,6 +75,7 @@ function OrderModal({ product, onClose }) {
         recipientPhone: form.recipientPhone.trim(),
         shippingAddress: `[${form.zipCode}] ${form.baseAddress} ${form.detailAddress}`.trim(),
         usePoint,
+        sizeNm: selectedSize?.sizeNm || null,
       });
 
       const { tossOrderId } = res.data;
@@ -169,6 +172,8 @@ function OrderModal({ product, onClose }) {
             <div className="order-product-info">
               <span className="order-product-brand">{product.brandNm}</span>
               <span className="order-product-name">{product.productNm}</span>
+              {product.productEnNm && <span className="order-product-name-en">{product.productEnNm}</span>}
+              {selectedSize && <span className="order-product-size">사이즈: {selectedSize.sizeNm}</span>}
               <span className="order-product-price">{product.productPrice?.toLocaleString()}원</span>
             </div>
           </div>
@@ -181,7 +186,7 @@ function OrderModal({ product, onClose }) {
                 <button type="button" className="order-qty-btn" onClick={() => handleQuantityChange(-1)}>−</button>
                 <span className="order-qty-value">{form.quantity}</span>
                 <button type="button" className="order-qty-btn" onClick={() => handleQuantityChange(1)}>+</button>
-                <span className="order-qty-stock">재고 {product.productQuantity}개</span>
+                <span className="order-qty-stock">재고 {maxQuantity}개</span>
               </div>
             </div>
 

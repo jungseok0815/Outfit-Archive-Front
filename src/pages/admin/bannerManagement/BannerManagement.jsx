@@ -8,7 +8,7 @@ import './BannerManagement.css';
 
 const PAGE_SIZE = 10;
 
-const EMPTY_FORM = { title: '', highlight: '', description: '', buttonText: '', sortOrder: 1, active: true };
+const EMPTY_FORM = { title: '', highlight: '', description: '', buttonText: '', buttonUrl: '', sortOrder: 1, active: true };
 
 /* 배너 미리보기 모달 */
 const BannerPreviewModal = ({ banner, onClose }) => {
@@ -103,6 +103,7 @@ const BannerManagement = ({ registerTrigger }) => {
             highlight: banner.highlight || '',
             description: banner.description || '',
             buttonText: banner.buttonText || '',
+            buttonUrl: banner.buttonUrl || '',
             sortOrder: banner.sortOrder ?? 1,
             active: banner.active ?? true,
         });
@@ -255,6 +256,14 @@ const BannerManagement = ({ registerTrigger }) => {
                                             value={form.buttonText}
                                             onChange={e => setForm(p => ({ ...p, buttonText: e.target.value }))}
                                             placeholder="예) Explore Now"
+                                        />
+                                    </div>
+                                    <div className="banner-mgmt-field">
+                                        <label>버튼 클릭 URL</label>
+                                        <input
+                                            value={form.buttonUrl}
+                                            onChange={e => setForm(p => ({ ...p, buttonUrl: e.target.value }))}
+                                            placeholder="예) /shop, /style"
                                         />
                                     </div>
                                     <div className="banner-mgmt-field">

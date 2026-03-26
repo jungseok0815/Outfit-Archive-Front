@@ -14,6 +14,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
   const [formData, setFormData] = useState({
     id : "",
     productNm: "",
+    productEnNm: "",
     productPrice : "",
     productQuantity : "",
     brandId : "",
@@ -27,6 +28,8 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
   // 새로 추가할 파일
   const [newFiles, setNewFiles] = useState([]);
   const [newPreviews, setNewPreviews] = useState([]);
+  // 사이즈
+  const [sizes, setSizes] = useState([]); // [{sizeNm, quantity}]
 
   useEffect(() => {
     const autoBrandId = user?.brandId || "";
@@ -34,6 +37,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
       setFormData({
         id : product.id || "",
         productNm: product.productNm || "",
+        productEnNm: product.productEnNm || "",
         productPrice: product.productPrice || "",
         productQuantity: product.productQuantity || "",
         brandId: product.brandId || autoBrandId,
@@ -46,10 +50,12 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
       setRemovedImageIds([]);
       setNewFiles([]);
       setNewPreviews([]);
+      setSizes(product.sizes?.map(s => ({ sizeNm: s.sizeNm, quantity: s.quantity })) || []);
     } else {
       setFormData({
         id : "",
         productNm: "",
+        productEnNm: "",
         productPrice: "",
         productQuantity: "",
         brandId: autoBrandId,
@@ -60,6 +66,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
       setRemovedImageIds([]);
       setNewFiles([]);
       setNewPreviews([]);
+      setSizes([]);
     }
   }, [product, user]);
 
@@ -95,12 +102,18 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
     setNewPreviews(prev => prev.filter((_, i) => i !== index));
   };
 
+  const handleAddSize = () => setSizes(prev => [...prev, { sizeNm: '', quantity: '' }]);
+  const handleRemoveSize = (i) => setSizes(prev => prev.filter((_, idx) => idx !== i));
+  const handleSizeChange = (i, field, value) =>
+    setSizes(prev => prev.map((s, idx) => idx === i ? { ...s, [field]: value } : s));
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitting(true);
     const form = new FormData();
     Object.entries(formData).forEach(([k, v]) => { if (v !== "") form.append(k, v); });
     newFiles.forEach(f => form.append('image', f));
+    if (sizes.length > 0) form.append('sizesJson', JSON.stringify(sizes.filter(s => s.sizeNm.trim())));
     InsertProduct(form)
       .then(res => {
         if (res.status === 200 || res.status === 201) {
@@ -120,6 +133,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
     Object.entries(formData).forEach(([k, v]) => { if (v !== "") form.append(k, v); });
     newFiles.forEach(f => form.append('image', f));
     removedImageIds.forEach(id => form.append('deleteImageIds', id));
+    form.append('sizesJson', JSON.stringify(sizes.filter(s => s.sizeNm.toString().trim())));
     UpdateProduct(form)
       .then(res => {
         if (res.status === 200) {
@@ -259,7 +273,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      상품명
+                      상품명 (한글)
                     </label>
                     <input
                       type="text"
@@ -269,6 +283,20 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
                       placeholder="상품명을 입력하세요"
                       className="w-full px-3 py-1.5 border border-gray-300 rounded-md"
                       required
+                    />
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      상품명 (영문)
+                    </label>
+                    <input
+                      type="text"
+                      name="productEnNm"
+                      value={formData.productEnNm}
+                      onChange={handleChange}
+                      placeholder="English product name"
+                      className="w-full px-3 py-1.5 border border-gray-300 rounded-md"
                     />
                   </div>
 
@@ -308,6 +336,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
                     />
                   </div>
 
+                  {sizes.length === 0 && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       수량
@@ -320,9 +349,9 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
                       placeholder="수량 입력"
                       min="0"
                       className="w-full px-3 py-1.5 border border-gray-300 rounded-md"
-                      required
                     />
                   </div>
+                  )}
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -340,7 +369,40 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
                     />
                   </div>
                 </div>
-                <div className="mt-16 flex justify-end space-x-2">
+                {/* 사이즈 관리 */}
+                <div className="pm-size-section">
+                  <div className="pm-size-header">
+                    <span className="pm-size-label">사이즈</span>
+                    <button type="button" className="pm-size-add-btn" onClick={handleAddSize}>+ 추가</button>
+                  </div>
+                  {sizes.length === 0 && (
+                    <p className="pm-size-empty">사이즈를 추가하면 수량 입력 대신 사이즈별 수량으로 관리됩니다.</p>
+                  )}
+                  {sizes.map((s, i) => (
+                    <div key={i} className="pm-size-row">
+                      <input
+                        type="text"
+                        className="pm-size-input-nm"
+                        placeholder="예) S, M, L, 95"
+                        value={s.sizeNm}
+                        onChange={e => handleSizeChange(i, 'sizeNm', e.target.value)}
+                      />
+                      <input
+                        type="number"
+                        className="pm-size-input-qty"
+                        placeholder="수량"
+                        min="0"
+                        value={s.quantity}
+                        onChange={e => handleSizeChange(i, 'quantity', Number(e.target.value))}
+                      />
+                      <button type="button" className="pm-size-remove-btn" onClick={() => handleRemoveSize(i)}>
+                        <X size={13} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 flex justify-end space-x-2">
               {!product  && (
                 <SubmitButton children={"등록"}/>
               )}

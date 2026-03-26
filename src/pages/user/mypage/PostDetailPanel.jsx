@@ -241,6 +241,7 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
                 <div className="detail-product-info">
                   <span className="detail-product-brand">{product.brandNm}</span>
                   <span className="detail-product-name">{product.productNm}</span>
+                  {product.productEnNm && <span className="detail-product-name-en">{product.productEnNm}</span>}
                   <span className="detail-product-price">{product.productPrice?.toLocaleString()}원</span>
                 </div>
               </div>

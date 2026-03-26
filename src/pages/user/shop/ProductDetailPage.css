@@ -136,8 +136,15 @@
   font-size: 20px;
   font-weight: 700;
   color: #222222;
-  margin: 0 0 14px 0;
+  margin: 0 0 4px 0;
   line-height: 1.4;
+}
+
+.detail-name-en {
+  font-size: 13px;
+  font-weight: 400;
+  color: #999999;
+  margin: 0 0 14px 0;
 }
 
 /* 평점 */
@@ -184,6 +191,67 @@
   cursor: default;
 }
 
+/* 사이즈 선택 */
+.detail-size-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.detail-size-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+  white-space: nowrap;
+  padding-top: 6px;
+  min-width: 36px;
+}
+
+.detail-size-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.detail-size-btn {
+  position: relative;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #222;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.detail-size-btn:hover:not(:disabled) {
+  border-color: #222;
+}
+
+.detail-size-btn.active {
+  border-color: #222;
+  background: #222;
+  color: #fff;
+}
+
+.detail-size-btn.sold-out {
+  color: #bbb;
+  border-color: #e5e7eb;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.detail-size-soldout-text {
+  display: block;
+  font-size: 9px;
+  color: #bbb;
+  line-height: 1;
+  margin-top: 1px;
+}
+
 .detail-divider {
   height: 1px;
   background-color: #ebebeb;
@@ -214,6 +282,49 @@
   font-size: 13px;
   font-weight: 500;
   color: #222222;
+}
+
+/* 공유 드롭다운 */
+.detail-share-wrap {
+  position: relative;
+}
+
+.detail-share-dropdown {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  overflow: hidden;
+  min-width: 140px;
+  z-index: 100;
+}
+
+.detail-share-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: #222;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.detail-share-item:hover {
+  background: #f5f5f5;
+}
+
+.detail-share-item + .detail-share-item {
+  border-top: 1px solid #f0f0f0;
 }
 
 /* 액션 버튼 바 */
