@@ -156,15 +156,21 @@ const SalesManagement = ({ user }) => {
         setSelectedPeriodKey(getCurrentPeriodKey(val));
     };
 
-    // 선택된 기간의 상품별 집계
+    // 선택된 기간의 상품별 집계 (사이즈 다르면 별도 행)
     const periodProductStats = useMemo(() => {
         const filtered = validOrders.filter(o => getPeriodKey(o.orderDate, period) === selectedPeriodKey);
         const map = new Map();
         filtered.forEach(o => {
-            const nm = o.productNm || '알 수 없음';
-            if (!map.has(nm)) map.set(nm, { productNm: nm, productImgPath: o.productImgPath || null, quantity: 0, revenue: 0 });
-            map.get(nm).quantity += o.quantity || 1;
-            map.get(nm).revenue += o.totalPrice || 0;
+            const key = `${o.productNm || '알 수 없음'}__${o.sizeNm || ''}`;
+            if (!map.has(key)) map.set(key, {
+                productNm: o.productNm || '알 수 없음',
+                sizeNm: o.sizeNm || null,
+                productImgPath: o.productImgPath || null,
+                quantity: 0,
+                revenue: 0,
+            });
+            map.get(key).quantity += o.quantity || 1;
+            map.get(key).revenue += o.totalPrice || 0;
         });
         return Array.from(map.values()).sort((a, b) => b.revenue - a.revenue);
     }, [validOrders, period, selectedPeriodKey]);
@@ -209,9 +215,9 @@ const SalesManagement = ({ user }) => {
 
         // ── 상품별 매출 (선택 기간) ────────────────
         rows.push([`[ 상품별 매출 — ${selectedPeriodKey} ]`]);
-        rows.push(['순위', '상품명', '판매수량', '매출액']);
+        rows.push(['순위', '상품명', '사이즈', '판매수량', '매출액']);
         periodProductStats.forEach((item, idx) =>
-            rows.push([idx + 1, item.productNm, item.quantity, item.revenue])
+            rows.push([idx + 1, item.productNm, item.sizeNm || '-', item.quantity, item.revenue])
         );
         rows.push([]);
 
@@ -227,9 +233,9 @@ const SalesManagement = ({ user }) => {
 
         // ── 전체 주문 목록 ─────────────────────────
         rows.push(['[ 전체 주문 목록 ]']);
-        rows.push(['주문ID', '주문자', '상품명', '수량', '결제금액', '상태', '주문일시']);
+        rows.push(['주문ID', '주문자', '상품명', '사이즈', '수량', '결제금액', '상태', '주문일시']);
         orders.forEach(o => rows.push([
-            o.id, o.userNm, o.productNm, o.quantity, o.totalPrice,
+            o.id, o.userNm, o.productNm, o.sizeNm || '-', o.quantity, o.totalPrice,
             STATUS_MAP[o.status] || o.status, o.orderDate,
         ]));
 
@@ -376,6 +382,7 @@ const SalesManagement = ({ user }) => {
                                 <tr>
                                     <th>순위</th>
                                     <th>상품</th>
+                                    <th>사이즈</th>
                                     <th>판매수량</th>
                                     <th>매출액</th>
                                     <th>비율</th>
@@ -386,7 +393,7 @@ const SalesManagement = ({ user }) => {
                                     const totalRevenue = periodProductStats.reduce((s, i) => s + i.revenue, 0);
                                     const pct = totalRevenue > 0 ? ((item.revenue / totalRevenue) * 100).toFixed(1) : '0.0';
                                     return (
-                                        <tr key={item.productNm}>
+                                        <tr key={`${item.productNm}__${item.sizeNm || ''}`}>
                                             <td className="sales-product-rank">
                                                 <span className={`sales-rank-badge ${idx < 3 ? `top${idx + 1}` : ''}`}>{idx + 1}</span>
                                             </td>
@@ -395,6 +402,12 @@ const SalesManagement = ({ user }) => {
                                                     <img src={item.productImgPath} alt={item.productNm} className="sales-product-thumb" />
                                                 )}
                                                 <span>{item.productNm}</span>
+                                            </td>
+                                            <td className="sales-product-size">
+                                                {item.sizeNm
+                                                    ? <span className="sales-size-badge">{item.sizeNm}</span>
+                                                    : <span className="sales-size-none">-</span>
+                                                }
                                             </td>
                                             <td className="sales-product-qty">{item.quantity.toLocaleString()}개</td>
                                             <td className="sales-product-revenue">₩{item.revenue.toLocaleString()}</td>

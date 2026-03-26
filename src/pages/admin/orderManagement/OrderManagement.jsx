@@ -246,7 +246,10 @@ const OrderManagement = ({ user }) => {
                                                     </div>
                                                     <div className="order-item-product-info">
                                                         <span className="order-item-brand">{order.userNm}</span>
-                                                        <span className="order-item-name">{order.productNm}</span>
+                                                        <span className="order-item-name">
+                                                            {order.productNm}
+                                                            {order.sizeNm && <span className="order-item-size-badge">{order.sizeNm}</span>}
+                                                        </span>
                                                         <span className="order-item-price">
                                                             ₩{order.totalPrice?.toLocaleString()}
                                                             {order.quantity > 1 && (
@@ -310,6 +313,12 @@ const OrderManagement = ({ user }) => {
                                                                     <span className="order-detail-label">상품명</span>
                                                                     <span>{order.productNm}</span>
                                                                 </div>
+                                                                {order.sizeNm && (
+                                                                    <div className="order-detail-row">
+                                                                        <span className="order-detail-label">사이즈</span>
+                                                                        <span className="order-detail-size">{order.sizeNm}</span>
+                                                                    </div>
+                                                                )}
                                                                 <div className="order-detail-row">
                                                                     <span className="order-detail-label">수량</span>
                                                                     <span>{order.quantity}개</span>

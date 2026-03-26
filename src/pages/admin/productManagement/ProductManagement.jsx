@@ -158,7 +158,7 @@ const ProductManagement = ({ registerTrigger, user }) => {
         toast.success(res.data);
         fetchProducts();
       })
-      .catch(() => toast.error('일괄 등록에 실패했습니다.'))
+      .catch(err => toast.error(err?.response?.data?.msg || '일괄 등록에 실패했습니다.'))
       .finally(() => setUploading(false));
     e.target.value = '';
   };
@@ -214,11 +214,12 @@ const ProductManagement = ({ registerTrigger, user }) => {
               <tr><td>A</td><td>상품명</td><td>텍스트</td><td>슬림 데님 팬츠</td></tr>
               <tr><td>B</td><td>상품코드</td><td>텍스트</td><td>P2024-001</td></tr>
               <tr><td>C</td><td>가격</td><td>숫자(원)</td><td>59000</td></tr>
-              <tr><td>D</td><td>수량</td><td>숫자</td><td>100</td></tr>
+              <tr><td>D</td><td>사이즈/수량</td><td>사이즈:수량 (쉼표 구분)</td><td>S:10,M:20,L:15</td></tr>
               <tr><td>E</td><td>카테고리</td><td>코드</td><td>BOTTOM</td></tr>
               <tr><td>F</td><td>이미지파일명</td><td>텍스트</td><td>image1.jpg</td></tr>
             </tbody>
           </table>
+          <p className="pm-guide-desc" style={{marginTop:'8px', color:'#f59e0b'}}>※ 사이즈/수량은 <strong>사이즈:수량</strong> 형식으로 쉼표로 구분하여 입력하세요. (예: S:10,M:20,L:15,XL:5)</p>
           <div className="pm-guide-categories">
             <span className="pm-guide-label">카테고리 코드</span>
             {[
