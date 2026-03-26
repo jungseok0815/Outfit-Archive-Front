@@ -495,3 +495,24 @@
     align-items: flex-start;
   }
 }
+
+/* 사이즈 배지 */
+.sales-size-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6c5ce7;
+  background: #f0eeff;
+  border-radius: 4px;
+}
+
+.sales-size-none {
+  color: #c0c0c0;
+  font-size: 13px;
+}
+
+.sales-product-size {
+  text-align: center;
+}
