@@ -25,67 +25,123 @@
 
 /* 사이즈 관리 */
 .pm-size-section {
-  margin-top: 12px;
+  margin-top: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #fafafa;
 }
 
 .pm-size-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .pm-size-label {
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   color: #374151;
 }
 
 .pm-size-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 3px;
   font-size: 12px;
   font-weight: 500;
-  color: #222;
-  background: none;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  padding: 2px 8px;
+  color: #fff;
+  background: #222;
+  border: none;
+  border-radius: 5px;
+  padding: 4px 10px;
   cursor: pointer;
   transition: background 0.15s;
 }
 
 .pm-size-add-btn:hover {
-  background: #f4f4f4;
+  background: #444;
 }
 
 .pm-size-empty {
   font-size: 11px;
-  color: #9ca3af;
-  margin: 0;
+  color: #b0b7c0;
+  margin: 4px 0 0;
+  text-align: center;
+  padding: 8px 0 4px;
+}
+
+.pm-size-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.pm-size-list::-webkit-scrollbar {
+  width: 4px;
+}
+.pm-size-list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
 }
 
 .pm-size-row {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 5px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 5px 8px;
+}
+
+.pm-size-row-label {
+  font-size: 11px;
+  color: #9ca3af;
+  white-space: nowrap;
 }
 
 .pm-size-input-nm {
-  width: 90px;
-  padding: 4px 8px;
+  flex: 1;
+  min-width: 0;
+  padding: 3px 7px;
   font-size: 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e5e7eb;
   border-radius: 4px;
   outline: none;
+  background: #f9fafb;
+  transition: border-color 0.15s;
+}
+
+.pm-size-input-nm:focus {
+  border-color: #222;
+  background: #fff;
+}
+
+.pm-size-divider {
+  color: #d1d5db;
+  font-size: 12px;
 }
 
 .pm-size-input-qty {
-  width: 70px;
-  padding: 4px 8px;
+  width: 60px;
+  padding: 3px 7px;
   font-size: 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e5e7eb;
   border-radius: 4px;
   outline: none;
+  background: #f9fafb;
+  text-align: right;
+  transition: border-color 0.15s;
+}
+
+.pm-size-input-qty:focus {
+  border-color: #222;
+  background: #fff;
 }
 
 .pm-size-remove-btn {
@@ -95,11 +151,14 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #9ca3af;
+  color: #d1d5db;
   padding: 2px;
-  transition: color 0.15s;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
 }
 
 .pm-size-remove-btn:hover {
   color: #ef4444;
+  background: #fef2f2;
 }

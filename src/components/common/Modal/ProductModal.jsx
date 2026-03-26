@@ -16,7 +16,6 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
     productNm: "",
     productEnNm: "",
     productPrice : "",
-    productQuantity : "",
     brandId : "",
     productCode : "",
     category: "",
@@ -39,7 +38,6 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
         productNm: product.productNm || "",
         productEnNm: product.productEnNm || "",
         productPrice: product.productPrice || "",
-        productQuantity: product.productQuantity || "",
         brandId: product.brandId || autoBrandId,
         productCode: product.productCode || "",
         category: product.category || "",
@@ -57,7 +55,6 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
         productNm: "",
         productEnNm: "",
         productPrice: "",
-        productQuantity: "",
         brandId: autoBrandId,
         productCode: "",
         category:  "",
@@ -336,23 +333,6 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
                     />
                   </div>
 
-                  {sizes.length === 0 && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      수량
-                    </label>
-                    <input
-                      type="number"
-                      name="productQuantity"
-                      value={formData.productQuantity}
-                      onChange={handleChange}
-                      placeholder="수량 입력"
-                      min="0"
-                      className="w-full px-3 py-1.5 border border-gray-300 rounded-md"
-                    />
-                  </div>
-                  )}
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       가격
@@ -372,34 +352,40 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
                 {/* 사이즈 관리 */}
                 <div className="pm-size-section">
                   <div className="pm-size-header">
-                    <span className="pm-size-label">사이즈</span>
-                    <button type="button" className="pm-size-add-btn" onClick={handleAddSize}>+ 추가</button>
+                    <span className="pm-size-label">사이즈별 수량</span>
+                    <button type="button" className="pm-size-add-btn" onClick={handleAddSize}>+ 사이즈 추가</button>
                   </div>
-                  {sizes.length === 0 && (
-                    <p className="pm-size-empty">사이즈를 추가하면 수량 입력 대신 사이즈별 수량으로 관리됩니다.</p>
-                  )}
-                  {sizes.map((s, i) => (
-                    <div key={i} className="pm-size-row">
-                      <input
-                        type="text"
-                        className="pm-size-input-nm"
-                        placeholder="예) S, M, L, 95"
-                        value={s.sizeNm}
-                        onChange={e => handleSizeChange(i, 'sizeNm', e.target.value)}
-                      />
-                      <input
-                        type="number"
-                        className="pm-size-input-qty"
-                        placeholder="수량"
-                        min="0"
-                        value={s.quantity}
-                        onChange={e => handleSizeChange(i, 'quantity', Number(e.target.value))}
-                      />
-                      <button type="button" className="pm-size-remove-btn" onClick={() => handleRemoveSize(i)}>
-                        <X size={13} />
-                      </button>
+                  {sizes.length === 0 ? (
+                    <p className="pm-size-empty">사이즈를 추가하여 사이즈별 수량을 관리하세요.</p>
+                  ) : (
+                    <div className="pm-size-list">
+                      {sizes.map((s, i) => (
+                        <div key={i} className="pm-size-row">
+                          <span className="pm-size-row-label">사이즈</span>
+                          <input
+                            type="text"
+                            className="pm-size-input-nm"
+                            placeholder="S / M / L / 95"
+                            value={s.sizeNm}
+                            onChange={e => handleSizeChange(i, 'sizeNm', e.target.value)}
+                          />
+                          <span className="pm-size-divider">|</span>
+                          <span className="pm-size-row-label">수량</span>
+                          <input
+                            type="number"
+                            className="pm-size-input-qty"
+                            placeholder="0"
+                            min="0"
+                            value={s.quantity}
+                            onChange={e => handleSizeChange(i, 'quantity', Number(e.target.value))}
+                          />
+                          <button type="button" className="pm-size-remove-btn" onClick={() => handleRemoveSize(i)}>
+                            <X size={13} />
+                          </button>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
 
                 <div className="mt-4 flex justify-end space-x-2">
