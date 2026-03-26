@@ -112,6 +112,12 @@
   color: #aaaaaa;
 }
 
+.order-product-size {
+  font-size: 12px;
+  color: #555;
+  font-weight: 500;
+}
+
 .order-product-price {
   font-size: 15px;
   font-weight: 700;

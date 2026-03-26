@@ -191,6 +191,67 @@
   cursor: default;
 }
 
+/* 사이즈 선택 */
+.detail-size-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.detail-size-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+  white-space: nowrap;
+  padding-top: 6px;
+  min-width: 36px;
+}
+
+.detail-size-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.detail-size-btn {
+  position: relative;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #222;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.detail-size-btn:hover:not(:disabled) {
+  border-color: #222;
+}
+
+.detail-size-btn.active {
+  border-color: #222;
+  background: #222;
+  color: #fff;
+}
+
+.detail-size-btn.sold-out {
+  color: #bbb;
+  border-color: #e5e7eb;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.detail-size-soldout-text {
+  display: block;
+  font-size: 9px;
+  color: #bbb;
+  line-height: 1;
+  margin-top: 1px;
+}
+
 .detail-divider {
   height: 1px;
   background-color: #ebebeb;

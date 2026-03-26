@@ -22,3 +22,84 @@
   0% { transform: translateX(-100%); }
   100% { transform: translateX(350%); }
 }
+
+/* 사이즈 관리 */
+.pm-size-section {
+  margin-top: 12px;
+}
+
+.pm-size-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.pm-size-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.pm-size-add-btn {
+  font-size: 12px;
+  font-weight: 500;
+  color: #222;
+  background: none;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.pm-size-add-btn:hover {
+  background: #f4f4f4;
+}
+
+.pm-size-empty {
+  font-size: 11px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.pm-size-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+.pm-size-input-nm {
+  width: 90px;
+  padding: 4px 8px;
+  font-size: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  outline: none;
+}
+
+.pm-size-input-qty {
+  width: 70px;
+  padding: 4px 8px;
+  font-size: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  outline: none;
+}
+
+.pm-size-remove-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  padding: 2px;
+  transition: color 0.15s;
+}
+
+.pm-size-remove-btn:hover {
+  color: #ef4444;
+}

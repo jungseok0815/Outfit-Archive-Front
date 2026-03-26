@@ -34,6 +34,7 @@ function ProductDetailPage() {
   const [selectedPost, setSelectedPost] = useState(null);
   const [shareOpen, setShareOpen] = useState(false);
   const shareRef = useRef(null);
+  const [selectedSize, setSelectedSize] = useState(null);
 
   useEffect(() => {
     if (!product) {
@@ -159,6 +160,7 @@ function ProductDetailPage() {
       {showOrderModal && (
         <OrderModal
           product={product}
+          selectedSize={selectedSize}
           onClose={() => setShowOrderModal(false)}
         />
       )}
@@ -240,6 +242,26 @@ function ProductDetailPage() {
               </div>
             </div>
 
+            {/* 사이즈 선택 */}
+            {product.sizes?.length > 0 && (
+              <div className="detail-size-section">
+                <span className="detail-size-label">사이즈</span>
+                <div className="detail-size-list">
+                  {product.sizes.map(s => (
+                    <button
+                      key={s.sizeNm}
+                      className={`detail-size-btn ${selectedSize?.sizeNm === s.sizeNm ? 'active' : ''} ${s.quantity === 0 ? 'sold-out' : ''}`}
+                      onClick={() => s.quantity > 0 && setSelectedSize(s)}
+                      disabled={s.quantity === 0}
+                    >
+                      {s.sizeNm}
+                      {s.quantity === 0 && <span className="detail-size-soldout-text">품절</span>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="detail-divider" />
 
             {/* 액션 버튼 */}
@@ -279,13 +301,25 @@ function ProductDetailPage() {
                   </div>
                 )}
               </div>
-              <button
-                className="detail-buy-btn"
-                onClick={handleBuyClick}
-                disabled={product.productQuantity === 0}
-              >
-                {product.productQuantity === 0 ? "품절" : "구매하기"}
-              </button>
+              {(() => {
+                const hasSizes = product.sizes?.length > 0;
+                const isSoldOut = hasSizes
+                  ? product.sizes.every(s => s.quantity === 0)
+                  : product.productQuantity === 0;
+                return (
+                  <button
+                    className="detail-buy-btn"
+                    onClick={handleBuyClick}
+                    disabled={isSoldOut || (hasSizes && !selectedSize)}
+                  >
+                    {isSoldOut
+                      ? "품절"
+                      : hasSizes && !selectedSize
+                      ? "사이즈 선택"
+                      : "구매하기"}
+                  </button>
+                );
+              })()}
             </div>
           </div>
         </div>
