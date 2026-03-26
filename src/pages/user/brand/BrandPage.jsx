@@ -42,6 +42,7 @@ function BrandPage() {
     image: p.images?.length > 0 ? p.images[0].imgPath : '',
     brand: p.brandNm,
     name: p.productNm,
+    enName: p.productEnNm,
     price: p.productPrice?.toLocaleString(),
     _raw: p,
   });

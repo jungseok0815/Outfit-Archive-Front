@@ -457,11 +457,12 @@ function MyPage() {
                     <div className="mypage-order-info">
                       {order.brandNm && <span className="mypage-order-brand">{order.brandNm}</span>}
                       <span className="mypage-order-product">{order.productNm}</span>
+                      {order.productEnNm && <span className="mypage-order-product-en">{order.productEnNm}</span>}
                       <span className="mypage-order-qty">수량 {order.quantity}개</span>
                     </div>
                     <strong className="mypage-order-price">{order.totalPrice?.toLocaleString()}원</strong>
                   </div>
-                  {order.status === 'SHIPPING' && order.trackingNumber && (
+                  {order.status === 'SHIPPING' && (
                     <div className="mypage-order-tracking">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3" />
@@ -469,8 +470,20 @@ function MyPage() {
                         <circle cx="12" cy="16" r="1" />
                         <circle cx="20" cy="16" r="1" />
                       </svg>
-                      <span className="mypage-order-tracking-label">송장번호</span>
-                      <span className="mypage-order-tracking-number">{order.trackingNumber}</span>
+                      {order.trackingNumber ? (
+                        <>
+                          <span className="mypage-order-tracking-label">송장번호</span>
+                          <span className="mypage-order-tracking-number">{order.trackingNumber}</span>
+                          <button
+                            className="mypage-order-tracking-btn"
+                            onClick={() => window.open(`https://search.naver.com/search.naver?query=${order.trackingNumber}`, '_blank')}
+                          >
+                            배송 조회
+                          </button>
+                        </>
+                      ) : (
+                        <span className="mypage-order-tracking-label">배송 준비 중</span>
+                      )}
                     </div>
                   )}
                   {(order.recipientName || order.shippingAddress) && (
@@ -601,6 +614,7 @@ function MyPage() {
                   <div className="mypage-wishlist-info" onClick={() => navigate(`/shop/${item.productId}`)}>
                     <span className="mypage-wishlist-brand">{item.brandNm}</span>
                     <p className="mypage-wishlist-name">{item.productNm}</p>
+                    {item.productEnNm && <p className="mypage-wishlist-name-en">{item.productEnNm}</p>}
                     <span className="mypage-wishlist-price">{item.productPrice?.toLocaleString()}원</span>
                   </div>
                   <button

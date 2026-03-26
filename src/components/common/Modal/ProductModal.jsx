@@ -14,6 +14,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
   const [formData, setFormData] = useState({
     id : "",
     productNm: "",
+    productEnNm: "",
     productPrice : "",
     productQuantity : "",
     brandId : "",
@@ -34,6 +35,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
       setFormData({
         id : product.id || "",
         productNm: product.productNm || "",
+        productEnNm: product.productEnNm || "",
         productPrice: product.productPrice || "",
         productQuantity: product.productQuantity || "",
         brandId: product.brandId || autoBrandId,
@@ -50,6 +52,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
       setFormData({
         id : "",
         productNm: "",
+        productEnNm: "",
         productPrice: "",
         productQuantity: "",
         brandId: autoBrandId,
@@ -259,7 +262,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      상품명
+                      상품명 (한글)
                     </label>
                     <input
                       type="text"
@@ -269,6 +272,20 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
                       placeholder="상품명을 입력하세요"
                       className="w-full px-3 py-1.5 border border-gray-300 rounded-md"
                       required
+                    />
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      상품명 (영문)
+                    </label>
+                    <input
+                      type="text"
+                      name="productEnNm"
+                      value={formData.productEnNm}
+                      onChange={handleChange}
+                      placeholder="English product name"
+                      className="w-full px-3 py-1.5 border border-gray-300 rounded-md"
                     />
                   </div>
 

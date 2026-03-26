@@ -87,6 +87,7 @@ function App() {
           image: p.images?.length > 0 ? p.images[0].imgPath : '',
           brand: p.brandNm,
           name: p.productNm,
+          enName: p.productEnNm,
           price: p.productPrice?.toLocaleString(),
           _raw: p,
         })));
@@ -120,6 +121,7 @@ function App() {
           image: p.images?.length > 0 ? p.images[0].imgPath : '',
           brand: p.brandNm,
           name: p.productNm,
+          enName: p.productEnNm,
           price: p.productPrice?.toLocaleString(),
           _raw: p,
         })));
@@ -177,10 +179,21 @@ function App() {
       <div className="hero-container">
         <div className="hero-slider">
           {heroSlides.map((slide, index) => (
-            <div key={index} className={`hero-slide ${index === heroIndex ? 'active' : ''}`}>
-              <h1>{slide.title} <span>{slide.highlight}</span></h1>
-              <p>{slide.description}</p>
-              <button>{slide.buttonText}</button>
+            <div
+              key={index}
+              className={`hero-slide ${index === heroIndex ? 'active' : ''} ${slide.imgPath ? 'has-image' : ''}`}
+              style={slide.imgPath ? { backgroundImage: `url(${slide.imgPath})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+            >
+              {slide.imgPath && <div className="hero-slide-dim" />}
+              <div className="hero-slide-content">
+                <h1>{slide.title} <span>{slide.highlight}</span></h1>
+                <p>{slide.description}</p>
+                {slide.buttonText && (
+                  <button onClick={() => slide.buttonUrl && navigate(slide.buttonUrl)}>
+                    {slide.buttonText}
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>

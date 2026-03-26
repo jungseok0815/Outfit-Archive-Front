@@ -53,6 +53,7 @@ function ProductCard({ product, rank, isWished = false }) {
               {product.brand}
             </span>
             <p className="card-name">{product.name}</p>
+            {product.enName && <p className="card-name-en">{product.enName}</p>}
           </div>
           <button
             className={`card-wishlist-btn ${wishlisted ? 'active' : ''}`}

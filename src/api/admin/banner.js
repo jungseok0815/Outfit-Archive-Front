@@ -8,6 +8,7 @@ export const InsertBanner = (data, image) => {
     form.append('highlight', data.highlight || '');
     form.append('description', data.description || '');
     form.append('buttonText', data.buttonText || '');
+    form.append('buttonUrl', data.buttonUrl || '');
     form.append('sortOrder', data.sortOrder);
     form.append('active', data.active);
     if (image) form.append('image', image);
@@ -23,6 +24,7 @@ export const UpdateBanner = (data, image) => {
     form.append('highlight', data.highlight || '');
     form.append('description', data.description || '');
     form.append('buttonText', data.buttonText || '');
+    form.append('buttonUrl', data.buttonUrl || '');
     form.append('sortOrder', data.sortOrder);
     form.append('active', data.active);
     if (image) form.append('image', image);

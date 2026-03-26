@@ -107,6 +107,11 @@
   color: #222;
 }
 
+.order-product-name-en {
+  font-size: 12px;
+  color: #aaaaaa;
+}
+
 .order-product-price {
   font-size: 15px;
   font-weight: 700;

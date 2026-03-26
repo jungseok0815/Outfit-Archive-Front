@@ -169,6 +169,7 @@ function OrderModal({ product, onClose }) {
             <div className="order-product-info">
               <span className="order-product-brand">{product.brandNm}</span>
               <span className="order-product-name">{product.productNm}</span>
+              {product.productEnNm && <span className="order-product-name-en">{product.productEnNm}</span>}
               <span className="order-product-price">{product.productPrice?.toLocaleString()}원</span>
             </div>
           </div>
