@@ -124,6 +124,10 @@ function MyPage() {
 
   const handleCouponIssue = () => {
     if (!couponCode.trim()) { toast.error('쿠폰 코드를 입력해주세요.'); return; }
+    if (coupons.some(c => c.couponCode === couponCode.trim())) {
+      toast.error('이미 보유하거나 사용한 쿠폰입니다.');
+      return;
+    }
     setCouponIssuing(true);
     IssueCoupon(couponCode.trim())
       .then(() => {
@@ -668,7 +672,8 @@ function MyPage() {
               <p className="mypage-coupon-empty">보유한 쿠폰이 없습니다.</p>
             ) : (
               coupons.map((c) => (
-                <div key={c.userCouponId} className="mypage-coupon-card">
+                <div key={c.userCouponId} className={`mypage-coupon-card${c.isUsed ? ' mypage-coupon-card--used' : ''}`}>
+                  {c.isUsed && <span className="mypage-coupon-used-badge">사용완료</span>}
                   <div className="mypage-coupon-card-left">
                     <span className="mypage-coupon-card-name">{c.couponName}</span>
                     <span className="mypage-coupon-card-code">{c.couponCode}</span>
