@@ -8,10 +8,10 @@ const BrandManagement = ({ registerTrigger }) => {
     const [brands, setBrands] = useState([]);
     const [products, setProducts] = useState([]);
     const [keyword, setKeyword] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [initialLoading, setInitialLoading] = useState(true);
 
-    const loadData = async () => {
-        setLoading(true);
+    const loadData = async (isRefresh = false) => {
+        if (!isRefresh) setInitialLoading(true);
         try {
             const [brandsRes, productsRes] = await Promise.all([
                 ListBrand(keyword),
@@ -21,7 +21,7 @@ const BrandManagement = ({ registerTrigger }) => {
             setProducts(productsRes.data.content || []);
         } catch (e) {
         } finally {
-            setLoading(false);
+            if (!isRefresh) setInitialLoading(false);
         }
     };
 
@@ -48,9 +48,9 @@ const BrandManagement = ({ registerTrigger }) => {
             <BrandManagementSearchbar keyword={keyword} setKeyword={setKeyword} />
             <BrandManagementContent
                 brands={brandsWithProducts}
-                loading={loading}
+                loading={initialLoading}
                 registerTrigger={registerTrigger}
-                onRefresh={loadData}
+                onRefresh={() => loadData(true)}
             />
         </div>
     );

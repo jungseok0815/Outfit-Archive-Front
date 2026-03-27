@@ -214,6 +214,26 @@
   white-space: nowrap;
 }
 
+/* 쿠폰 */
+.order-coupon-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.order-coupon-select {
+  width: 100%;
+  cursor: pointer;
+  background: #fff;
+}
+
+.order-coupon-warn {
+  font-size: 12px;
+  color: #e74c3c;
+  margin: 0;
+}
+
 /* 결제 요약 */
 .order-summary {
   border-top: 1px solid #ebebeb;

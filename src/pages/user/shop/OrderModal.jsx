@@ -4,6 +4,7 @@ import DaumPostcode from "react-daum-postcode";
 import { InsertOrder } from "../../../api/user/order";
 import { DirectCompleteOrder } from "../../../api/user/payment";
 import { GetPoint } from "../../../api/user/point";
+import { GetMyCoupons } from "../../../api/user/coupon";
 import "./OrderModal.css";
 
 // const TOSS_CLIENT_KEY = "test_ck_zXLkKEypNArWmo50nX3lmeaxYG5R"; // 토스 결제 비활성화
@@ -20,14 +21,24 @@ function OrderModal({ product, selectedSize, onClose }) {
   });
   const [showPostcode, setShowPostcode] = useState(false);
   const [availablePoint, setAvailablePoint] = useState(0);
+  const [coupons, setCoupons] = useState([]);
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [orderResult, setOrderResult] = useState(null); // 결제 완료 결과
+  const [appliedCouponDiscount, setAppliedCouponDiscount] = useState(0);
   const detailAddressRef = useRef(null);
 
   useEffect(() => {
     GetPoint()
       .then(res => setAvailablePoint(res.data.point || 0))
+      .catch(() => {});
+    GetMyCoupons()
+      .then(res => {
+        const now = new Date();
+        const valid = (res.data || []).filter(c => !c.isUsed && new Date(c.expiredAt) >= now);
+        setCoupons(valid);
+      })
       .catch(() => {});
   }, []);
 
@@ -54,8 +65,26 @@ function OrderModal({ product, selectedSize, onClose }) {
   };
 
   const totalPrice = product.productPrice * form.quantity;
-  const usePoint = Math.min(Number(form.usePoint) || 0, availablePoint, totalPrice);
-  const finalPrice = Math.max(0, totalPrice - usePoint);
+
+  const couponDiscount = (() => {
+    if (!selectedCoupon || totalPrice < (selectedCoupon.minOrderPrice || 0)) return 0;
+    if (selectedCoupon.discountType === 'FIXED') {
+      return Math.min(selectedCoupon.discountValue, totalPrice);
+    }
+    const d = Math.floor(totalPrice * selectedCoupon.discountValue / 100);
+    return selectedCoupon.maxDiscountPrice ? Math.min(d, selectedCoupon.maxDiscountPrice) : d;
+  })();
+
+  const priceAfterCoupon = Math.max(0, totalPrice - couponDiscount);
+  const usePoint = Math.min(Number(form.usePoint) || 0, availablePoint, priceAfterCoupon);
+  const finalPrice = Math.max(0, priceAfterCoupon - usePoint);
+
+  const formatCouponLabel = (c) => {
+    const discount = c.discountType === 'FIXED'
+      ? `${c.discountValue.toLocaleString()}원 할인`
+      : `${c.discountValue}% 할인${c.maxDiscountPrice ? ` (최대 ${c.maxDiscountPrice.toLocaleString()}원)` : ''}`;
+    return `${c.couponName} — ${discount}`;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,7 +105,9 @@ function OrderModal({ product, selectedSize, onClose }) {
         shippingAddress: `[${form.zipCode}] ${form.baseAddress} ${form.detailAddress}`.trim(),
         usePoint,
         sizeNm: selectedSize?.sizeNm || null,
+        userCouponId: selectedCoupon?.userCouponId || null,
       });
+      setAppliedCouponDiscount(couponDiscount);
 
       const { tossOrderId } = res.data;
 
@@ -130,6 +161,12 @@ function OrderModal({ product, selectedSize, onClose }) {
                 <span>결제 금액</span>
                 <span>{orderResult.actualPayment?.toLocaleString()}원</span>
               </div>
+              {appliedCouponDiscount > 0 && (
+                <div className="order-success-row">
+                  <span>쿠폰 할인</span>
+                  <span>− {appliedCouponDiscount.toLocaleString()}원</span>
+                </div>
+              )}
               {orderResult.usedPoint > 0 && (
                 <div className="order-success-row">
                   <span>포인트 사용</span>
@@ -268,6 +305,40 @@ function OrderModal({ product, selectedSize, onClose }) {
               </div>
             )}
 
+            {/* 쿠폰 */}
+            <div className="order-field">
+              <label className="order-label">쿠폰</label>
+              <div className="order-coupon-wrap">
+                {coupons.length === 0 ? (
+                  <span className="order-point-available">사용 가능한 쿠폰이 없습니다</span>
+                ) : (
+                  <>
+                    <select
+                      className="order-input order-coupon-select"
+                      value={selectedCoupon?.userCouponId || ''}
+                      onChange={(e) => {
+                        const c = coupons.find(c => String(c.userCouponId) === e.target.value);
+                        setSelectedCoupon(c || null);
+                      }}
+                    >
+                      <option value="">쿠폰 선택 안함</option>
+                      {coupons.map(c => {
+                        const applicable = totalPrice >= (c.minOrderPrice || 0);
+                        return (
+                          <option key={c.userCouponId} value={c.userCouponId} disabled={!applicable}>
+                            {formatCouponLabel(c)}{!applicable ? ` (${c.minOrderPrice.toLocaleString()}원 이상)` : ''}
+                          </option>
+                        );
+                      })}
+                    </select>
+                    {selectedCoupon && totalPrice < (selectedCoupon.minOrderPrice || 0) && (
+                      <p className="order-coupon-warn">최소 주문금액 {selectedCoupon.minOrderPrice.toLocaleString()}원 이상 구매 시 사용 가능합니다.</p>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+
             {/* 포인트 사용 */}
             <div className="order-field">
               <label className="order-label">포인트</label>
@@ -292,6 +363,12 @@ function OrderModal({ product, selectedSize, onClose }) {
                 <span>상품금액</span>
                 <span>{totalPrice.toLocaleString()}원</span>
               </div>
+              {couponDiscount > 0 && (
+                <div className="order-summary-row discount">
+                  <span>쿠폰 할인</span>
+                  <span>− {couponDiscount.toLocaleString()}원</span>
+                </div>
+              )}
               {usePoint > 0 && (
                 <div className="order-summary-row discount">
                   <span>포인트 할인</span>

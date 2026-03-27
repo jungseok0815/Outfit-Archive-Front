@@ -420,6 +420,17 @@
   min-width: 55px;
 }
 
+.order-detail-discount {
+  color: #e74c3c;
+}
+
+.order-detail-total {
+  font-weight: 600;
+  color: #111827;
+  padding-top: 6px;
+  border-top: 1px solid #e5e7eb;
+}
+
 /* ===== 운송장 정보 ===== */
 .order-shipping-card {
   background: #ffffff;

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ChevronDown, Edit2, Package, X } from 'lucide-react';
 import BrandItemCard from './BrandItemCard';
 import ProductModal from '../../common/Modal/ProductModal';
@@ -14,6 +14,8 @@ const BrandAccordion = ({ brand, id, onRefresh }) => {
     const [showEditForm, setShowEditForm] = useState(false);
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
+
+    const userForModal = useMemo(() => ({ brandNm: brand.brandNm, brandId: id }), [brand.brandNm, id]);
 
     const totalStock = brand.products?.reduce((sum, p) => sum + p.productQuantity, 0) || 0;
     const productCount = brand.products?.length || 0;
@@ -143,7 +145,7 @@ const BrandAccordion = ({ brand, id, onRefresh }) => {
                 onClose={() => { setIsProductModalOpen(false); setSelectedProduct(null); }}
                 updateProduct={onRefresh}
                 product={selectedProduct}
-                user={{ brandNm: brand.brandNm, brandId: id }}
+                user={userForModal}
             />
 
             {/* 브랜드 수정 모달 */}

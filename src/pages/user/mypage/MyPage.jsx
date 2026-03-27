@@ -124,6 +124,10 @@ function MyPage() {
 
   const handleCouponIssue = () => {
     if (!couponCode.trim()) { toast.error('쿠폰 코드를 입력해주세요.'); return; }
+    if (coupons.some(c => c.couponCode === couponCode.trim())) {
+      toast.error('이미 보유하거나 사용한 쿠폰입니다.');
+      return;
+    }
     setCouponIssuing(true);
     IssueCoupon(couponCode.trim())
       .then(() => {
@@ -460,8 +464,34 @@ function MyPage() {
                       {order.productEnNm && <span className="mypage-order-product-en">{order.productEnNm}</span>}
                       <span className="mypage-order-qty">수량 {order.quantity}개</span>
                     </div>
-                    <strong className="mypage-order-price">{order.totalPrice?.toLocaleString()}원</strong>
+                    <strong className="mypage-order-price">{(order.actualPayment ?? order.totalPrice)?.toLocaleString()}원</strong>
                   </div>
+                  {(order.couponDiscount > 0 || order.usedPoint > 0 || order.earnedPoint > 0) && (
+                    <div className="mypage-order-payment-detail">
+                      <div className="mypage-order-payment-row">
+                        <span>상품금액</span>
+                        <span>{order.totalPrice?.toLocaleString()}원</span>
+                      </div>
+                      {order.couponDiscount > 0 && (
+                        <div className="mypage-order-payment-row discount">
+                          <span>쿠폰 할인</span>
+                          <span>− {order.couponDiscount?.toLocaleString()}원</span>
+                        </div>
+                      )}
+                      {order.usedPoint > 0 && (
+                        <div className="mypage-order-payment-row discount">
+                          <span>포인트 사용</span>
+                          <span>− {order.usedPoint?.toLocaleString()}P</span>
+                        </div>
+                      )}
+                      {order.earnedPoint > 0 && (
+                        <div className="mypage-order-payment-row earn">
+                          <span>포인트 적립</span>
+                          <span>+ {order.earnedPoint?.toLocaleString()}P</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   {order.status === 'SHIPPING' && (
                     <div className="mypage-order-tracking">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -668,7 +698,8 @@ function MyPage() {
               <p className="mypage-coupon-empty">보유한 쿠폰이 없습니다.</p>
             ) : (
               coupons.map((c) => (
-                <div key={c.userCouponId} className="mypage-coupon-card">
+                <div key={c.userCouponId} className={`mypage-coupon-card${c.isUsed ? ' mypage-coupon-card--used' : ''}`}>
+                  {c.isUsed && <span className="mypage-coupon-used-badge">사용완료</span>}
                   <div className="mypage-coupon-card-left">
                     <span className="mypage-coupon-card-name">{c.couponName}</span>
                     <span className="mypage-coupon-card-code">{c.couponCode}</span>
