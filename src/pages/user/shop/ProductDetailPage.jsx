@@ -128,6 +128,8 @@ function ProductDetailPage() {
   const handleNext = () =>
     setImgIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
 
+  const isDiscontinued = product?.hidden === true;
+
   const handleBuyClick = () => {
     if (!user) { setShowAuthModal(true); return; }
     setShowOrderModal(true);
@@ -202,6 +204,12 @@ function ProductDetailPage() {
 
           {/* 상품 정보 */}
           <div className="detail-info">
+            {isDiscontinued && (
+              <div style={{ background: '#f1f3f5', border: '1px solid #dee2e6', borderRadius: '8px', padding: '12px 16px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '16px' }}>🚫</span>
+                <span style={{ fontSize: '14px', color: '#495057', fontWeight: 500 }}>더 이상 판매하지 않는 상품입니다.</span>
+              </div>
+            )}
             {/* 브랜드 + 상품명 */}
             <div
               className="detail-brand"
@@ -310,9 +318,11 @@ function ProductDetailPage() {
                   <button
                     className="detail-buy-btn"
                     onClick={handleBuyClick}
-                    disabled={isSoldOut || (hasSizes && !selectedSize)}
+                    disabled={isDiscontinued || isSoldOut || (hasSizes && !selectedSize)}
                   >
-                    {isSoldOut
+                    {isDiscontinued
+                      ? "판매 중단"
+                      : isSoldOut
                       ? "품절"
                       : hasSizes && !selectedSize
                       ? "사이즈 선택"

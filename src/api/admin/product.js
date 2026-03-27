@@ -23,6 +23,10 @@ export const DeleteProduct = (productId) => {
     return api.delete('/api/admin/product/delete', { params: { id: productId } });
 }
 
+export const HideProduct = (productId) => {
+    return api.put('/api/admin/product/hide', null, { params: { id: productId } });
+}
+
 export const BulkInsertProduct = (zipFile, brandId = null) => {
     const form = new FormData();
     form.append('file', zipFile);

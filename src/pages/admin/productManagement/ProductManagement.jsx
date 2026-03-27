@@ -238,7 +238,7 @@ const ProductManagement = ({ registerTrigger, user }) => {
         </div>
       </div>
 
-      <Content products={pagedProducts} openModal={handleOpenModal} selectedIds={selectedIds} onToggleSelect={handleToggleSelect}/>
+      <Content products={pagedProducts} openModal={handleOpenModal} selectedIds={selectedIds} onToggleSelect={handleToggleSelect} onHideToggle={fetchProducts}/>
 
       {/* 페이징 */}
       {totalProducts > 0 && (

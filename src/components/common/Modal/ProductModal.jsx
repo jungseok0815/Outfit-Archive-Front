@@ -2,7 +2,7 @@ import {useState,useEffect } from "react";
 import Modal from "./Modal";
 import ConfirmModal from "./ConfirmModal";
 import "./ProductModal.css";
-import { InsertProduct, UpdateProduct, DeleteProduct} from "../../../api/admin/product";
+import { InsertProduct, UpdateProduct, DeleteProduct, HideProduct } from "../../../api/admin/product";
 import { ImagePlus, X } from 'lucide-react'
 import { toast } from "react-toastify";
 import { CancelButton, DeleteButton, SubmitButton } from "../Button/Button";
@@ -11,6 +11,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [formData, setFormData] = useState({
     id : "",
     productNm: "",
@@ -49,6 +50,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
       setNewFiles([]);
       setNewPreviews([]);
       setSizes(product.sizes?.map(s => ({ sizeNm: s.sizeNm, quantity: s.quantity })) || []);
+      setHidden(product.hidden || false);
     } else {
       setFormData({
         id : "",
@@ -64,8 +66,19 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
       setNewFiles([]);
       setNewPreviews([]);
       setSizes([]);
+      setHidden(false);
     }
   }, [product, user]);
+
+  const handleToggleHidden = () => {
+    HideProduct(formData.id)
+      .then(res => {
+        setHidden(res.data);
+        updateProduct();
+        toast.success(res.data ? '상품이 숨김 처리되었습니다.' : '상품이 노출 처리되었습니다.');
+      })
+      .catch(() => toast.error('처리에 실패했습니다.'));
+  };
 
 
   const handleChange = (e) => {
@@ -395,7 +408,16 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
               {product  && (
                 <SubmitButton children={"수정"}/>
               )}
-               {product  && (
+               {product && (
+                <button
+                  type="button"
+                  onClick={handleToggleHidden}
+                  className={`px-3 py-1.5 rounded text-sm font-medium border ${hidden ? 'bg-green-500 text-white border-green-500' : 'bg-gray-100 text-gray-600 border-gray-300'}`}
+                >
+                  {hidden ? '👁 노출하기' : '🚫 숨김처리'}
+                </button>
+              )}
+              {product && user?.adminRole !== 'PARTNER' && (
                 <DeleteButton onClick={handlerDeleteProduct} children={"삭제"}/>
               )}
               <CancelButton onClick={onClose} children={"취소"}/>
