@@ -324,8 +324,24 @@ const OrderManagement = ({ user }) => {
                                                                     <span>{order.quantity}개</span>
                                                                 </div>
                                                                 <div className="order-detail-row">
-                                                                    <span className="order-detail-label">결제금액</span>
+                                                                    <span className="order-detail-label">상품금액</span>
                                                                     <span>₩{order.totalPrice?.toLocaleString()}</span>
+                                                                </div>
+                                                                {order.couponDiscount > 0 && (
+                                                                    <div className="order-detail-row order-detail-discount">
+                                                                        <span className="order-detail-label">쿠폰 할인</span>
+                                                                        <span>− ₩{order.couponDiscount?.toLocaleString()}</span>
+                                                                    </div>
+                                                                )}
+                                                                {order.usedPoint > 0 && (
+                                                                    <div className="order-detail-row order-detail-discount">
+                                                                        <span className="order-detail-label">포인트 사용</span>
+                                                                        <span>− {order.usedPoint?.toLocaleString()}P</span>
+                                                                    </div>
+                                                                )}
+                                                                <div className="order-detail-row order-detail-total">
+                                                                    <span className="order-detail-label">실결제금액</span>
+                                                                    <span>₩{(order.actualPayment ?? order.totalPrice)?.toLocaleString()}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
