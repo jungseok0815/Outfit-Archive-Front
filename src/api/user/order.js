@@ -1,7 +1,7 @@
 import api from '../api';
 
 // POST /api/usr/order → ResponseUserOrderDto
-// Body: { productId, quantity, shippingAddress, recipientName, recipientPhone, usePoint }
+// Body: { productId, quantity, shippingAddress, recipientName, recipientPhone, usePoint, sizeNm, userCouponId }
 export const InsertOrder = (orderForm) =>
     api.post('/api/usr/order', orderForm);
 
