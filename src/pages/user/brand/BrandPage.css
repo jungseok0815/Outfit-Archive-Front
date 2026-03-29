@@ -1,78 +1,125 @@
-/* 히어로 섹션 */
-.brand-hero {
-  width: 100%;
-  height: 360px;
-  position: relative;
-  background-color: #111;
-  overflow: hidden;
+/* 전체 컨텐츠 래퍼 */
+.brand-content-wrap {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
-.brand-hero-img {
+/* 배너 섹션 */
+.brand-banner-wrap {
+  width: 100%;
+  position: relative;
+}
+
+.brand-banner-bg {
+  width: 100%;
+  height: 280px;
+  overflow: hidden;
+  background-color: #e5e7eb;
+}
+
+.brand-banner-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.6;
 }
 
-.brand-hero-placeholder {
+.brand-banner-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+  background: linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%);
 }
 
-.brand-hero-overlay {
-  position: absolute;
-  inset: 0;
+.brand-banner-bottom {
   display: flex;
-  flex-direction: column;
+  align-items: flex-end;
+  padding: 0 40px;
+  position: relative;
+  margin-top: -40px;
+}
+
+/* 로고 */
+.brand-logo-wrap {
+  width: 88px;
+  height: 88px;
+  border-radius: 16px;
+  border: 3px solid #fff;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  flex-shrink: 0;
+}
+
+.brand-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.brand-logo-placeholder {
+  width: 100%;
+  height: 100%;
+  background: #f3f4f6;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 20px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #9ca3af;
 }
 
-.brand-hero-name {
-  font-size: 2.8rem;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: 0.02em;
-  text-align: center;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+/* 브랜드 정보 섹션 */
+.brand-info-section {
+  padding: 16px 40px 32px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.brand-hero-meta {
+.brand-info-name-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.brand-info-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+}
+
+.brand-verified-badge {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.brand-info-desc {
   font-size: 0.9rem;
-  color: rgba(255,255,255,0.8);
-}
-
-/* 소개 섹션 */
-.brand-intro {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 40px 20px;
-  text-align: center;
-}
-
-.brand-intro-desc {
-  font-size: 1rem;
   color: #555;
-  line-height: 1.8;
+  line-height: 1.7;
   white-space: pre-line;
+  margin: 0 0 12px;
+  text-align: left;
 }
 
-.brand-intro-divider {
-  width: 40px;
-  height: 2px;
-  background: #222;
-  margin: 0 auto 24px;
+.brand-info-meta-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.brand-info-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  color: #888;
 }
 
 /* 상품 섹션 */
 .brand-products-section {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 20px 60px;
   border-top: 1px solid #eee;

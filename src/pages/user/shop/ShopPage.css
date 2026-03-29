@@ -18,6 +18,63 @@
   margin: 0;
 }
 
+.shop-ai-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 20px;
+  font-size: 0.85em;
+  font-weight: 500;
+  color: #999999;
+  background-color: #ffffff;
+  border: 1px solid #ebebeb;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.shop-ai-btn:hover {
+  color: #222222;
+  border-color: #d5d5d5;
+}
+
+.shop-ai-btn.active {
+  background-color: #222222;
+  color: #ffffff;
+  border-color: #222222;
+}
+
+/* AI 모드 툴바 레이블 */
+.shop-ai-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6c5ce7;
+}
+
+/* AI 추천 카드 래퍼 (추천 이유 배지 포함) */
+.shop-ai-card-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.shop-ai-reason {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 5px 8px;
+  background: #f5f3ff;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #6c5ce7;
+  line-height: 1.4;
+}
+
 /* 검색바 */
 .shop-search-container {
   display: flex;
