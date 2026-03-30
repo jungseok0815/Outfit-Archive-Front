@@ -87,7 +87,12 @@
   font-weight: 400;
 }
 
-.hero-slide button {
+.hero-slide-btn {
+  position: absolute;
+  bottom: 52px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
   padding: 14px 40px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -99,10 +104,20 @@
   letter-spacing: 1px;
   text-transform: uppercase;
   transition: background-color 0.2s ease;
+  white-space: nowrap;
 }
 
-.hero-slide button:hover {
+.hero-slide-btn:hover {
   background-color: #000000;
+}
+
+.hero-slide.has-image .hero-slide-btn {
+  background-color: #ffffff;
+  color: #222222;
+}
+
+.hero-slide.has-image .hero-slide-btn:hover {
+  background-color: #f0f0f0;
 }
 
 .slider-button {
