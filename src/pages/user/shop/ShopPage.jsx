@@ -4,6 +4,7 @@ import AuthModal from '../auth/AuthPage';
 import ProductCard from '../../../components/user/card/ProductCard';
 import { ListProduct } from '../../../api/user/product';
 import { GetWishlistProductIds } from '../../../api/user/wishlist';
+import { RecommendProducts } from '../../../api/user/recommend';
 import { useAuth } from '../../../store/context/UserContext';
 import "../../../App.css";
 import "./ShopPage.css";
@@ -40,13 +41,17 @@ function ShopPage() {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
 
+  // AI 추천 모드
+  const [aiMode, setAiMode] = useState(false);
+  const [aiProducts, setAiProducts] = useState([]);
+  const [aiLoading, setAiLoading] = useState(false);
+
   useEffect(() => {
     if (!user) return;
     GetWishlistProductIds()
       .then(setWishlistedIds)
       .catch(() => {});
   }, [user]);
-
 
   const debounceRef = useRef(null);
   const observerRef = useRef(null);
@@ -65,8 +70,23 @@ function ShopPage() {
     _raw: p,
   });
 
+  const mapAiProduct = (p) => ({
+    id: p.productId,
+    image: p.imgPath || '',
+    brand: p.brandNm,
+    name: p.productNm,
+    enName: null,
+    price: p.productPrice?.toLocaleString(),
+    category: CATEGORY_KOR[p.category] || p.category,
+    reviewCount: p.reviewCount || 0,
+    orderCount: p.orderCount || 0,
+    reason: p.reason,
+    _raw: { id: p.productId },
+  });
+
   // 첫 페이지 로드 (검색어·카테고리 변경 시 리셋)
   useEffect(() => {
+    if (aiMode) return;
     setProducts([]);
     setPage(0);
     setHasMore(true);
@@ -86,11 +106,11 @@ function ShopPage() {
         setLoading(false);
         loadingRef.current = false;
       });
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, aiMode]);
 
   // 다음 페이지 로드
   const loadMore = useCallback(() => {
-    if (loadingRef.current || !hasMore) return;
+    if (loadingRef.current || !hasMore || aiMode) return;
 
     const nextPage = page + 1;
     setPage(nextPage);
@@ -107,7 +127,7 @@ function ShopPage() {
       .finally(() => {
         loadingRef.current = false;
       });
-  }, [page, hasMore, searchQuery, selectedCategory]);
+  }, [page, hasMore, searchQuery, selectedCategory, aiMode]);
 
   // IntersectionObserver — 하단 감지 시 다음 페이지 로드
   const sentinelRef = useCallback(node => {
@@ -115,9 +135,7 @@ function ShopPage() {
     if (!node) return;
 
     observerRef.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) {
-        loadMore();
-      }
+      if (entries[0].isIntersecting) loadMore();
     }, { threshold: 0.1 });
 
     observerRef.current.observe(node);
@@ -137,6 +155,22 @@ function ShopPage() {
     clearTimeout(debounceRef.current);
     setSearchQuery(inputValue);
   };
+
+  const handleAiClick = () => {
+    if (aiMode) {
+      setAiMode(false);
+      return;
+    }
+    setAiMode(true);
+    setAiLoading(true);
+    setAiProducts([]);
+    RecommendProducts(12)
+      .then(res => setAiProducts((res.data || []).map(mapAiProduct)))
+      .catch(() => setAiProducts([]))
+      .finally(() => setAiLoading(false));
+  };
+
+  const isAiActive = aiMode;
 
   return (
     <div className="app">
@@ -166,48 +200,91 @@ function ShopPage() {
         </form>
       </div>
 
-      {/* 카테고리 탭 */}
+      {/* 카테고리 탭 + AI 추천 버튼 */}
       <div className="shop-categories">
         {categories.map((cat) => (
           <button
             key={cat}
-            className={`category-tab ${selectedCategory === cat ? 'active' : ''}`}
-            onClick={() => setSelectedCategory(cat)}
+            className={`category-tab ${!isAiActive && selectedCategory === cat ? 'active' : ''}`}
+            onClick={() => { setAiMode(false); setSelectedCategory(cat); }}
           >
             {cat}
           </button>
         ))}
+        <button className={`shop-ai-btn ${isAiActive ? 'active' : ''}`} onClick={handleAiClick}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          {isAiActive ? '전체 상품 보기' : 'AI 추천 받기'}
+        </button>
       </div>
 
-      {/* 상품 수 */}
-      <div className="shop-toolbar">
-        <span className="shop-count">상품 {totalCount}개</span>
-      </div>
-
-      {/* 상품 그리드 */}
-      {loading && products.length === 0 ? (
-        <div className="shop-empty"><p>상품을 불러오는 중...</p></div>
-      ) : (
+      {/* AI 추천 모드 */}
+      {isAiActive ? (
         <>
-          <div className="shop-grid">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} isWished={wishlistedIds.includes(product.id)} />
-            ))}
+          <div className="shop-toolbar">
+            <span className="shop-ai-label">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              {user ? '구매 이력 기반 맞춤 추천' : '지금 인기 있는 상품 추천'}
+            </span>
           </div>
 
-          {/* 무한 스크롤 감지 영역 */}
-          {hasMore && products.length > 0 && (
-            <div ref={sentinelRef} className="shop-scroll-sentinel">
-              <div className="shop-spinner" />
+          {aiLoading ? (
+            <div className="shop-empty"><p>AI가 상품을 분석 중이에요...</p></div>
+          ) : aiProducts.length === 0 ? (
+            <div className="shop-empty"><p>추천 상품을 불러오지 못했습니다.</p></div>
+          ) : (
+            <div className="shop-grid">
+              {aiProducts.map((product) => (
+                <div key={product.id} className="shop-ai-card-wrap">
+                  <ProductCard product={product} isWished={wishlistedIds.includes(product.id)} />
+                  {product.reason && (
+                    <div className="shop-ai-reason">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                      </svg>
+                      {product.reason}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </>
-      )}
+      ) : (
+        <>
+          {/* 상품 수 */}
+          <div className="shop-toolbar">
+            <span className="shop-count">상품 {totalCount}개</span>
+          </div>
 
-      {!loading && products.length === 0 && (
-        <div className="shop-empty">
-          <p>검색 결과가 없습니다.</p>
-        </div>
+          {/* 상품 그리드 */}
+          {loading && products.length === 0 ? (
+            <div className="shop-empty"><p>상품을 불러오는 중...</p></div>
+          ) : (
+            <>
+              <div className="shop-grid">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} isWished={wishlistedIds.includes(product.id)} />
+                ))}
+              </div>
+
+              {hasMore && products.length > 0 && (
+                <div ref={sentinelRef} className="shop-scroll-sentinel">
+                  <div className="shop-spinner" />
+                </div>
+              )}
+            </>
+          )}
+
+          {!loading && products.length === 0 && (
+            <div className="shop-empty">
+              <p>검색 결과가 없습니다.</p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

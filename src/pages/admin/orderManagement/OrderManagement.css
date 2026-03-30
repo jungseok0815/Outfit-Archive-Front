@@ -78,6 +78,27 @@
   max-width: 400px;
 }
 
+.order-excel-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.order-excel-btn:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
 .order-search-icon {
   position: absolute;
   left: 14px;

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Package, Truck, CheckCircle, Clock, ChevronDown, ChevronLeft, ChevronRight, Search, MapPin, Phone, User } from 'lucide-react';
+import { Package, Truck, CheckCircle, Clock, ChevronDown, ChevronLeft, ChevronRight, Search, MapPin, Phone, User, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import './OrderManagement.css';
 import { ListOrder, UpdateOrderStatus, RegisterShipping, DeleteOrder } from '../../../api/admin/order';
 import { toast } from "react-toastify";
@@ -152,6 +153,33 @@ const OrderManagement = ({ user }) => {
             });
     };
 
+    const handleExportExcel = () => {
+        if (filteredOrders.length === 0) { toast.warn('내보낼 주문이 없습니다.'); return; }
+        const rows = filteredOrders.map(o => ({
+            '주문번호': o.id,
+            '주문일': o.orderDate ? o.orderDate.substring(0, 10) : '',
+            '주문자 ID': o.userId,
+            '주문자명': o.userNm,
+            '수령인': o.recipientName,
+            '수령인 연락처': o.recipientPhone,
+            '배송지': o.shippingAddress,
+            '상품명': o.productNm,
+            '사이즈': o.sizeNm || '',
+            '수량': o.quantity,
+            '상품금액': o.totalPrice,
+            '쿠폰할인': o.couponDiscount || 0,
+            '포인트사용': o.usedPoint || 0,
+            '실결제금액': o.actualPayment ?? o.totalPrice,
+            '상태': STATUS_MAP[o.status]?.label || o.status,
+            '운송장번호': o.trackingNumber || '',
+        }));
+        const ws = XLSX.utils.json_to_sheet(rows);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, '주문목록');
+        const today = new Date().toISOString().substring(0, 10);
+        XLSX.writeFile(wb, `주문목록_${today}.xlsx`);
+    };
+
     const getPageNumbers = () => {
         const pages = [];
         const maxVisible = 5;
@@ -207,6 +235,10 @@ const OrderManagement = ({ user }) => {
                         className="order-search-input"
                     />
                 </div>
+                <button className="order-excel-btn" onClick={handleExportExcel}>
+                    <Download className="w-4 h-4" />
+                    엑셀 다운로드
+                </button>
             </div>
 
             {/* 날짜별 주문 목록 */}

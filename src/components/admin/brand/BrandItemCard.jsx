@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import { useState } from 'react';
 import { Phone, MapPin } from 'lucide-react';
 import { SubmitButton, DeleteButton } from '../../common/Button/Button';
 import { InsertBrand, UpdateBrand, DeleteBrand } from '../../../api/admin/brand';
@@ -14,10 +14,12 @@ const BrandItemCard = ({ brand, onSuccess }) => {
         brandNm: brand?.brandNm || "",
         brandNum: brand?.brandNum || "",
         brandImg: null,
+        brandBannerImg: null,
         brandDc: brand?.brandDc || "",
         brandLocation: brand?.brandLocation || "",
     });
-    const [preview, setPreview] = useState(brand?.brandImg?.imgPath || null);
+    const [preview, setPreview] = useState(brand?.imgPath || null);
+    const [bannerPreview, setBannerPreview] = useState(brand?.bannerImgPath || null);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -32,6 +34,14 @@ const BrandItemCard = ({ brand, onSuccess }) => {
         }
     };
 
+    const handleBannerChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setFormData(prev => ({ ...prev, brandBannerImg: file }));
+            setBannerPreview(URL.createObjectURL(file));
+        }
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         const fd = new FormData();
@@ -41,6 +51,7 @@ const BrandItemCard = ({ brand, onSuccess }) => {
         fd.append('brandDc', formData.brandDc);
         fd.append('brandLocation', formData.brandLocation);
         if (formData.brandImg) fd.append('brandImg', formData.brandImg);
+        if (formData.brandBannerImg) fd.append('brandBannerImg', formData.brandBannerImg);
 
         const request = isEdit ? UpdateBrand(fd) : InsertBrand(fd);
         request
@@ -81,9 +92,33 @@ const BrandItemCard = ({ brand, onSuccess }) => {
                 onCancel={() => setConfirmOpen(false)}
             />
             <form onSubmit={handleSubmit} className="bg-white rounded-xl overflow-hidden">
+
+                {/* 배너 이미지 업로드 */}
+                <div className="p-4 border-b bg-gray-50">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">배너 이미지</label>
+                    <div
+                        className="w-full h-32 bg-gray-200 rounded-lg border-2 border-dashed border-gray-300 overflow-hidden flex items-center justify-center mb-2 relative cursor-pointer"
+                        onClick={() => document.getElementById('bannerImgInput').click()}
+                    >
+                        {bannerPreview ? (
+                            <img src={bannerPreview} alt="Banner Preview" className="w-full h-full object-cover" />
+                        ) : (
+                            <p className="text-gray-400 text-sm">배너 이미지 클릭하여 업로드</p>
+                        )}
+                    </div>
+                    <input
+                        id="bannerImgInput"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleBannerChange}
+                        className="hidden"
+                    />
+                </div>
+
                 <div className="flex">
                     {/* 왼쪽 로고 섹션 */}
                     <div className="w-1/3 bg-gray-50 p-6 flex flex-col items-center justify-center border-r">
+                        <p className="text-sm font-medium text-gray-700 mb-2">로고 이미지</p>
                         <div className="w-full aspect-square bg-white rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center mb-4 overflow-hidden">
                             {preview ? (
                                 <img src={preview} alt="Preview" className="w-full h-full object-contain" />

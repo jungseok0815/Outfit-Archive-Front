@@ -107,42 +107,58 @@ function BrandPage() {
 
       {/* 브랜드 히어로 */}
       {brand && (
-        <>
-          <div className="brand-hero">
-            {brand.imgPath
-              ? <img className="brand-hero-img" src={brand.imgPath} alt={brand.brandNm} />
-              : <div className="brand-hero-placeholder" />
-            }
-            <div className="brand-hero-overlay">
-              <h1 className="brand-hero-name">{brand.brandNm}</h1>
+        <div className="brand-content-wrap">
+          {/* 배너 + 로고 */}
+          <div className="brand-banner-wrap">
+            <div className="brand-banner-bg">
+              {brand.bannerImgPath
+                ? <img src={brand.bannerImgPath} alt="banner" className="brand-banner-img" />
+                : <div className="brand-banner-placeholder" />
+              }
+            </div>
+            <div className="brand-banner-bottom">
+              <div className="brand-logo-wrap">
+                {brand.imgPath
+                  ? <img src={brand.imgPath} alt={brand.brandNm} className="brand-logo-img" />
+                  : <div className="brand-logo-placeholder"><span>{brand.brandNm?.[0]}</span></div>
+                }
+              </div>
+            </div>
+          </div>
+
+          {/* 브랜드 정보 */}
+          <div className="brand-info-section">
+            <div className="brand-info-name-row">
+              <h1 className="brand-info-name">{brand.brandNm}</h1>
+              <span className="brand-verified-badge" title="인증된 브랜드">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="12" fill="#1d9bf0"/>
+                  <path d="M5 12l4.5 4.5L19 7" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </span>
+            </div>
+            {brand.brandDc && <p className="brand-info-desc">{brand.brandDc}</p>}
+            <div className="brand-info-meta-row">
               {brand.brandLocation && (
-                <p className="brand-hero-meta">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <span className="brand-info-meta">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                     <circle cx="12" cy="10" r="3"/>
                   </svg>
                   {brand.brandLocation}
-                </p>
+                </span>
               )}
               {brand.brandNum && (
-                <p className="brand-hero-meta">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <span className="brand-info-meta">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
                   </svg>
                   {brand.brandNum}
-                </p>
+                </span>
               )}
             </div>
           </div>
-
-          {/* 소개글 */}
-          {brand.brandDc && (
-            <div className="brand-intro">
-              <div className="brand-intro-divider" />
-              <p className="brand-intro-desc">{brand.brandDc}</p>
-            </div>
-          )}
-        </>
+        </div>
       )}
 
       {/* 상품 목록 */}
