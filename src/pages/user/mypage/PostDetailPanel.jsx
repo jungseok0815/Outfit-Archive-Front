@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import "./PostDetailPanel.css";
 import { ListComment, InsertComment, ToggleLike, GetLikeStatus } from '../../../api/user/post';
 import { GetProduct } from '../../../api/user/product';
+import { useAuth } from '../../../store/context/UserContext';
 
 function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [imageIndex, setImageIndex] = useState(0);
   const [showComments, setShowComments] = useState(false);
   const [showProducts, setShowProducts] = useState(false);
@@ -266,23 +268,27 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
                 ))
               )}
             </div>
-            <div className="detail-comment-input-wrap">
-              <input
-                className="detail-comment-input"
-                type="text"
-                placeholder="댓글 달기..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleCommentSubmit()}
-              />
-              <button
-                className="detail-comment-submit"
-                onClick={handleCommentSubmit}
-                disabled={submittingComment || !newComment.trim()}
-              >
-                게시
-              </button>
-            </div>
+            {user ? (
+              <div className="detail-comment-input-wrap">
+                <input
+                  className="detail-comment-input"
+                  type="text"
+                  placeholder="댓글 달기..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleCommentSubmit()}
+                />
+                <button
+                  className="detail-comment-submit"
+                  onClick={handleCommentSubmit}
+                  disabled={submittingComment || !newComment.trim()}
+                >
+                  게시
+                </button>
+              </div>
+            ) : (
+              <p className="detail-comment-login-hint">로그인 후 댓글을 남길 수 있습니다.</p>
+            )}
           </div>
         )}
       </div>
