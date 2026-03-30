@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Edit2, Trash2, Upload, X, Eye } from 'lucide-react';
+import { Edit2, Trash2, Upload, X, Eye, ChevronDown } from 'lucide-react';
 import { ListBanner, InsertBanner, UpdateBanner, DeleteBanner } from '../../../api/admin/banner';
+import { ListBrand } from '../../../api/admin/brand';
 import ConfirmModal from '../../../components/common/Modal/ConfirmModal';
 import Pagination from '../../../components/common/Pagination/Pagination';
 import { toast } from 'react-toastify';
@@ -34,8 +35,10 @@ const BannerPreviewModal = ({ banner, onClose }) => {
                             {banner.title}{banner.highlight && <> <em>{banner.highlight}</em></>}
                         </h1>
                         {banner.description && <p className="banner-preview-desc">{banner.description}</p>}
-                        {banner.buttonText && <button className="banner-preview-btn">{banner.buttonText}</button>}
                     </div>
+                    {banner.buttonText && (
+                        <button className="banner-preview-btn">{banner.buttonText}</button>
+                    )}
                     <div className="banner-preview-dots">
                         <span className="banner-preview-dot active" />
                         <span className="banner-preview-dot" />
@@ -61,6 +64,8 @@ const BannerManagement = ({ registerTrigger }) => {
     const [previewBanner, setPreviewBanner] = useState(null);
     const [confirmTarget, setConfirmTarget] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [brands, setBrands] = useState([]);
+    const [brandDropOpen, setBrandDropOpen] = useState(false);
     const fileInputRef = useRef(null);
     const isMounted = useRef(false);
 
@@ -78,7 +83,10 @@ const BannerManagement = ({ registerTrigger }) => {
             .finally(() => setLoading(false));
     };
 
-    useEffect(() => { load(); }, []);
+    useEffect(() => {
+        load();
+        ListBrand('', 0, 200).then(res => setBrands(res.data.content || [])).catch(() => {});
+    }, []);
 
     useEffect(() => {
         if (!isMounted.current) {
@@ -141,7 +149,6 @@ const BannerManagement = ({ registerTrigger }) => {
     };
 
     const handleSave = () => {
-        if (!form.title.trim()) { toast.error('제목을 입력해주세요.'); return; }
         setSaving(true);
         const req = editTarget
             ? UpdateBanner({ ...form, id: editTarget.id }, imageFile)
@@ -260,11 +267,43 @@ const BannerManagement = ({ registerTrigger }) => {
                                     </div>
                                     <div className="banner-mgmt-field">
                                         <label>버튼 클릭 URL</label>
-                                        <input
-                                            value={form.buttonUrl}
-                                            onChange={e => setForm(p => ({ ...p, buttonUrl: e.target.value }))}
-                                            placeholder="예) /shop, /style"
-                                        />
+                                        <div className="banner-url-row">
+                                            <input
+                                                value={form.buttonUrl}
+                                                onChange={e => setForm(p => ({ ...p, buttonUrl: e.target.value }))}
+                                                placeholder="예) /shop, /brand/1"
+                                            />
+                                            <div className="banner-brand-drop-wrap">
+                                                <button
+                                                    type="button"
+                                                    className="banner-brand-drop-btn"
+                                                    onClick={() => setBrandDropOpen(p => !p)}
+                                                >
+                                                    브랜드 선택 <ChevronDown size={13} />
+                                                </button>
+                                                {brandDropOpen && (
+                                                    <div className="banner-brand-drop-list">
+                                                        {brands.length === 0
+                                                            ? <div className="banner-brand-drop-empty">브랜드 없음</div>
+                                                            : brands.map(b => (
+                                                                <button
+                                                                    key={b.id}
+                                                                    type="button"
+                                                                    className="banner-brand-drop-item"
+                                                                    onClick={() => {
+                                                                        setForm(p => ({ ...p, buttonUrl: `/brand/${b.id}` }));
+                                                                        setBrandDropOpen(false);
+                                                                    }}
+                                                                >
+                                                                    {b.brandNm}
+                                                                    <span className="banner-brand-drop-url">/brand/{b.id}</span>
+                                                                </button>
+                                                            ))
+                                                        }
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
                                     <div className="banner-mgmt-field">
                                         <label>순서</label>

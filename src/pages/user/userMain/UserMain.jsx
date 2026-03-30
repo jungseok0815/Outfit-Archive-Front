@@ -188,12 +188,12 @@ function App() {
               <div className="hero-slide-content">
                 <h1>{slide.title} <span>{slide.highlight}</span></h1>
                 <p>{slide.description}</p>
-                {slide.buttonText && (
-                  <button onClick={() => slide.buttonUrl && navigate(slide.buttonUrl)}>
-                    {slide.buttonText}
-                  </button>
-                )}
               </div>
+              {slide.buttonText && (
+                <button className="hero-slide-btn" onClick={() => slide.buttonUrl && navigate(slide.buttonUrl)}>
+                  {slide.buttonText}
+                </button>
+              )}
             </div>
           ))}
         </div>
