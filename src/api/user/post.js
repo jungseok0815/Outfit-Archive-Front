@@ -59,3 +59,8 @@ export const ListComment = (postId, page = 0, size = 10) => {
 export const InsertComment = (commentDto) => {
     return api.post('/api/usr/post/comment/insert', commentDto);
 }
+
+// DELETE /api/usr/post/comment/delete?id={id}
+export const DeleteComment = (id) => {
+    return api.delete('/api/usr/post/comment/delete', { params: { id } });
+}
