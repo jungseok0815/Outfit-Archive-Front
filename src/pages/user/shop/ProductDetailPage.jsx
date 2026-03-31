@@ -5,6 +5,7 @@ import Navbar from "../../../components/user/header/Header";
 import AuthModal from "../auth/AuthPage";
 import OrderModal from "./OrderModal";
 import { GetProduct, ListProductReview } from "../../../api/user/product";
+import { RecordProductView } from "../../../api/user/productView";
 import { CheckWishlist, ToggleWishlist } from "../../../api/user/wishlist";
 import { ListPostByProduct } from "../../../api/user/post";
 import PostDetailPanel from "../../user/mypage/PostDetailPanel";
@@ -69,6 +70,12 @@ function ProductDetailPage() {
     CheckWishlist(productId)
       .then(res => setWishlisted(res.data.wished))
       .catch(() => {});
+  }, [user, productId]);
+
+  // 로그인 유저의 상품 조회 기록
+  useEffect(() => {
+    if (!user || !productId) return;
+    RecordProductView(productId).catch(() => {});
   }, [user, productId]);
 
   useEffect(() => {

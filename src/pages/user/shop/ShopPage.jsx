@@ -4,7 +4,7 @@ import AuthModal from '../auth/AuthPage';
 import ProductCard from '../../../components/user/card/ProductCard';
 import { ListProduct } from '../../../api/user/product';
 import { GetWishlistProductIds } from '../../../api/user/wishlist';
-import { RecommendProducts } from '../../../api/user/recommend';
+import { RecommendAiProducts, RecommendProducts } from '../../../api/user/recommend';
 import { useAuth } from '../../../store/context/UserContext';
 import "../../../App.css";
 import "./ShopPage.css";
@@ -45,6 +45,12 @@ function ShopPage() {
   const [aiMode, setAiMode] = useState(false);
   const [aiProducts, setAiProducts] = useState([]);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiPage, setAiPage] = useState(0);
+  const [aiHasMore, setAiHasMore] = useState(true);
+  const aiLoadingRef = useRef(false);
+  const aiObserverRef = useRef(null);
+  const aiPageRef = useRef(0);
+  const aiHasMoreRef = useRef(true);
 
   useEffect(() => {
     if (!user) return;
@@ -156,19 +162,65 @@ function ShopPage() {
     setSearchQuery(inputValue);
   };
 
+  const AI_PAGE_SIZE = 15;
+
+  const loadAiPage = useCallback((page) => {
+    if (aiLoadingRef.current) return;
+    if (!aiHasMoreRef.current && page > 0) return;
+    aiLoadingRef.current = true;
+    setAiLoading(true);
+    RecommendAiProducts(AI_PAGE_SIZE, page)
+      .then(res => {
+        const items = (res.data || []).map(mapAiProduct);
+        const hasMore = items.length >= AI_PAGE_SIZE;
+        setAiProducts(prev => page === 0 ? items : [...prev, ...items]);
+        setAiHasMore(hasMore);
+        aiHasMoreRef.current = hasMore;
+        setAiPage(page);
+        aiPageRef.current = page;
+      })
+      .catch(() => {
+        if (page === 0) setAiProducts([]);
+        setAiHasMore(false);
+        aiHasMoreRef.current = false;
+      })
+      .finally(() => {
+        setAiLoading(false);
+        aiLoadingRef.current = false;
+      });
+  }, []);
+
   const handleAiClick = () => {
     if (aiMode) {
       setAiMode(false);
       return;
     }
+    if (!user) {
+      setAiMode(true);
+      return;
+    }
     setAiMode(true);
-    setAiLoading(true);
     setAiProducts([]);
-    RecommendProducts(12)
-      .then(res => setAiProducts((res.data || []).map(mapAiProduct)))
-      .catch(() => setAiProducts([]))
-      .finally(() => setAiLoading(false));
+    setAiPage(0);
+    setAiHasMore(true);
+    aiPageRef.current = 0;
+    aiHasMoreRef.current = true;
+    loadAiPage(0);
   };
+
+  const aiSentinelRef = useCallback(node => {
+    if (aiObserverRef.current) {
+      aiObserverRef.current.disconnect();
+      aiObserverRef.current = null;
+    }
+    if (!node) return;
+    aiObserverRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && aiHasMoreRef.current && !aiLoadingRef.current) {
+        loadAiPage(aiPageRef.current + 1);
+      }
+    }, { threshold: 0.1 });
+    aiObserverRef.current.observe(node);
+  }, [loadAiPage]);
 
   const isAiActive = aiMode;
 
@@ -222,35 +274,57 @@ function ShopPage() {
       {/* AI 추천 모드 */}
       {isAiActive ? (
         <>
+          {!user ? (
+            <div className="shop-ai-login-required">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              <p className="shop-ai-login-title">로그인 후 사용 가능합니다</p>
+              <p className="shop-ai-login-desc">로그인하면 취향을 분석해 딱 맞는 상품을 추천해드려요</p>
+              <button className="shop-ai-login-btn" onClick={() => { setAiMode(false); setShowAuthModal(true); }}>
+                로그인하기
+              </button>
+            </div>
+          ) : (
+          <>
           <div className="shop-toolbar">
             <span className="shop-ai-label">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
               </svg>
-              {user ? '구매 이력 기반 맞춤 추천' : '지금 인기 있는 상품 추천'}
+              취향 분석 기반 AI 맞춤 추천
             </span>
           </div>
 
-          {aiLoading ? (
+          {aiLoading && aiProducts.length === 0 ? (
             <div className="shop-empty"><p>AI가 상품을 분석 중이에요...</p></div>
-          ) : aiProducts.length === 0 ? (
+          ) : !aiLoading && aiProducts.length === 0 ? (
             <div className="shop-empty"><p>추천 상품을 불러오지 못했습니다.</p></div>
           ) : (
-            <div className="shop-grid">
-              {aiProducts.map((product) => (
-                <div key={product.id} className="shop-ai-card-wrap">
-                  <ProductCard product={product} isWished={wishlistedIds.includes(product.id)} />
-                  {product.reason && (
-                    <div className="shop-ai-reason">
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                      </svg>
-                      {product.reason}
-                    </div>
-                  )}
+            <>
+              <div className="shop-grid">
+                {aiProducts.map((product) => (
+                  <div key={product.id} className="shop-ai-card-wrap">
+                    <ProductCard product={product} isWished={wishlistedIds.includes(product.id)} />
+                    {product.reason && (
+                      <div className="shop-ai-reason">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                        </svg>
+                        {product.reason}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {aiHasMore && (
+                <div ref={aiSentinelRef} className="shop-scroll-sentinel">
+                  {aiLoading && <div className="shop-spinner" />}
                 </div>
-              ))}
-            </div>
+              )}
+            </>
+          )}
+          </>
           )}
         </>
       ) : (

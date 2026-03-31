@@ -204,6 +204,45 @@
   to { transform: rotate(360deg); }
 }
 
+/* AI 추천 로그인 필요 안내 */
+.shop-ai-login-required {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 20px;
+  color: #aaaaaa;
+}
+
+.shop-ai-login-title {
+  font-size: 1.05em;
+  font-weight: 600;
+  color: #333333;
+  margin: 0;
+}
+
+.shop-ai-login-desc {
+  font-size: 0.85em;
+  color: #999999;
+  margin: 0;
+}
+
+.shop-ai-login-btn {
+  margin-top: 8px;
+  padding: 10px 28px;
+  font-size: 0.88em;
+  font-weight: 600;
+  color: #ffffff;
+  background: #222222;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.shop-ai-login-btn:hover {
+  background: #444444;
+}
+
 /* 검색 결과 없음 */
 .shop-empty {
   text-align: center;
