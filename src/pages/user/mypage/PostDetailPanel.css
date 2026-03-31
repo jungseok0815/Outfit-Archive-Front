@@ -318,6 +318,23 @@
     flex-shrink: 0;
 }
 
+.detail-comment-delete {
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 11px;
+    color: #bcbcbc;
+    cursor: pointer;
+    padding: 0 2px;
+    flex-shrink: 0;
+    font-family: inherit;
+    transition: color 0.2s ease;
+}
+
+.detail-comment-delete:hover {
+    color: #e74c3c;
+}
+
 /* 비로그인 댓글 힌트 */
 .detail-comment-login-hint {
     font-size: 13px;

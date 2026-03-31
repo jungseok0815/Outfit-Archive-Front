@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./PostDetailPanel.css";
-import { ListComment, InsertComment, ToggleLike, GetLikeStatus } from '../../../api/user/post';
+import { ListComment, InsertComment, DeleteComment, ToggleLike, GetLikeStatus } from '../../../api/user/post';
 import { GetProduct } from '../../../api/user/product';
 import { useAuth } from '../../../store/context/UserContext';
 
@@ -88,6 +88,14 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
       })
       .catch(() => {})
       .finally(() => setSubmittingComment(false));
+  };
+
+  const handleDeleteComment = (commentId) => {
+    DeleteComment(commentId)
+      .then(() => {
+        setComments(prev => prev.filter(c => c.id !== commentId));
+      })
+      .catch(() => {});
   };
 
   const handleToggleLike = () => {
@@ -264,6 +272,14 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
                     <span className="detail-comment-user">{comment.userNm}</span>
                     <span className="detail-comment-text">{comment.content}</span>
                     <span className="detail-comment-time">{formatDate(comment.createdAt)}</span>
+                    {user && user.id === comment.userId && (
+                      <button
+                        className="detail-comment-delete"
+                        onClick={() => handleDeleteComment(comment.id)}
+                      >
+                        삭제
+                      </button>
+                    )}
                   </div>
                 ))
               )}
