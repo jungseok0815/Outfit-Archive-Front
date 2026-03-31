@@ -48,6 +48,9 @@ function ShopPage() {
   const [aiPage, setAiPage] = useState(0);
   const [aiHasMore, setAiHasMore] = useState(true);
   const aiLoadingRef = useRef(false);
+  const aiObserverRef = useRef(null);
+  const aiPageRef = useRef(0);
+  const aiHasMoreRef = useRef(true);
 
   useEffect(() => {
     if (!user) return;
@@ -159,22 +162,27 @@ function ShopPage() {
     setSearchQuery(inputValue);
   };
 
-  const AI_PAGE_SIZE = 12;
+  const AI_PAGE_SIZE = 15;
 
   const loadAiPage = useCallback((page) => {
     if (aiLoadingRef.current) return;
+    if (!aiHasMoreRef.current && page > 0) return;
     aiLoadingRef.current = true;
     setAiLoading(true);
     RecommendAiProducts(AI_PAGE_SIZE, page)
       .then(res => {
         const items = (res.data || []).map(mapAiProduct);
+        const hasMore = items.length >= AI_PAGE_SIZE;
         setAiProducts(prev => page === 0 ? items : [...prev, ...items]);
-        setAiHasMore(items.length === AI_PAGE_SIZE);
+        setAiHasMore(hasMore);
+        aiHasMoreRef.current = hasMore;
         setAiPage(page);
+        aiPageRef.current = page;
       })
       .catch(() => {
         if (page === 0) setAiProducts([]);
         setAiHasMore(false);
+        aiHasMoreRef.current = false;
       })
       .finally(() => {
         setAiLoading(false);
@@ -195,19 +203,24 @@ function ShopPage() {
     setAiProducts([]);
     setAiPage(0);
     setAiHasMore(true);
+    aiPageRef.current = 0;
+    aiHasMoreRef.current = true;
     loadAiPage(0);
   };
 
   const aiSentinelRef = useCallback(node => {
+    if (aiObserverRef.current) {
+      aiObserverRef.current.disconnect();
+      aiObserverRef.current = null;
+    }
     if (!node) return;
-    const observer = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && aiHasMore && !aiLoadingRef.current) {
-        loadAiPage(aiPage + 1);
+    aiObserverRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && aiHasMoreRef.current && !aiLoadingRef.current) {
+        loadAiPage(aiPageRef.current + 1);
       }
     }, { threshold: 0.1 });
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [aiHasMore, aiPage, loadAiPage]);
+    aiObserverRef.current.observe(node);
+  }, [loadAiPage]);
 
   const isAiActive = aiMode;
 
