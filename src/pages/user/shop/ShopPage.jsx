@@ -4,7 +4,7 @@ import AuthModal from '../auth/AuthPage';
 import ProductCard from '../../../components/user/card/ProductCard';
 import { ListProduct } from '../../../api/user/product';
 import { GetWishlistProductIds } from '../../../api/user/wishlist';
-import { RecommendAiProducts, RecommendProducts } from '../../../api/user/recommend';
+import { RecommendAiProducts } from '../../../api/user/recommend';
 import { useAuth } from '../../../store/context/UserContext';
 import "../../../App.css";
 import "./ShopPage.css";
@@ -45,7 +45,7 @@ function ShopPage() {
   const [aiMode, setAiMode] = useState(false);
   const [aiProducts, setAiProducts] = useState([]);
   const [aiLoading, setAiLoading] = useState(false);
-  const [aiPage, setAiPage] = useState(0);
+  const [, setAiPage] = useState(0);
   const [aiHasMore, setAiHasMore] = useState(true);
   const aiLoadingRef = useRef(false);
   const aiObserverRef = useRef(null);
@@ -191,10 +191,7 @@ function ShopPage() {
   }, []);
 
   const handleAiClick = () => {
-    if (aiMode) {
-      setAiMode(false);
-      return;
-    }
+    if (aiMode) return;
     if (!user) {
       setAiMode(true);
       return;
@@ -267,7 +264,7 @@ function ShopPage() {
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
           </svg>
-          {isAiActive ? '전체 상품 보기' : 'AI 추천 받기'}
+          AI 추천 받기
         </button>
       </div>
 
@@ -306,14 +303,6 @@ function ShopPage() {
                 {aiProducts.map((product) => (
                   <div key={product.id} className="shop-ai-card-wrap">
                     <ProductCard product={product} isWished={wishlistedIds.includes(product.id)} />
-                    {product.reason && (
-                      <div className="shop-ai-reason">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                        </svg>
-                        {product.reason}
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
