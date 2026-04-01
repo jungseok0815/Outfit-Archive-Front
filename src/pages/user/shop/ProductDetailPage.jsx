@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Navbar from "../../../components/user/header/Header";
@@ -33,8 +33,6 @@ function ProductDetailPage() {
   const [wishlisted, setWishlisted] = useState(false);
   const [productPosts, setProductPosts] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
-  const [shareOpen, setShareOpen] = useState(false);
-  const shareRef = useRef(null);
   const [selectedSize, setSelectedSize] = useState(null);
 
   useEffect(() => {
@@ -78,13 +76,7 @@ function ProductDetailPage() {
     RecordProductView(productId).catch(() => {});
   }, [user, productId]);
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (shareRef.current && !shareRef.current.contains(e.target)) setShareOpen(false);
-    };
-    if (shareOpen) document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [shareOpen]);
+
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
@@ -146,14 +138,8 @@ function ProductDetailPage() {
     navigator.clipboard.writeText(window.location.href)
       .then(() => toast.success('링크가 복사되었습니다.'))
       .catch(() => toast.error('링크 복사에 실패했습니다.'));
-    setShareOpen(false);
   };
 
-  const handleShareTwitter = () => {
-    const text = `${product.productNm} - ${product.productPrice?.toLocaleString()}원`;
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`, '_blank');
-    setShareOpen(false);
-  };
 
   const handleWishlistClick = () => {
     if (!user) { setShowAuthModal(true); return; }
@@ -290,32 +276,14 @@ function ProductDetailPage() {
                 </svg>
                 <span>{wishlisted ? '저장됨' : '저장'}</span>
               </button>
-              <div className="detail-share-wrap" ref={shareRef}>
-                <button className="detail-icon-btn" onClick={() => setShareOpen(prev => !prev)}>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#222" strokeWidth="1.8">
-                    <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-                  </svg>
-                  <span>공유</span>
-                </button>
-                {shareOpen && (
-                  <div className="detail-share-dropdown">
-                    <button className="detail-share-item" onClick={handleCopyLink}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                      </svg>
-                      링크 복사
-                    </button>
-                    <button className="detail-share-item" onClick={handleShareTwitter}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                      </svg>
-                      X (Twitter)
-                    </button>
-                  </div>
-                )}
-              </div>
+              <button className="detail-icon-btn" onClick={handleCopyLink}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#222" strokeWidth="1.8">
+                  <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                </svg>
+                <span>공유</span>
+              </button>
               {(() => {
                 const hasSizes = product.sizes?.length > 0;
                 const isSoldOut = hasSizes
