@@ -343,6 +343,13 @@ function ProductDetailPage() {
                     <span className="review-item-date">{formatDate(review.createdAt)}</span>
                   </div>
                   <p className="review-item-content">{review.content}</p>
+                  {review.imgPaths && review.imgPaths.length > 0 && (
+                    <div className="review-item-images">
+                      {review.imgPaths.map((src, i) => (
+                        <img key={i} src={src} alt={`후기 이미지 ${i + 1}`} className="review-item-img" />
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))
             )}

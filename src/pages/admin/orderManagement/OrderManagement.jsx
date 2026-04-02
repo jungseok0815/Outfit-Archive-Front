@@ -426,6 +426,14 @@ const OrderManagement = ({ user }) => {
                                                                 <div className="order-cancelled-badge">주문 취소됨</div>
                                                             )}
                                                             <div className="flex gap-2 mt-3">
+                                                                {order.status === 'SHIPPING' && (
+                                                                    <button
+                                                                        className="text-xs px-3 py-1.5 bg-green-50 text-green-600 border border-green-200 rounded-md hover:bg-green-100 transition-colors"
+                                                                        onClick={() => handleStatusUpdate(order, 'DELIVERED')}
+                                                                    >
+                                                                        배송완료
+                                                                    </button>
+                                                                )}
                                                                 {order.status !== 'CANCELLED' && (
                                                                     <button
                                                                         className="text-xs px-3 py-1.5 bg-red-50 text-red-500 border border-red-200 rounded-md hover:bg-red-100 transition-colors"

@@ -145,7 +145,7 @@ function MyPage() {
   const isReviewEligible = (order) => {
     if (order.status !== 'DELIVERED') return false;
     if (order.reviewWritten) return false;
-    if (!order.deliveredDate) return false;
+    if (!order.deliveredDate) return true;
     const delivered = new Date(order.deliveredDate);
     const twoWeeksLater = new Date(delivered.getTime() + 14 * 24 * 60 * 60 * 1000);
     return new Date() <= twoWeeksLater;
