@@ -1,13 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { InsertProductReview } from "../../../api/user/product";
 import "./ReviewWriteModal.css";
 import { toast } from "react-toastify";
+
+const MAX_IMAGES = 3;
 
 function ReviewWriteModal({ order, onClose, onSuccess }) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [content, setContent] = useState("");
+  const [images, setImages] = useState([]);
+  const [previews, setPreviews] = useState([]);
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    const remaining = MAX_IMAGES - images.length;
+    if (files.length > remaining) {
+      toast.warn(`사진은 최대 ${MAX_IMAGES}장까지 첨부 가능합니다.`);
+    }
+    const selected = files.slice(0, remaining);
+    setImages(prev => [...prev, ...selected]);
+    setPreviews(prev => [...prev, ...selected.map(f => URL.createObjectURL(f))]);
+    e.target.value = '';
+  };
+
+  const handleRemoveImage = (index) => {
+    URL.revokeObjectURL(previews[index]);
+    setImages(prev => prev.filter((_, i) => i !== index));
+    setPreviews(prev => prev.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = () => {
     if (rating === 0) {
@@ -24,6 +47,7 @@ function ReviewWriteModal({ order, onClose, onSuccess }) {
       orderId: order.orderId,
       content: content.trim(),
       rating,
+      images,
     })
       .then(() => {
         onSuccess?.();
@@ -45,8 +69,13 @@ function ReviewWriteModal({ order, onClose, onSuccess }) {
         </div>
 
         <div className="review-modal-product">
-          {order.brandNm && <span className="review-modal-brand">{order.brandNm}</span>}
-          <span className="review-modal-product-name">{order.productNm}</span>
+          {order.productImgPath && (
+            <img className="review-modal-product-img" src={order.productImgPath} alt={order.productNm} />
+          )}
+          <div className="review-modal-product-info">
+            {order.brandNm && <span className="review-modal-brand">{order.brandNm}</span>}
+            <span className="review-modal-product-name">{order.productNm}</span>
+          </div>
         </div>
 
         <div className="review-modal-rating">
@@ -64,6 +93,31 @@ function ReviewWriteModal({ order, onClose, onSuccess }) {
               </span>
             ))}
           </div>
+        </div>
+
+        <div className="review-modal-images">
+          <div className="review-modal-image-list">
+            {previews.map((src, i) => (
+              <div className="review-modal-image-item" key={i}>
+                <img src={src} alt={`첨부 ${i + 1}`} />
+                <button className="review-modal-image-remove" onClick={() => handleRemoveImage(i)}>×</button>
+              </div>
+            ))}
+            {images.length < MAX_IMAGES && (
+              <button className="review-modal-image-add" onClick={() => fileInputRef.current.click()}>
+                <span>+</span>
+                <span className="review-modal-image-count">{images.length}/{MAX_IMAGES}</span>
+              </button>
+            )}
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            style={{ display: 'none' }}
+            onChange={handleImageChange}
+          />
         </div>
 
         <textarea

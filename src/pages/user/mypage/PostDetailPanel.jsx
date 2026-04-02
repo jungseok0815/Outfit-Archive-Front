@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./PostDetailPanel.css";
-import { ListComment, InsertComment, DeleteComment, ToggleLike, GetLikeStatus } from '../../../api/user/post';
+import { ListComment, InsertComment, DeleteComment, ToggleLike, GetLikeStatus, GetLikeUsers } from '../../../api/user/post';
 import { GetProduct } from '../../../api/user/product';
 import { useAuth } from '../../../store/context/UserContext';
 
@@ -17,6 +17,8 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [productImages, setProductImages] = useState({});
+  const [likeUsers, setLikeUsers] = useState([]);
+  const [showLikeUsers, setShowLikeUsers] = useState(false);
 
   useEffect(() => {
     setImageIndex(0);
@@ -98,6 +100,15 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
       .catch(() => {});
   };
 
+  const handleShowLikeUsers = () => {
+    GetLikeUsers(post.id)
+      .then(res => {
+        setLikeUsers(res.data);
+        setShowLikeUsers(true);
+      })
+      .catch(() => {});
+  };
+
   const handleToggleLike = () => {
     ToggleLike(post.id)
       .then(res => {
@@ -115,6 +126,23 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
 
   return (
     <div className="detail-overlay" onClick={onClose}>
+      {showLikeUsers && (
+        <div className="like-users-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="like-users-header">
+            <span>좋아요 {likeUsers.length}</span>
+            <button onClick={() => setShowLikeUsers(false)}>✕</button>
+          </div>
+          <div className="like-users-list">
+            {likeUsers.length === 0 ? (
+              <p className="like-users-empty">아직 좋아요가 없습니다.</p>
+            ) : (
+              likeUsers.map((u) => (
+                <div key={u.userId} className="like-users-item">{u.userNm}</div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
       <div className="detail-panel" onClick={(e) => e.stopPropagation()}>
         <div className="detail-header">
           <button className="detail-close" onClick={onClose}>✕</button>
@@ -205,7 +233,7 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
             <svg width="18" height="18" viewBox="0 0 24 24" fill={liked ? "#e74c3c" : "none"} stroke={liked ? "#e74c3c" : "currentColor"} strokeWidth="2">
               <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
             </svg>
-            {likeCount}
+            <span className="detail-like-count" onClick={(e) => { e.stopPropagation(); handleShowLikeUsers(); }}>{likeCount}</span>
           </button>
           <button
             className={`detail-stat-item detail-stat-btn ${showComments ? "active" : ""}`}

@@ -510,6 +510,22 @@
   margin: 0;
 }
 
+.review-item-images {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.review-item-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ebebeb;
+  cursor: pointer;
+}
+
 /* 반응형 */
 @media (max-width: 768px) {
   .detail-content {

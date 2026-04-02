@@ -48,12 +48,27 @@
 
 .review-modal-product {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
   padding: 14px 16px;
   background-color: #fafafa;
   border-radius: 10px;
   border: 1px solid #f0f0f0;
+}
+
+.review-modal-product-img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.review-modal-product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .review-modal-brand {
@@ -101,6 +116,78 @@
 
 .review-modal-star.filled {
   color: #ffc107;
+}
+
+.review-modal-images {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.review-modal-image-list {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.review-modal-image-item {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #ebebeb;
+}
+
+.review-modal-image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.review-modal-image-remove {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: rgba(0,0,0,0.5);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.review-modal-image-add {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  border: 1px dashed #d5d5d5;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  color: #999;
+  font-size: 24px;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.review-modal-image-add:hover {
+  border-color: #222;
+  color: #222;
+}
+
+.review-modal-image-count {
+  font-size: 11px;
 }
 
 .review-modal-textarea {

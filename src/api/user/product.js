@@ -22,5 +22,14 @@ export const ListProductReview = (productId, page = 0, size = 10) => {
 
 // POST /api/usr/review - Body: { orderId, rating, content }
 export const InsertProductReview = (reviewDto) => {
-    return api.post('/api/usr/review', reviewDto);
+    const formData = new FormData();
+    formData.append('orderId', reviewDto.orderId);
+    formData.append('rating', reviewDto.rating);
+    formData.append('content', reviewDto.content);
+    if (reviewDto.images) {
+        reviewDto.images.forEach(img => formData.append('images', img));
+    }
+    return api.post('/api/usr/review', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
 }
