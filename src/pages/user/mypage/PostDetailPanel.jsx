@@ -126,24 +126,33 @@ function PostDetailPanel({ post, onClose, onDelete, onEdit }) {
 
   return (
     <div className="detail-overlay" onClick={onClose}>
-      {showLikeUsers && (
-        <div className="like-users-modal" onClick={(e) => e.stopPropagation()}>
-          <div className="like-users-header">
-            <span>좋아요 {likeUsers.length}</span>
-            <button onClick={() => setShowLikeUsers(false)}>✕</button>
-          </div>
-          <div className="like-users-list">
-            {likeUsers.length === 0 ? (
-              <p className="like-users-empty">아직 좋아요가 없습니다.</p>
-            ) : (
-              likeUsers.map((u) => (
-                <div key={u.userId} className="like-users-item">{u.userNm}</div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
       <div className="detail-panel" onClick={(e) => e.stopPropagation()}>
+        {showLikeUsers && (
+          <div className="like-users-overlay" onClick={() => setShowLikeUsers(false)}>
+            <div className="like-users-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="like-users-header">
+                <span>좋아요 {likeUsers.length}</span>
+                <button onClick={() => setShowLikeUsers(false)}>✕</button>
+              </div>
+              <div className="like-users-list">
+                {likeUsers.length === 0 ? (
+                  <p className="like-users-empty">아직 좋아요가 없습니다.</p>
+                ) : (
+                  likeUsers.map((u) => (
+                    <div key={u.userId} className="like-users-item" onClick={() => { setShowLikeUsers(false); navigate(`/mypage/${u.userId}`); }}>
+                      {u.profileImgNm ? (
+                        <img src={u.profileImgNm} alt={u.userNm} className="like-users-avatar" />
+                      ) : (
+                        <div className="like-users-avatar like-users-avatar-placeholder">{u.userNm?.[0]}</div>
+                      )}
+                      <span className="like-users-name">{u.userNm}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        )}
         <div className="detail-header">
           <button className="detail-close" onClick={onClose}>✕</button>
           <div className="detail-actions">
