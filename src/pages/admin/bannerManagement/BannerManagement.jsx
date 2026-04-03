@@ -122,13 +122,60 @@ const BannerManagement = ({ registerTrigger }) => {
 
     const closeForm = () => setShowForm(false);
 
-    const handleImageSelect = (file) => {
+    const BANNER_WIDTH = 1920;
+    const BANNER_HEIGHT = 480;
+
+    const cropAndResizeImage = (file) => new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            const targetRatio = BANNER_WIDTH / BANNER_HEIGHT;
+            const srcRatio = img.width / img.height;
+
+            let sx, sy, sw, sh;
+            if (srcRatio > targetRatio) {
+                // 원본이 더 넓음 → 좌우 crop
+                sh = img.height;
+                sw = img.height * targetRatio;
+                sx = (img.width - sw) / 2;
+                sy = 0;
+            } else {
+                // 원본이 더 높음 → 상하 crop
+                sw = img.width;
+                sh = img.width / targetRatio;
+                sx = 0;
+                sy = (img.height - sh) / 2;
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = BANNER_WIDTH;
+            canvas.height = BANNER_HEIGHT;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, sx, sy, sw, sh, 0, 0, BANNER_WIDTH, BANNER_HEIGHT);
+            canvas.toBlob(blob => {
+                if (!blob) { reject(new Error('변환 실패')); return; }
+                const resized = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
+                resolve(resized);
+            }, 'image/jpeg', 0.92);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('이미지 로드 실패')); };
+        img.src = url;
+    });
+
+    const handleImageSelect = async (file) => {
         if (!file || !file.type.startsWith('image/')) {
             toast.error('이미지 파일만 업로드할 수 있습니다.');
             return;
         }
-        setImageFile(file);
-        setImagePreview(URL.createObjectURL(file));
+        try {
+            const resized = await cropAndResizeImage(file);
+            setImageFile(resized);
+            setImagePreview(URL.createObjectURL(resized));
+            toast.info(`이미지를 배너 규격(${BANNER_WIDTH}×${BANNER_HEIGHT})으로 자동 조정했습니다.`);
+        } catch {
+            toast.error('이미지 처리 중 오류가 발생했습니다.');
+        }
     };
 
     const handleFileChange = (e) => {
@@ -219,7 +266,7 @@ const BannerManagement = ({ registerTrigger }) => {
                                         >
                                             <Upload size={24} className="banner-mgmt-dropzone-icon" />
                                             <p className="banner-mgmt-dropzone-text">클릭하거나 이미지를 드래그하세요</p>
-                                            <p className="banner-mgmt-dropzone-hint">JPG, PNG, WEBP</p>
+                                            <p className="banner-mgmt-dropzone-hint">JPG, PNG, WEBP · 권장 비율 16:4 (1920×480) · 업로드 시 자동 크롭</p>
                                         </div>
                                     )}
                                     <input
