@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import DaumPostcode from "react-daum-postcode";
+import { loadTossPayments } from "@tosspayments/payment-sdk";
 import { InsertOrder } from "../../../api/user/order";
-import { DirectCompleteOrder } from "../../../api/user/payment";
 import { GetPoint } from "../../../api/user/point";
 import { GetMyCoupons } from "../../../api/user/coupon";
 import { ListAddress, InsertAddress, DeleteAddress, SetDefaultAddress } from "../../../api/user/address";
@@ -14,8 +14,6 @@ function OrderModal({ product, selectedSize, onClose }) {
   const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [orderResult, setOrderResult] = useState(null);
-  const [appliedCouponDiscount, setAppliedCouponDiscount] = useState(0);
 
   // 주소 상태
   const [addresses, setAddresses] = useState([]);
@@ -61,6 +59,16 @@ function OrderModal({ product, selectedSize, onClose }) {
     setForm(prev => ({ ...prev, quantity: Math.max(1, Math.min(maxQuantity, prev.quantity + delta)) }));
   };
 
+  // 쿠폰이 이 상품에 적용 가능한지 확인 (카테고리/브랜드 제한)
+  const isCouponApplicable = (coupon) => {
+    const cats = coupon.targetCategories || [];
+    const brandIds = coupon.targetBrandIds || [];
+    if (cats.length === 0 && brandIds.length === 0) return true;
+    if (cats.length > 0 && cats.includes(product.category)) return true;
+    if (brandIds.length > 0 && brandIds.includes(product.brandId)) return true;
+    return false;
+  };
+
   const totalPrice = product.productPrice * form.quantity;
   const couponDiscount = (() => {
     if (!selectedCoupon || totalPrice < (selectedCoupon.minOrderPrice || 0)) return 0;
@@ -98,13 +106,20 @@ function OrderModal({ product, selectedSize, onClose }) {
         sizeNm: selectedSize?.sizeNm || null,
         userCouponId: selectedCoupon?.userCouponId || null,
       });
-      setAppliedCouponDiscount(couponDiscount);
-      const completeRes = await DirectCompleteOrder(res.data.tossOrderId);
-      setOrderResult(completeRes.data);
+
+      const tossPayments = await loadTossPayments(process.env.REACT_APP_TOSS_CLIENT_KEY);
+      await tossPayments.requestPayment("카드", {
+        amount: finalPrice,
+        orderId: res.data.tossOrderId,
+        orderName: product.productNm,
+        customerName: addr.recipientName,
+        successUrl: `${window.location.origin}/payment/success`,
+        failUrl: `${window.location.origin}/payment/fail`,
+      });
+      // requestPayment 성공 시 토스가 successUrl로 리다이렉트하므로 아래 코드는 실행되지 않음
     } catch (err) {
       const msg = err?.response?.data?.msg || err?.message || "";
       if (msg) setError(msg);
-    } finally {
       setSubmitting(false);
     }
   };
@@ -158,32 +173,6 @@ function OrderModal({ product, selectedSize, onClose }) {
   };
 
   const thumbImg = product.images?.length > 0 ? product.images[0].imgPath : null;
-
-  if (orderResult) {
-    return (
-      <div className="order-modal-overlay" onClick={onClose}>
-        <div className="order-modal" onClick={e => e.stopPropagation()}>
-          <div className="order-modal-header">
-            <h3 className="order-modal-title">주문 완료</h3>
-            <button className="order-modal-close" onClick={onClose}>✕</button>
-          </div>
-          <div className="order-modal-body order-success-body">
-            <div className="order-success-icon">✓</div>
-            <p className="order-success-title">결제가 완료되었습니다</p>
-            <div className="order-success-info">
-              <div className="order-success-row"><span>주문 상품</span><span>{orderResult.productNm}</span></div>
-              <div className="order-success-row"><span>수량</span><span>{orderResult.quantity}개</span></div>
-              <div className="order-success-row"><span>결제 금액</span><span>{orderResult.actualPayment?.toLocaleString()}원</span></div>
-              {appliedCouponDiscount > 0 && <div className="order-success-row"><span>쿠폰 할인</span><span>− {appliedCouponDiscount.toLocaleString()}원</span></div>}
-              {orderResult.usedPoint > 0 && <div className="order-success-row"><span>포인트 사용</span><span>− {orderResult.usedPoint?.toLocaleString()}P</span></div>}
-              {orderResult.earnedPoint > 0 && <div className="order-success-row earn"><span>적립 포인트</span><span>+ {orderResult.earnedPoint?.toLocaleString()}P</span></div>}
-            </div>
-            <button className="order-submit-btn" onClick={onClose}>확인</button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -269,33 +258,40 @@ function OrderModal({ product, selectedSize, onClose }) {
               <div className="order-field">
                 <label className="order-label">쿠폰</label>
                 <div className="order-coupon-wrap">
-                  {coupons.length === 0 ? (
-                    <span className="order-point-available">사용 가능한 쿠폰이 없습니다</span>
-                  ) : (
-                    <>
-                      <select
-                        className="order-input order-coupon-select"
-                        value={selectedCoupon?.userCouponId || ''}
-                        onChange={(e) => {
-                          const c = coupons.find(c => String(c.userCouponId) === e.target.value);
-                          setSelectedCoupon(c || null);
-                        }}
-                      >
-                        <option value="">쿠폰 선택 안함</option>
-                        {coupons.map(c => {
-                          const applicable = totalPrice >= (c.minOrderPrice || 0);
-                          return (
-                            <option key={c.userCouponId} value={c.userCouponId} disabled={!applicable}>
-                              {formatCouponLabel(c)}{!applicable ? ` (${c.minOrderPrice.toLocaleString()}원 이상)` : ''}
-                            </option>
-                          );
-                        })}
-                      </select>
-                      {selectedCoupon && totalPrice < (selectedCoupon.minOrderPrice || 0) && (
-                        <p className="order-coupon-warn">최소 주문금액 {selectedCoupon.minOrderPrice.toLocaleString()}원 이상 구매 시 사용 가능합니다.</p>
-                      )}
-                    </>
-                  )}
+                  {(() => {
+                    const productCoupons = coupons.filter(isCouponApplicable);
+                    if (coupons.length === 0) {
+                      return <span className="order-point-available">사용 가능한 쿠폰이 없습니다</span>;
+                    }
+                    if (productCoupons.length === 0) {
+                      return <span className="order-point-available">이 상품에 적용 가능한 쿠폰이 없습니다</span>;
+                    }
+                    return (
+                      <>
+                        <select
+                          className="order-input order-coupon-select"
+                          value={selectedCoupon?.userCouponId || ''}
+                          onChange={(e) => {
+                            const c = productCoupons.find(c => String(c.userCouponId) === e.target.value);
+                            setSelectedCoupon(c || null);
+                          }}
+                        >
+                          <option value="">쿠폰 선택 안함</option>
+                          {productCoupons.map(c => {
+                            const meetsMin = totalPrice >= (c.minOrderPrice || 0);
+                            return (
+                              <option key={c.userCouponId} value={c.userCouponId} disabled={!meetsMin}>
+                                {formatCouponLabel(c)}{!meetsMin ? ` (${c.minOrderPrice.toLocaleString()}원 이상)` : ''}
+                              </option>
+                            );
+                          })}
+                        </select>
+                        {selectedCoupon && totalPrice < (selectedCoupon.minOrderPrice || 0) && (
+                          <p className="order-coupon-warn">최소 주문금액 {selectedCoupon.minOrderPrice.toLocaleString()}원 이상 구매 시 사용 가능합니다.</p>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
 
