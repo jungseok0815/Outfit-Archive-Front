@@ -1,11 +1,21 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { CreateCoupon, ListCoupon, UpdateCoupon, DeleteCoupon } from '../../../api/admin/coupon';
+import { ListBrand } from '../../../api/admin/brand';
 import ConfirmModal from '../../../components/common/Modal/ConfirmModal';
 import Pagination from '../../../components/common/Pagination/Pagination';
 import { toast } from 'react-toastify';
 import './CouponManagement.css';
 
 const PAGE_SIZE = 10;
+
+const CATEGORIES = [
+    { value: 'TOP', label: '상의' },
+    { value: 'BOTTOM', label: '하의' },
+    { value: 'OUTER', label: '아우터' },
+    { value: 'DRESS', label: '원피스' },
+    { value: 'SHOES', label: '신발' },
+    { value: 'BAG', label: '가방' },
+];
 
 const INITIAL_FORM = {
     code: '',
@@ -17,6 +27,8 @@ const INITIAL_FORM = {
     totalQuantity: '',
     startAt: '',
     endAt: '',
+    targetCategories: [],
+    targetBrandIds: [],
 };
 
 const toInputFormat = (dt) => {
@@ -26,6 +38,7 @@ const toInputFormat = (dt) => {
 
 const CouponManagement = ({ registerTrigger }) => {
     const [coupons, setCoupons] = useState([]);
+    const [brands, setBrands] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const [editTarget, setEditTarget] = useState(null);
@@ -34,12 +47,18 @@ const CouponManagement = ({ registerTrigger }) => {
     const [deletingId, setDeletingId] = useState(null);
     const [confirmTarget, setConfirmTarget] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [brandSearch, setBrandSearch] = useState('');
     const isMounted = useRef(false);
 
     const totalPages = Math.max(1, Math.ceil(coupons.length / PAGE_SIZE));
     const pagedCoupons = useMemo(
         () => coupons.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
         [coupons, currentPage]
+    );
+
+    const filteredBrands = useMemo(
+        () => brands.filter(b => b.brandNm.toLowerCase().includes(brandSearch.toLowerCase())),
+        [brands, brandSearch]
     );
 
     const loadCoupons = () => {
@@ -50,7 +69,10 @@ const CouponManagement = ({ registerTrigger }) => {
             .finally(() => setLoading(false));
     };
 
-    useEffect(() => { loadCoupons(); }, []);
+    useEffect(() => {
+        loadCoupons();
+        ListBrand('', 0, 200).then(res => setBrands(res.data.content || [])).catch(() => {});
+    }, []);
 
     useEffect(() => {
         if (!isMounted.current) {
@@ -63,6 +85,7 @@ const CouponManagement = ({ registerTrigger }) => {
     const openCreate = () => {
         setEditTarget(null);
         setForm(INITIAL_FORM);
+        setBrandSearch('');
         setShowForm(true);
     };
 
@@ -78,7 +101,10 @@ const CouponManagement = ({ registerTrigger }) => {
             totalQuantity: String(coupon.totalQuantity),
             startAt: toInputFormat(coupon.startAt),
             endAt: toInputFormat(coupon.endAt),
+            targetCategories: coupon.targetCategories || [],
+            targetBrandIds: coupon.targetBrandIds || [],
         });
+        setBrandSearch('');
         setShowForm(true);
     };
 
@@ -86,11 +112,30 @@ const CouponManagement = ({ registerTrigger }) => {
         setShowForm(false);
         setEditTarget(null);
         setForm(INITIAL_FORM);
+        setBrandSearch('');
     };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const toggleCategory = (value) => {
+        setForm(prev => ({
+            ...prev,
+            targetCategories: prev.targetCategories.includes(value)
+                ? prev.targetCategories.filter(c => c !== value)
+                : [...prev.targetCategories, value],
+        }));
+    };
+
+    const toggleBrand = (id) => {
+        setForm(prev => ({
+            ...prev,
+            targetBrandIds: prev.targetBrandIds.includes(id)
+                ? prev.targetBrandIds.filter(b => b !== id)
+                : [...prev.targetBrandIds, id],
+        }));
     };
 
     const validate = () => {
@@ -121,6 +166,8 @@ const CouponManagement = ({ registerTrigger }) => {
                 totalQuantity: Number(form.totalQuantity),
                 startAt: form.startAt,
                 endAt: form.endAt,
+                targetCategories: form.targetCategories,
+                targetBrandIds: form.targetBrandIds,
             };
             UpdateCoupon(editTarget.id, dto)
                 .then(() => {
@@ -170,6 +217,28 @@ const CouponManagement = ({ registerTrigger }) => {
     const isActive = (startAt, endAt) => {
         const now = new Date();
         return new Date(startAt) <= now && now < new Date(endAt);
+    };
+
+    const renderTargetBadges = (coupon) => {
+        const cats = coupon.targetCategories || [];
+        const brandIds = coupon.targetBrandIds || [];
+        if (cats.length === 0 && brandIds.length === 0) {
+            return <span className="coupon-target-badge coupon-target-badge--all">전체</span>;
+        }
+        return (
+            <div className="coupon-target-badges">
+                {cats.map(c => {
+                    const found = CATEGORIES.find(x => x.value === c);
+                    return <span key={c} className="coupon-target-badge coupon-target-badge--cat">{found?.label || c}</span>;
+                })}
+                {brandIds.map(id => {
+                    const found = brands.find(b => b.id === id);
+                    return found
+                        ? <span key={id} className="coupon-target-badge coupon-target-badge--brand">{found.brandNm}</span>
+                        : null;
+                })}
+            </div>
+        );
     };
 
     return (
@@ -316,6 +385,84 @@ const CouponManagement = ({ registerTrigger }) => {
                                 </div>
                             </div>
 
+                            {/* 적용 대상 */}
+                            <div className="coupon-target-section">
+                                <div className="coupon-target-section-header">
+                                    <span className="coupon-target-section-title">적용 대상</span>
+                                    <span className="coupon-target-section-hint">
+                                        선택하지 않으면 전체 상품에 적용됩니다
+                                    </span>
+                                </div>
+
+                                {/* 카테고리 */}
+                                <div className="coupon-target-group">
+                                    <div className="coupon-target-group-label">
+                                        카테고리
+                                        {form.targetCategories.length > 0 && (
+                                            <span className="coupon-target-count">{form.targetCategories.length}개 선택</span>
+                                        )}
+                                    </div>
+                                    <div className="coupon-chip-group">
+                                        {CATEGORIES.map(cat => (
+                                            <button
+                                                key={cat.value}
+                                                type="button"
+                                                className={`coupon-chip ${form.targetCategories.includes(cat.value) ? 'active' : ''}`}
+                                                onClick={() => toggleCategory(cat.value)}
+                                            >
+                                                {cat.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* 브랜드 */}
+                                <div className="coupon-target-group">
+                                    <div className="coupon-target-group-label">
+                                        브랜드
+                                        {form.targetBrandIds.length > 0 && (
+                                            <span className="coupon-target-count">{form.targetBrandIds.length}개 선택</span>
+                                        )}
+                                    </div>
+                                    <input
+                                        className="coupon-brand-search"
+                                        type="text"
+                                        placeholder="브랜드 검색..."
+                                        value={brandSearch}
+                                        onChange={e => setBrandSearch(e.target.value)}
+                                    />
+                                    <div className="coupon-brand-list">
+                                        {filteredBrands.length === 0 ? (
+                                            <p className="coupon-brand-empty">검색 결과가 없습니다.</p>
+                                        ) : (
+                                            filteredBrands.map(brand => (
+                                                <label key={brand.id} className="coupon-brand-item">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={form.targetBrandIds.includes(brand.id)}
+                                                        onChange={() => toggleBrand(brand.id)}
+                                                    />
+                                                    <span className="coupon-brand-name">{brand.brandNm}</span>
+                                                </label>
+                                            ))
+                                        )}
+                                    </div>
+                                    {form.targetBrandIds.length > 0 && (
+                                        <div className="coupon-brand-selected-tags">
+                                            {form.targetBrandIds.map(id => {
+                                                const b = brands.find(br => br.id === id);
+                                                return b ? (
+                                                    <span key={id} className="coupon-brand-tag">
+                                                        {b.brandNm}
+                                                        <button type="button" onClick={() => toggleBrand(id)}>×</button>
+                                                    </span>
+                                                ) : null;
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
                             {/* 미리보기 */}
                             {form.discountValue && form.name && (
                                 <div className="coupon-preview">
@@ -325,6 +472,14 @@ const CouponManagement = ({ registerTrigger }) => {
                                             <span className="coupon-preview-code">{form.code || 'CODE'}</span>
                                             {form.minOrderPrice && (
                                                 <span className="coupon-preview-min">{Number(form.minOrderPrice).toLocaleString()}원 이상 구매 시</span>
+                                            )}
+                                            {(form.targetCategories.length > 0 || form.targetBrandIds.length > 0) && (
+                                                <span className="coupon-preview-target">
+                                                    {[
+                                                        ...form.targetCategories.map(c => CATEGORIES.find(x => x.value === c)?.label || c),
+                                                        ...form.targetBrandIds.map(id => brands.find(b => b.id === id)?.brandNm || ''),
+                                                    ].filter(Boolean).join(', ')} 전용
+                                                </span>
                                             )}
                                         </div>
                                         <div className="coupon-preview-right">
@@ -374,6 +529,7 @@ const CouponManagement = ({ registerTrigger }) => {
                                 <th>쿠폰명</th>
                                 <th>할인</th>
                                 <th>최소주문</th>
+                                <th>적용대상</th>
                                 <th>발급현황</th>
                                 <th>유효기간</th>
                                 <th>상태</th>
@@ -394,6 +550,7 @@ const CouponManagement = ({ registerTrigger }) => {
                                         )}
                                     </td>
                                     <td>{c.minOrderPrice.toLocaleString()}원 이상</td>
+                                    <td>{renderTargetBadges(c)}</td>
                                     <td>
                                         <div className="coupon-qty-wrap">
                                             <div

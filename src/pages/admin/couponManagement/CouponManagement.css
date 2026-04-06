@@ -470,3 +470,233 @@
     color: #9ca3af !important;
     cursor: not-allowed;
 }
+
+/* ── 적용 대상 섹션 ── */
+.coupon-target-section {
+    margin-top: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.coupon-target-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.coupon-target-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.coupon-target-section-hint {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+.coupon-target-group {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.coupon-target-group:last-child {
+    border-bottom: none;
+}
+
+.coupon-target-group-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.coupon-target-count {
+    display: inline-block;
+    background: #111827;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 99px;
+    padding: 1px 8px;
+}
+
+/* 카테고리 칩 */
+.coupon-chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.coupon-chip {
+    height: 30px;
+    padding: 0 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 99px;
+    background: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+
+.coupon-chip:hover {
+    border-color: #9ca3af;
+    background: #f3f4f6;
+}
+
+.coupon-chip.active {
+    background: #111827;
+    border-color: #111827;
+    color: #fff;
+}
+
+/* 브랜드 검색 */
+.coupon-brand-search {
+    width: 100%;
+    height: 34px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    padding: 0 10px;
+    font-size: 12px;
+    color: #111827;
+    background: #f9fafb;
+    outline: none;
+    margin-bottom: 8px;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+}
+
+.coupon-brand-search:focus {
+    border-color: #111827;
+    background: #fff;
+}
+
+/* 브랜드 체크박스 목록 */
+.coupon-brand-list {
+    max-height: 160px;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 7px;
+    background: #fff;
+}
+
+.coupon-brand-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.coupon-brand-item:hover {
+    background: #f9fafb;
+}
+
+.coupon-brand-item input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    accent-color: #111827;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.coupon-brand-name {
+    font-size: 12px;
+    color: #374151;
+}
+
+.coupon-brand-empty {
+    padding: 16px;
+    text-align: center;
+    font-size: 12px;
+    color: #9ca3af;
+    margin: 0;
+}
+
+/* 선택된 브랜드 태그 */
+.coupon-brand-selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.coupon-brand-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 24px;
+    padding: 0 10px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #16a34a;
+}
+
+.coupon-brand-tag button {
+    border: none;
+    background: none;
+    color: #16a34a;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.coupon-brand-tag button:hover {
+    color: #dc2626;
+}
+
+/* 미리보기 적용 대상 텍스트 */
+.coupon-preview-target {
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 2px;
+}
+
+/* 테이블 적용대상 뱃지 */
+.coupon-target-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+}
+
+.coupon-target-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.coupon-target-badge--all {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.coupon-target-badge--cat {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.coupon-target-badge--brand {
+    background: #f0fdf4;
+    color: #16a34a;
+}
