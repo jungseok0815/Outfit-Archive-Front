@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import "../auth/auth.css"
 import LoginForm from "./LoginForm";
 import JoinForm from "./JoinForm";
+import ForgotPasswordForm from "./ForgotPasswordForm";
 
 function AuthModal({ onClose }) {
-    const [isLogin, setIsLogin] = useState(true);
+    const [view, setView] = useState("login"); // "login" | "join" | "forgot"
 
     const handleOverlayClick = (e) => {
         if (e.target === e.currentTarget) {
@@ -24,22 +25,42 @@ function AuthModal({ onClose }) {
                     <p className="auth-subtitle">당신의 패션, 당신의 이야기</p>
                 </div>
                 <div className="auth-form">
-                    <div className="form-toggle">
-                        <button
-                            className={isLogin ? "active" : ""}
-                            onClick={() => setIsLogin(true)}
-                        >
-                            로그인
-                        </button>
-                        <button
-                            className={!isLogin ? "active" : ""}
-                            onClick={() => setIsLogin(false)}
-                        >
-                            회원가입
-                        </button>
-                    </div>
-                    <div className="form-content" key={isLogin ? "login" : "join"}>
-                        {isLogin ? (<LoginForm onClose={onClose} />) : (<JoinForm onSuccess={() => setIsLogin(true)} />)}
+                    {view !== "forgot" && (
+                        <div className="form-toggle">
+                            <button
+                                className={view === "login" ? "active" : ""}
+                                onClick={() => setView("login")}
+                            >
+                                로그인
+                            </button>
+                            <button
+                                className={view === "join" ? "active" : ""}
+                                onClick={() => setView("join")}
+                            >
+                                회원가입
+                            </button>
+                        </div>
+                    )}
+                    {view === "forgot" && (
+                        <p style={{ fontWeight: 600, fontSize: "0.95em", color: "#222", marginBottom: 20 }}>
+                            비밀번호 찾기
+                        </p>
+                    )}
+                    <div className="form-content" key={view}>
+                        {view === "login" && (
+                            <>
+                                <LoginForm onClose={onClose} />
+                                <button
+                                    type="button"
+                                    onClick={() => setView("forgot")}
+                                    style={{ marginTop: 12, background: "none", border: "none", color: "#888", fontSize: "0.8em", cursor: "pointer", width: "100%" }}
+                                >
+                                    비밀번호를 잊으셨나요?
+                                </button>
+                            </>
+                        )}
+                        {view === "join" && <JoinForm onSuccess={() => setView("login")} />}
+                        {view === "forgot" && <ForgotPasswordForm onBack={() => setView("login")} />}
                     </div>
                 </div>
                 <div className="auth-footer">

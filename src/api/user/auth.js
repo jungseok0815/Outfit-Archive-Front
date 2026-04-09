@@ -26,6 +26,16 @@ export const Logout = () => {
     return api.post("/api/usr/logout");
 }
 
+// 비밀번호 재설정 이메일 발송
+export const postForgotPassword = (email) => {
+    return api.post("/api/usr/forgot-password", { email });
+}
+
+// 비밀번호 재설정 (토큰 + 새 비밀번호)
+export const postResetPassword = (token, newPassword) => {
+    return api.post("/api/usr/reset-password", { token, newPassword });
+}
+
 // 프로필 이미지 수정
 export const UpdateProfileImg = (id, file) => {
     const fd = new FormData();
