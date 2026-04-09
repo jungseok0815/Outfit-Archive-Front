@@ -15,6 +15,7 @@ import SearchPage from './pages/user/search/SearchPage';
 import BrandPage from './pages/user/brand/BrandPage';
 import PaymentSuccessPage from './pages/user/payment/PaymentSuccessPage';
 import PaymentFailPage from './pages/user/payment/PaymentFailPage';
+import ResetPasswordPage from './pages/user/auth/ResetPasswordPage';
 import { AuthProvider } from './store/context/UserContext';
 
 
@@ -37,6 +38,7 @@ function App() {
                   <Route path='/mypage/:userId' element={<MyPage/>}/>
                   <Route path='/payment/success' element={<PaymentSuccessPage/>}/>
                   <Route path='/payment/fail' element={<PaymentFailPage/>}/>
+                  <Route path='/reset-password' element={<ResetPasswordPage/>}/>
                   <Route path='/admin' element={<PrivateMasterRoute component={<Admin />}/>}/>
                   </Routes>
               </BrowserRouter>
