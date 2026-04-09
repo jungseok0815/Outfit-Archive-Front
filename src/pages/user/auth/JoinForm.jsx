@@ -11,6 +11,8 @@ function JoinForm({ onSuccess }){
     userAge: "",
     authName: "USER"
   });
+  const [confirmPwd, setConfirmPwd] = useState("");
+  const [pwdMismatch, setPwdMismatch] = useState(false);
   const [toast, setToast] = useState({ message: "", type: "success" });
 
   const closeToast = useCallback(() => setToast({ message: "", type: "success" }), []);
@@ -20,8 +22,18 @@ function JoinForm({ onSuccess }){
     setJoinForm({ ...joinForm, [name]: value });
   };
 
+  const handleConfirmPwdChange = (e) => {
+    const value = e.target.value;
+    setConfirmPwd(value);
+    setPwdMismatch(joinForm.userPwd !== value);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (joinForm.userPwd !== confirmPwd) {
+      setPwdMismatch(true);
+      return;
+    }
     postJoin(joinForm).then(() => {
         setToast({ message: "회원가입이 완료되었습니다! 로그인해주세요.", type: "success" });
         setTimeout(() => { if (onSuccess) onSuccess(); }, 1500);
@@ -83,6 +95,23 @@ function JoinForm({ onSuccess }){
             placeholder="비밀번호를 입력하세요"
             required
           />
+        </div>
+        <div className="form-group">
+          <label htmlFor="confirmPwd">비밀번호 확인</label>
+          <input
+            type="password"
+            id="confirmPwd"
+            name="confirmPwd"
+            value={confirmPwd}
+            onChange={handleConfirmPwdChange}
+            placeholder="비밀번호를 다시 입력하세요"
+            required
+          />
+          {pwdMismatch && (
+            <p style={{ color: "red", fontSize: "0.8rem", marginTop: "4px" }}>
+              비밀번호가 일치하지 않습니다.
+            </p>
+          )}
         </div>
         <button type="submit" className="submit-button">
             회원가입
