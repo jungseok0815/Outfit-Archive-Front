@@ -9,7 +9,8 @@ function JoinForm({ onSuccess }){
     userPwd: "",
     userNm: "",
     userAge: "",
-    authName: "USER"
+    authName: "USER",
+    phone: ""
   });
   const [confirmPwd, setConfirmPwd] = useState("");
   const [pwdMismatch, setPwdMismatch] = useState(false);
@@ -81,6 +82,18 @@ function JoinForm({ onSuccess }){
             value={joinForm.userId}
             onChange={handleInputChange}
             placeholder="이메일을 입력하세요"
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="phone">전화번호</label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            value={joinForm.phone}
+            onChange={handleInputChange}
+            placeholder="전화번호를 입력하세요 (예: 01012345678)"
             required
           />
         </div>

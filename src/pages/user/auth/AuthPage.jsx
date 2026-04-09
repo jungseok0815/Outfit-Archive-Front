@@ -3,9 +3,10 @@ import "../auth/auth.css"
 import LoginForm from "./LoginForm";
 import JoinForm from "./JoinForm";
 import ForgotPasswordForm from "./ForgotPasswordForm";
+import FindIdForm from "./FindIdForm";
 
 function AuthModal({ onClose }) {
-    const [view, setView] = useState("login"); // "login" | "join" | "forgot"
+    const [view, setView] = useState("login"); // "login" | "join" | "forgot" | "findId"
 
     const handleOverlayClick = (e) => {
         if (e.target === e.currentTarget) {
@@ -25,7 +26,7 @@ function AuthModal({ onClose }) {
                     <p className="auth-subtitle">당신의 패션, 당신의 이야기</p>
                 </div>
                 <div className="auth-form">
-                    {view !== "forgot" && (
+                    {(view === "login" || view === "join") && (
                         <div className="form-toggle">
                             <button
                                 className={view === "login" ? "active" : ""}
@@ -46,21 +47,37 @@ function AuthModal({ onClose }) {
                             비밀번호 찾기
                         </p>
                     )}
+                    {view === "findId" && (
+                        <p style={{ fontWeight: 600, fontSize: "0.95em", color: "#222", marginBottom: 20 }}>
+                            아이디 찾기
+                        </p>
+                    )}
                     <div className="form-content" key={view}>
                         {view === "login" && (
                             <>
                                 <LoginForm onClose={onClose} />
-                                <button
-                                    type="button"
-                                    onClick={() => setView("forgot")}
-                                    style={{ marginTop: 12, background: "none", border: "none", color: "#888", fontSize: "0.8em", cursor: "pointer", width: "100%" }}
-                                >
-                                    비밀번호를 잊으셨나요?
-                                </button>
+                                <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginTop: 12 }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setView("findId")}
+                                        style={{ background: "none", border: "none", color: "#888", fontSize: "0.8em", cursor: "pointer" }}
+                                    >
+                                        아이디 찾기
+                                    </button>
+                                    <span style={{ color: "#ddd", fontSize: "0.8em", lineHeight: "1.8" }}>|</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => setView("forgot")}
+                                        style={{ background: "none", border: "none", color: "#888", fontSize: "0.8em", cursor: "pointer" }}
+                                    >
+                                        비밀번호 찾기
+                                    </button>
+                                </div>
                             </>
                         )}
                         {view === "join" && <JoinForm onSuccess={() => setView("login")} />}
                         {view === "forgot" && <ForgotPasswordForm onBack={() => setView("login")} />}
+                        {view === "findId" && <FindIdForm onBack={() => setView("login")} />}
                     </div>
                 </div>
                 <div className="auth-footer">
