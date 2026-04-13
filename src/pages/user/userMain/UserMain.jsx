@@ -15,18 +15,12 @@ import "../../../App.css";
 import "./UserMain.css";
 import "../../../styles/user/Hero.css";
 
-const DEFAULT_HERO_SLIDES = [
-  { title: "Define Your", highlight: "Style", description: "Discover curated fashion that speaks to your identity", buttonText: "Explore Now" },
-  { title: "New Season", highlight: "Collection", description: "The latest trends from the world's finest designers", buttonText: "Shop Collection" },
-  { title: "Timeless", highlight: "Elegance", description: "Classic pieces that transcend every season", buttonText: "View Lookbook" }
-];
-
 function App() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [inputValue, setInputValue] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [heroSlides, setHeroSlides] = useState(DEFAULT_HERO_SLIDES);
+  const [heroSlides, setHeroSlides] = useState([]);
   const [heroIndex, setHeroIndex] = useState(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [feedItems, setFeedItems] = useState([]);
@@ -175,8 +169,8 @@ function App() {
         <PostDetailPanel post={selectedPost} onClose={() => setSelectedPost(null)} />
       )}
 
-      {/* 히어로 섹션 */}
-      <div className="hero-container">
+      {/* 히어로 섹션 - 배너 없으면 미표시 */}
+      {heroSlides.length > 0 && <div className="hero-container">
         <div className="hero-slider">
           {heroSlides.map((slide, index) => (
             <div
@@ -204,7 +198,7 @@ function App() {
             <button key={index} className={`dot ${index === heroIndex ? 'active' : ''}`} onClick={() => setHeroIndex(index)} />
           ))}
         </div>
-      </div>
+      </div>}
 
       {/* 검색바 영역 */}
       <div className="search-container">
