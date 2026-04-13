@@ -26,6 +26,11 @@ export const Logout = () => {
     return api.post("/api/usr/logout");
 }
 
+// 아이디 찾기 (전화번호 → 마스킹된 이메일)
+export const getFindId = (phone) => {
+    return api.get("/api/usr/find-id", { params: { phone } });
+}
+
 // 비밀번호 재설정 이메일 발송
 export const postForgotPassword = (email) => {
     return api.post("/api/usr/forgot-password", { email });
