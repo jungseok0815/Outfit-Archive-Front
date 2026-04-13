@@ -458,6 +458,7 @@ function MyPage() {
                       {order.brandNm && <span className="mypage-order-brand">{order.brandNm}</span>}
                       <span className="mypage-order-product">{order.productNm}</span>
                       {order.productEnNm && <span className="mypage-order-product-en">{order.productEnNm}</span>}
+                      {order.sizeNm && <span className="mypage-order-size">사이즈 {order.sizeNm}</span>}
                       <span className="mypage-order-qty">수량 {order.quantity}개</span>
                     </div>
                     <strong className="mypage-order-price">{(order.actualPayment ?? order.totalPrice)?.toLocaleString()}원</strong>

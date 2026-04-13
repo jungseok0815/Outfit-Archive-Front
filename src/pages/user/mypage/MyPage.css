@@ -361,6 +361,11 @@
   text-overflow: ellipsis;
 }
 
+.mypage-order-size {
+  font-size: 13px;
+  color: #777777;
+}
+
 .mypage-order-qty {
   font-size: 13px;
   color: #999999;
