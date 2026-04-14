@@ -4,7 +4,8 @@ import { toast } from "react-toastify";
 import OrderModal from "./OrderModal";
 import PostDetailPanel from "../mypage/PostDetailPanel";
 import AuthModal from "../auth/AuthPage";
-import { GetProduct, ListProduct, ListProductReview } from "../../../api/user/product";
+import { GetProduct, ListProductReview } from "../../../api/user/product";
+import { GetSimilarProducts } from "../../../api/user/recommend";
 import { RecordProductView } from "../../../api/user/productView";
 import { CheckWishlist, ToggleWishlist } from "../../../api/user/wishlist";
 import { ListPostByProduct } from "../../../api/user/post";
@@ -66,26 +67,23 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
       .catch(() => {});
   }, [resolvedId]);
 
-  // 비슷한 상품 (같은 카테고리, 현재 상품 제외, 최대 8개)
+  // 비슷한 상품 (벡터 코사인 유사도 기반, 최대 8개)
   useEffect(() => {
-    if (!product?.category) return;
-    ListProduct('', product.category, 0, 9)
+    if (!resolvedId) return;
+    setSimilarProducts([]);
+    GetSimilarProducts(resolvedId, 8)
       .then(res => {
-        const items = (res.data.content || [])
-          .filter(p => p.id !== product.id)
-          .slice(0, 8)
-          .map(p => ({
-            id: p.id,
-            image: p.images?.length > 0 ? p.images[0].imgPath : '',
-            brand: p.brandNm,
-            name: p.productNm,
-            price: p.productPrice?.toLocaleString(),
-            _raw: p,
-          }));
+        const items = (res.data || []).map(p => ({
+          id: p.productId,
+          image: p.imgPath || '',
+          brand: p.brandNm,
+          name: p.productNm,
+          price: p.productPrice?.toLocaleString(),
+        }));
         setSimilarProducts(items);
       })
       .catch(() => {});
-  }, [product?.id, product?.category]);
+  }, [resolvedId]);
 
   useEffect(() => {
     if (!user || !resolvedId) return;
