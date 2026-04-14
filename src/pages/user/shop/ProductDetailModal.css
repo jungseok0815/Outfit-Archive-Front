@@ -37,7 +37,7 @@
 .pd-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 12px 16px;
   border-bottom: 1px solid #f0f0f0;
   flex-shrink: 0;
@@ -452,6 +452,36 @@
                  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .pd-post-meta  { font-size: 10px; color: #ccc; display: flex; gap: 7px; }
 
+/* ── 비슷한 상품 ── */
+.pd-similar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.pd-similar-card {
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+  transition: box-shadow 0.15s;
+}
+.pd-similar-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
+
+.pd-similar-img {
+  aspect-ratio: 1 / 1;
+  background: #f4f4f4;
+  overflow: hidden;
+}
+.pd-similar-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pd-similar-img-empty { width: 100%; height: 100%; background: #ebebeb; }
+
+.pd-similar-body { padding: 8px; }
+.pd-similar-brand { font-size: 10px; color: #bbb; margin: 0 0 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.pd-similar-name  { font-size: 11px; color: #333; margin: 0 0 4px; line-height: 1.4;
+                    overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.pd-similar-price { font-size: 12px; font-weight: 700; color: #1a1a1a; margin: 0; }
+
 /* ── 반응형 ── */
 @media (max-width: 760px) {
   .pd-panel {
@@ -471,4 +501,5 @@
   .pd-top { flex-direction: column; gap: 16px; }
   .pd-img-area { flex: none; width: 100%; }
   .pd-posts-grid { grid-template-columns: repeat(3, 1fr); }
+  .pd-similar-grid { grid-template-columns: repeat(3, 1fr); }
 }

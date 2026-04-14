@@ -30,6 +30,7 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
   const [productPosts, setProductPosts] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
+  const [similarProducts, setSimilarProducts] = useState([]);
 
   const resolvedId = productId || initialProduct?.id;
 
@@ -64,6 +65,27 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
       .then(res => setProductPosts(res.data.content || []))
       .catch(() => {});
   }, [resolvedId]);
+
+  // 비슷한 상품 (같은 카테고리, 현재 상품 제외, 최대 8개)
+  useEffect(() => {
+    if (!product?.category) return;
+    ListProduct('', product.category, 0, 9)
+      .then(res => {
+        const items = (res.data.content || [])
+          .filter(p => p.id !== product.id)
+          .slice(0, 8)
+          .map(p => ({
+            id: p.id,
+            image: p.images?.length > 0 ? p.images[0].imgPath : '',
+            brand: p.brandNm,
+            name: p.productNm,
+            price: p.productPrice?.toLocaleString(),
+            _raw: p,
+          }));
+        setSimilarProducts(items);
+      })
+      .catch(() => {});
+  }, [product?.id, product?.category]);
 
   useEffect(() => {
     if (!user || !resolvedId) return;
@@ -139,19 +161,10 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
 
         {/* ── 헤더 ── */}
         <div className="pd-header">
-          <div className="pd-header-left">
-            <button className="pd-close" onClick={onClose} aria-label="닫기">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
-            </button>
-          </div>
-          <button className="pd-fullpage" onClick={() => { onClose(); navigate(`/shop/${resolvedId}`); }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-              <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+          <button className="pd-close" onClick={onClose} aria-label="닫기">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
-            전체 페이지
           </button>
         </div>
 
@@ -331,6 +344,45 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
                   ))
                 )}
               </div>
+
+              {/* 비슷한 상품 */}
+              {similarProducts.length > 0 && (
+                <div className="pd-section">
+                  <div className="pd-section-head">
+                    <h3 className="pd-section-title">비슷한 상품</h3>
+                  </div>
+                  <div className="pd-similar-grid">
+                    {similarProducts.map(p => (
+                      <div
+                        key={p.id}
+                        className="pd-similar-card"
+                        onClick={() => {
+                          setImgIndex(0);
+                          setSelectedSize(null);
+                          setSimilarProducts([]);
+                          setProduct(null);
+                          setLoading(true);
+                          GetProduct(p.id)
+                            .then(res => setProduct(res.data))
+                            .catch(() => {})
+                            .finally(() => setLoading(false));
+                        }}
+                      >
+                        <div className="pd-similar-img">
+                          {p.image
+                            ? <img src={p.image} alt={p.name} />
+                            : <div className="pd-similar-img-empty" />}
+                        </div>
+                        <div className="pd-similar-body">
+                          <p className="pd-similar-brand">{p.brand}</p>
+                          <p className="pd-similar-name">{p.name}</p>
+                          <p className="pd-similar-price">{p.price}원</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* 연관 게시글 */}
               {productPosts.length > 0 && (
