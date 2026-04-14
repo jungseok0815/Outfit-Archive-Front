@@ -6,6 +6,7 @@ import AuthModal from '../auth/AuthPage';
 import StyleCard from '../../../components/user/card/StyleCard';
 import ProductCard from '../../../components/user/card/ProductCard';
 import PostDetailPanel from '../mypage/PostDetailPanel';
+import ProductDetailModal from '../shop/ProductDetailModal';
 import { ListPost, SearchPost, ToggleLike } from '../../../api/user/post';
 import { ListProduct } from '../../../api/user/product';
 import { GetWishlistProductIds } from '../../../api/user/wishlist';
@@ -27,6 +28,7 @@ function App() {
   const [popularProducts, setPopularProducts] = useState([]);
   const [wishlistedIds, setWishlistedIds] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchTab, setSearchTab] = useState("products");
 
   // 검색 결과
@@ -168,6 +170,9 @@ function App() {
       {selectedPost && (
         <PostDetailPanel post={selectedPost} onClose={() => setSelectedPost(null)} />
       )}
+      {selectedProduct && (
+        <ProductDetailModal product={selectedProduct._raw || selectedProduct} onClose={() => setSelectedProduct(null)} />
+      )}
 
       {/* 히어로 섹션 - 배너 없으면 미표시 */}
       {heroSlides.length > 0 && <div className="hero-container">
@@ -244,7 +249,7 @@ function App() {
               ? <div className="search-empty"><p>"{searchKeyword}"에 해당하는 상품이 없습니다.</p></div>
               : <div className="popular-grid">
                   {searchProducts.map(product => (
-                    <ProductCard key={product.id} product={product} isWished={wishlistedIds.includes(product.id)} />
+                    <ProductCard key={product.id} product={product} isWished={wishlistedIds.includes(product.id)} onDetailClick={setSelectedProduct} />
                   ))}
                 </div>
           ) : (
@@ -289,7 +294,7 @@ function App() {
             </div>
             <div className="popular-grid">
               {visibleProducts.map((product, index) => (
-                <ProductCard key={product.id} product={product} rank={index + 1} isWished={wishlistedIds.includes(product.id)} />
+                <ProductCard key={product.id} product={product} rank={index + 1} isWished={wishlistedIds.includes(product.id)} onDetailClick={setSelectedProduct} />
               ))}
             </div>
             <div className="popular-more">

@@ -11,7 +11,7 @@ const formatCount = (n) => {
   return n.toLocaleString();
 };
 
-function ProductCard({ product, rank, isWished = false }) {
+function ProductCard({ product, rank, isWished = false, onDetailClick }) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [wishlisted, setWishlisted] = useState(isWished);
@@ -21,7 +21,11 @@ function ProductCard({ product, rank, isWished = false }) {
   }, [isWished]);
 
   const handleClick = () => {
-    navigate(`/shop/${product.id}`, { state: { product: product._raw || product } });
+    if (onDetailClick) {
+      onDetailClick(product);
+    } else {
+      navigate(`/shop/${product.id}`, { state: { product: product._raw || product } });
+    }
   };
 
   const handleWishlistClick = (e) => {

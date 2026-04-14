@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Navbar from '../../../components/user/header/Header';
 import AuthModal from '../auth/AuthPage';
 import ProductCard from '../../../components/user/card/ProductCard';
+import ProductDetailModal from './ProductDetailModal';
 import { ListProduct } from '../../../api/user/product';
 import { GetWishlistProductIds } from '../../../api/user/wishlist';
 import { RecommendAiProducts } from '../../../api/user/recommend';
@@ -34,6 +35,7 @@ function ShopPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [products, setProducts] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -225,6 +227,12 @@ function ShopPage() {
     <div className="app">
       <Navbar onLoginClick={() => setShowAuthModal(true)} />
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+      {selectedProduct && (
+        <ProductDetailModal
+          product={selectedProduct._raw || selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+        />
+      )}
 
       {/* 페이지 헤더 */}
       <div className="shop-header">
@@ -302,7 +310,7 @@ function ShopPage() {
               <div className="shop-grid">
                 {aiProducts.map((product) => (
                   <div key={product.id} className="shop-ai-card-wrap">
-                    <ProductCard product={product} isWished={wishlistedIds.includes(product.id)} />
+                    <ProductCard product={product} isWished={wishlistedIds.includes(product.id)} onDetailClick={setSelectedProduct} />
                   </div>
                 ))}
               </div>
@@ -330,7 +338,7 @@ function ShopPage() {
             <>
               <div className="shop-grid">
                 {products.map((product) => (
-                  <ProductCard key={product.id} product={product} isWished={wishlistedIds.includes(product.id)} />
+                  <ProductCard key={product.id} product={product} isWished={wishlistedIds.includes(product.id)} onDetailClick={setSelectedProduct} />
                 ))}
               </div>
 
