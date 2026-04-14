@@ -10,7 +10,7 @@ import ProfileEditModal from "./ProfileEditModal";
 import FollowListModal from "./FollowListModal";
 import ReviewWriteModal from "./ReviewWriteModal";
 import { useAuth } from "../../../store/context/UserContext";
-import { ListMyPost, ListPost, DeletePost } from '../../../api/user/post';
+import { ListMyPost, ListUserPost, DeletePost } from '../../../api/user/post';
 import { GetFollowCount, CheckFollow, Follow, Unfollow } from '../../../api/user/follow';
 import { UpdateProfileImg, GetUserProfile } from '../../../api/user/auth';
 import { GetPoint, GetPointHistory } from '../../../api/user/point';
@@ -75,13 +75,9 @@ function MyPage() {
       .catch(() => {});
   };
 
-  const loadUserPosts = (userNm) => {
-    ListPost('', 0, 100)
-      .then(res => {
-        const all = res.data.content || [];
-        const filtered = all.filter(p => p.userNm === userNm);
-        setPosts(mapPosts(filtered));
-      })
+  const loadUserPosts = (targetUserId) => {
+    ListUserPost(targetUserId, 0, 100)
+      .then(res => setPosts(mapPosts(res.data.content || [])))
       .catch(() => {});
   };
 
@@ -192,7 +188,7 @@ function MyPage() {
       GetUserProfile(paramUserId)
         .then(res => {
           setProfileUser(res.data);
-          loadUserPosts(res.data.userNm);
+          loadUserPosts(paramUserId);
         })
         .catch(() => setProfileUser(null));
     }
@@ -462,6 +458,7 @@ function MyPage() {
                       {order.brandNm && <span className="mypage-order-brand">{order.brandNm}</span>}
                       <span className="mypage-order-product">{order.productNm}</span>
                       {order.productEnNm && <span className="mypage-order-product-en">{order.productEnNm}</span>}
+                      {order.sizeNm && <span className="mypage-order-size">사이즈 {order.sizeNm}</span>}
                       <span className="mypage-order-qty">수량 {order.quantity}개</span>
                     </div>
                     <strong className="mypage-order-price">{(order.actualPayment ?? order.totalPrice)?.toLocaleString()}원</strong>

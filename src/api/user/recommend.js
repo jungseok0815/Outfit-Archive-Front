@@ -14,3 +14,8 @@ export const RecommendAiProducts = (limit = 12, page = 0) => {
 export const RecommendPopularProducts = (limit = 8) => {
     return api.get('/api/recommend/popular', { params: { limit } });
 }
+
+// GET /api/usr/product/similar?productId={id}&limit={n} → 벡터(CLIP) 코사인 유사도 기반 유사 상품
+export const GetSimilarProducts = (productId, limit = 8) => {
+    return api.get('/api/usr/product/similar', { params: { productId, limit } });
+}

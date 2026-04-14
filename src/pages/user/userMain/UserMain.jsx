@@ -6,6 +6,7 @@ import AuthModal from '../auth/AuthPage';
 import StyleCard from '../../../components/user/card/StyleCard';
 import ProductCard from '../../../components/user/card/ProductCard';
 import PostDetailPanel from '../mypage/PostDetailPanel';
+import ProductDetailModal from '../shop/ProductDetailModal';
 import { ListPost, SearchPost, ToggleLike } from '../../../api/user/post';
 import { ListProduct } from '../../../api/user/product';
 import { GetWishlistProductIds } from '../../../api/user/wishlist';
@@ -15,24 +16,19 @@ import "../../../App.css";
 import "./UserMain.css";
 import "../../../styles/user/Hero.css";
 
-const DEFAULT_HERO_SLIDES = [
-  { title: "Define Your", highlight: "Style", description: "Discover curated fashion that speaks to your identity", buttonText: "Explore Now" },
-  { title: "New Season", highlight: "Collection", description: "The latest trends from the world's finest designers", buttonText: "Shop Collection" },
-  { title: "Timeless", highlight: "Elegance", description: "Classic pieces that transcend every season", buttonText: "View Lookbook" }
-];
-
 function App() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [inputValue, setInputValue] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [heroSlides, setHeroSlides] = useState(DEFAULT_HERO_SLIDES);
+  const [heroSlides, setHeroSlides] = useState([]);
   const [heroIndex, setHeroIndex] = useState(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [feedItems, setFeedItems] = useState([]);
   const [popularProducts, setPopularProducts] = useState([]);
   const [wishlistedIds, setWishlistedIds] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchTab, setSearchTab] = useState("products");
 
   // 검색 결과
@@ -174,9 +170,12 @@ function App() {
       {selectedPost && (
         <PostDetailPanel post={selectedPost} onClose={() => setSelectedPost(null)} />
       )}
+      {selectedProduct && (
+        <ProductDetailModal product={selectedProduct._raw || selectedProduct} onClose={() => setSelectedProduct(null)} />
+      )}
 
-      {/* 히어로 섹션 */}
-      <div className="hero-container">
+      {/* 히어로 섹션 - 배너 없으면 미표시 */}
+      {heroSlides.length > 0 && <div className="hero-container">
         <div className="hero-slider">
           {heroSlides.map((slide, index) => (
             <div
@@ -204,7 +203,7 @@ function App() {
             <button key={index} className={`dot ${index === heroIndex ? 'active' : ''}`} onClick={() => setHeroIndex(index)} />
           ))}
         </div>
-      </div>
+      </div>}
 
       {/* 검색바 영역 */}
       <div className="search-container">
@@ -250,7 +249,7 @@ function App() {
               ? <div className="search-empty"><p>"{searchKeyword}"에 해당하는 상품이 없습니다.</p></div>
               : <div className="popular-grid">
                   {searchProducts.map(product => (
-                    <ProductCard key={product.id} product={product} isWished={wishlistedIds.includes(product.id)} />
+                    <ProductCard key={product.id} product={product} isWished={wishlistedIds.includes(product.id)} onDetailClick={setSelectedProduct} />
                   ))}
                 </div>
           ) : (
@@ -295,7 +294,7 @@ function App() {
             </div>
             <div className="popular-grid">
               {visibleProducts.map((product, index) => (
-                <ProductCard key={product.id} product={product} rank={index + 1} isWished={wishlistedIds.includes(product.id)} />
+                <ProductCard key={product.id} product={product} rank={index + 1} isWished={wishlistedIds.includes(product.id)} onDetailClick={setSelectedProduct} />
               ))}
             </div>
             <div className="popular-more">
