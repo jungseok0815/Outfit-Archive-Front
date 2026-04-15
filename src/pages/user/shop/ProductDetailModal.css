@@ -37,12 +37,28 @@
 .pd-header {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: 12px 16px;
   border-bottom: 1px solid #f0f0f0;
   flex-shrink: 0;
 }
 .pd-header-left { display: flex; align-items: center; }
+
+.pd-back {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #555;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+.pd-back:hover { color: #222; background: #f5f5f5; }
 
 .pd-close {
   background: none;
@@ -71,6 +87,16 @@
   transition: all 0.15s;
 }
 .pd-fullpage:hover { color: #222; border-color: #bbb; }
+
+/* ── 콘텐츠 영역 (바텀 시트 포함 블록) ── */
+.pd-content-area {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
 
 /* ── 바디 (스크롤) ── */
 .pd-body {
@@ -301,35 +327,34 @@
 
 /* 액션 */
 .pd-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
   margin-top: auto;
 }
 
-.pd-icon-btns {
+.pd-buy-row {
   display: flex;
+  align-items: center;
   gap: 8px;
 }
 
 .pd-icon-btn {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
   background: none;
   border: 1px solid #e4e4e4;
-  border-radius: 8px;
-  padding: 8px 14px;
+  border-radius: 10px;
+  width: 46px;
+  height: 46px;
   cursor: pointer;
-  font-size: 12px;
   color: #555;
   transition: all 0.15s;
 }
 .pd-icon-btn:hover { border-color: #999; color: #222; }
-.pd-icon-btn.on   { border-color: #222; color: #222; }
+.pd-icon-btn.on   { border-color: #222; color: #222; background: #f5f5f5; }
 
 .pd-buy-btn {
-  width: 100%;
+  flex: 1;
   background: #1a1a1a;
   color: #fff;
   border: none;
@@ -452,6 +477,41 @@
                  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .pd-post-meta  { font-size: 10px; color: #ccc; display: flex; gap: 7px; }
 
+/* ── 주문 뷰 ── */
+.pd-order-view {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+/* 배송지 추가 인라인 폼 */
+.pd-addr-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #f8f8f8;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1.5px dashed #e0e0e0;
+}
+
+.pd-addr-save-btn {
+  align-self: flex-end;
+  padding: 9px 24px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #fff;
+  background: #222;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.pd-addr-save-btn:hover { opacity: 0.8; }
+
 /* ── 비슷한 상품 ── */
 .pd-similar-grid {
   display: grid;
@@ -481,6 +541,88 @@
 .pd-similar-name  { font-size: 11px; color: #333; margin: 0 0 4px; line-height: 1.4;
                     overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .pd-similar-price { font-size: 12px; font-weight: 700; color: #1a1a1a; margin: 0; }
+
+/* ── 바텀 시트 ── */
+.pd-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  pointer-events: none;
+  transition: background 0.3s ease;
+  z-index: 10;
+}
+.pd-sheet-backdrop.visible {
+  background: rgba(0, 0, 0, 0.28);
+  pointer-events: auto;
+}
+
+.pd-order-sheet {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(100%);
+  width: 480px;
+  max-width: calc(100% - 32px);
+  height: 85%;
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 11;
+  display: flex;
+  flex-direction: column;
+}
+.pd-order-sheet.open {
+  transform: translateX(-50%) translateY(0);
+}
+
+.pd-sheet-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.pd-sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  margin: 0 auto;
+}
+
+.pd-sheet-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.pd-sheet-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+.pd-sheet-close:hover { color: #222; background: #f5f5f5; }
+
+.pd-sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.pd-sheet-body::-webkit-scrollbar { width: 4px; }
+.pd-sheet-body::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 4px; }
 
 /* ── 반응형 ── */
 @media (max-width: 760px) {
