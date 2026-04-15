@@ -27,6 +27,7 @@
   flex-direction: column;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18);
   animation: pdPanelIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
 }
 @keyframes pdPanelIn {
   from { opacity: 0; transform: translate(-50%, -47%) scale(0.97); }
@@ -531,6 +532,87 @@
 .pd-similar-name  { font-size: 11px; color: #333; margin: 0 0 4px; line-height: 1.4;
                     overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .pd-similar-price { font-size: 12px; font-weight: 700; color: #1a1a1a; margin: 0; }
+
+/* ── 바텀 시트 ── */
+.pd-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  pointer-events: none;
+  transition: background 0.3s ease;
+  z-index: 10;
+}
+.pd-sheet-backdrop.visible {
+  background: rgba(0, 0, 0, 0.28);
+  pointer-events: auto;
+}
+
+.pd-order-sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 85%;
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 11;
+  display: flex;
+  flex-direction: column;
+}
+.pd-order-sheet.open {
+  transform: translateY(0);
+}
+
+.pd-sheet-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.pd-sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  margin: 0 auto;
+}
+
+.pd-sheet-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.pd-sheet-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+.pd-sheet-close:hover { color: #222; background: #f5f5f5; }
+
+.pd-sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.pd-sheet-body::-webkit-scrollbar { width: 4px; }
+.pd-sheet-body::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 4px; }
 
 /* ── 반응형 ── */
 @media (max-width: 760px) {
