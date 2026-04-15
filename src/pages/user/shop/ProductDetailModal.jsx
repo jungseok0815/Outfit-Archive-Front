@@ -357,7 +357,8 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
           </button>
         </div>
 
-        {/* ── 바디 ── */}
+        {/* ── 콘텐츠 영역 (바디 + 바텀 시트 포함 블록) ── */}
+        <div className="pd-content-area">
         <div className="pd-body">
           {loading ? (
             <div className="pd-empty">상품을 불러오는 중...</div>
@@ -588,14 +589,9 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
               onClick={() => setShowOrderSheet(false)}
             />
             <div className={`pd-order-sheet ${showOrderSheet ? "open" : ""}`}>
-              {/* 핸들 + 닫기 */}
+              {/* 핸들 */}
               <div className="pd-sheet-header">
                 <div className="pd-sheet-handle" />
-                <button className="pd-sheet-close" onClick={() => setShowOrderSheet(false)}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                  </svg>
-                </button>
               </div>
 
               <div className="pd-sheet-body">
@@ -761,6 +757,7 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
             </div>
           </>
         )}
+        </div> {/* pd-content-area */}
       </div>
 
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
