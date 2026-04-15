@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import OrderModal from "./OrderModal";
+import DaumPostcode from "react-daum-postcode";
+import { loadTossPayments } from "@tosspayments/payment-sdk";
 import PostDetailPanel from "../mypage/PostDetailPanel";
 import AuthModal from "../auth/AuthPage";
 import { GetProduct, ListProductReview } from "../../../api/user/product";
@@ -9,6 +10,10 @@ import { GetSimilarProducts } from "../../../api/user/recommend";
 import { RecordProductView } from "../../../api/user/productView";
 import { CheckWishlist, ToggleWishlist } from "../../../api/user/wishlist";
 import { ListPostByProduct } from "../../../api/user/post";
+import { InsertOrder } from "../../../api/user/order";
+import { GetPoint } from "../../../api/user/point";
+import { GetMyCoupons } from "../../../api/user/coupon";
+import { ListAddress, InsertAddress, DeleteAddress, SetDefaultAddress } from "../../../api/user/address";
 import { useAuth } from "../../../store/context/UserContext";
 import "./ProductDetailModal.css";
 
@@ -21,11 +26,11 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  // ── 상품 상태 ──
   const [product, setProduct] = useState(initialProduct || null);
   const [loading, setLoading] = useState(!initialProduct);
   const [imgIndex, setImgIndex] = useState(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showOrderModal, setShowOrderModal] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [wishlisted, setWishlisted] = useState(false);
   const [productPosts, setProductPosts] = useState([]);
@@ -33,8 +38,28 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
   const [selectedSize, setSelectedSize] = useState(null);
   const [similarProducts, setSimilarProducts] = useState([]);
 
+  // ── 주문 뷰 전환 ──
+  const [showOrderForm, setShowOrderForm] = useState(false);
+
+  // ── 주문 폼 상태 ──
+  const [orderForm, setOrderForm] = useState({ quantity: 1, usePoint: 0 });
+  const [availablePoint, setAvailablePoint] = useState(0);
+  const [coupons, setCoupons] = useState([]);
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [orderError, setOrderError] = useState("");
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [showAddressForm, setShowAddressForm] = useState(false);
+  const [showPostcode, setShowPostcode] = useState(false);
+  const [addressForm, setAddressForm] = useState({
+    recipientName: "", recipientPhone: "", zipCode: "", baseAddress: "", detailAddress: "", isDefault: false,
+  });
+  const detailRef = useRef(null);
+
   const resolvedId = productId || initialProduct?.id;
 
+  // ── 상품 데이터 로드 ──
   useEffect(() => {
     setProduct(initialProduct || null);
     setLoading(!initialProduct);
@@ -43,6 +68,7 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
     setReviews([]);
     setProductPosts([]);
     setWishlisted(false);
+    setShowOrderForm(false);
 
     if (!initialProduct && resolvedId) {
       setLoading(true);
@@ -67,7 +93,6 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
       .catch(() => {});
   }, [resolvedId]);
 
-  // 비슷한 상품 (벡터 코사인 유사도 기반, 최대 8개)
   useEffect(() => {
     if (!resolvedId) return;
     setSimilarProducts([]);
@@ -108,6 +133,31 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
     return () => document.removeEventListener("keydown", handleKey);
   }, [onClose]);
 
+  // ── 주문 폼 데이터 로드 ──
+  const loadOrderData = () => {
+    GetPoint().then(res => setAvailablePoint(res.data.point || 0)).catch(() => {});
+    GetMyCoupons()
+      .then(res => {
+        const now = new Date();
+        const valid = (res.data || []).filter(c => !c.isUsed && new Date(c.expiredAt) >= now);
+        setCoupons(valid);
+      })
+      .catch(() => {});
+    loadAddresses();
+  };
+
+  const loadAddresses = () => {
+    ListAddress()
+      .then(res => {
+        const list = res.data || [];
+        setAddresses(list);
+        const def = list.find(a => a.isDefault);
+        if (def) setSelectedAddressId(def.id);
+      })
+      .catch(() => {});
+  };
+
+  // ── 상품 관련 계산 ──
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
     const d = new Date(dateStr);
@@ -132,9 +182,50 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
     ? product.sizes.every(s => s.quantity === 0)
     : product?.productQuantity === 0;
 
+  // ── 주문 관련 계산 ──
+  const maxQuantity = selectedSize ? selectedSize.quantity : (product?.productQuantity || 1);
+  const totalPrice = (product?.productPrice || 0) * orderForm.quantity;
+
+  const isCouponApplicable = (coupon) => {
+    const cats = coupon.targetCategories || [];
+    const brandIds = coupon.targetBrandIds || [];
+    if (cats.length === 0 && brandIds.length === 0) return true;
+    if (cats.length > 0 && cats.includes(product?.category)) return true;
+    if (brandIds.length > 0 && brandIds.includes(product?.brandId)) return true;
+    return false;
+  };
+
+  const couponDiscount = (() => {
+    if (!selectedCoupon || totalPrice < (selectedCoupon.minOrderPrice || 0)) return 0;
+    if (selectedCoupon.discountType === 'FIXED') return Math.min(selectedCoupon.discountValue, totalPrice);
+    const d = Math.floor(totalPrice * selectedCoupon.discountValue / 100);
+    return selectedCoupon.maxDiscountPrice ? Math.min(d, selectedCoupon.maxDiscountPrice) : d;
+  })();
+  const priceAfterCoupon = Math.max(0, totalPrice - couponDiscount);
+  const usePoint = Math.min(Number(orderForm.usePoint) || 0, availablePoint, priceAfterCoupon);
+  const finalPrice = Math.max(0, priceAfterCoupon - usePoint);
+
+  const formatCouponLabel = (c) => {
+    const discount = c.discountType === 'FIXED'
+      ? `${c.discountValue.toLocaleString()}원 할인`
+      : `${c.discountValue}% 할인${c.maxDiscountPrice ? ` (최대 ${c.maxDiscountPrice.toLocaleString()}원)` : ''}`;
+    return `${c.couponName} — ${discount}`;
+  };
+
+  // ── 핸들러 ──
   const handleBuyClick = () => {
     if (!user) { setShowAuthModal(true); return; }
-    setShowOrderModal(true);
+    setOrderForm({ quantity: 1, usePoint: 0 });
+    setSelectedCoupon(null);
+    setOrderError("");
+    loadOrderData();
+    setShowOrderForm(true);
+  };
+
+  const handleBackToProduct = () => {
+    setShowOrderForm(false);
+    setShowAddressForm(false);
+    setShowPostcode(false);
   };
 
   const handleWishlistClick = () => {
@@ -151,6 +242,98 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
       .catch(() => toast.error('링크 복사에 실패했습니다.'));
   };
 
+  const handleOrderFormChange = (e) => {
+    const { name, value } = e.target;
+    setOrderForm(prev => ({ ...prev, [name]: value }));
+    setOrderError("");
+  };
+
+  const handleQuantityChange = (delta) => {
+    setOrderForm(prev => ({ ...prev, quantity: Math.max(1, Math.min(maxQuantity, prev.quantity + delta)) }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedAddressId) { setOrderError("배송지를 선택해주세요."); return; }
+    const addr = addresses.find(a => a.id === selectedAddressId);
+    if (!addr) { setOrderError("배송지를 선택해주세요."); return; }
+
+    setSubmitting(true);
+    setOrderError("");
+    try {
+      const res = await InsertOrder({
+        productId: product.id,
+        quantity: orderForm.quantity,
+        recipientName: addr.recipientName,
+        recipientPhone: addr.recipientPhone,
+        shippingAddress: `[${addr.zipCode}] ${addr.baseAddress} ${addr.detailAddress || ""}`.trim(),
+        usePoint,
+        sizeNm: selectedSize?.sizeNm || null,
+        userCouponId: selectedCoupon?.userCouponId || null,
+      });
+
+      const tossPayments = await loadTossPayments(process.env.REACT_APP_TOSS_CLIENT_KEY);
+      await tossPayments.requestPayment("카드", {
+        amount: finalPrice,
+        orderId: res.data.tossOrderId,
+        orderName: product.productNm,
+        customerName: addr.recipientName,
+        successUrl: `${window.location.origin}/payment/success`,
+        failUrl: `${window.location.origin}/payment/fail`,
+      });
+    } catch (err) {
+      const msg = err?.response?.data?.msg || err?.message || "";
+      if (msg) setOrderError(msg);
+      setSubmitting(false);
+    }
+  };
+
+  // ── 주소 관련 핸들러 ──
+  const handleAddressFormChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setAddressForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+  };
+
+  const handlePostcodeComplete = (data) => {
+    const address = data.roadAddress || data.jibunAddress;
+    setAddressForm(prev => ({ ...prev, zipCode: data.zonecode, baseAddress: address, detailAddress: "" }));
+    setShowPostcode(false);
+    setTimeout(() => detailRef.current?.focus(), 100);
+  };
+
+  const handleAddressSubmit = () => {
+    if (!addressForm.recipientName.trim() || !addressForm.recipientPhone.trim() || !addressForm.baseAddress.trim()) return;
+    InsertAddress({
+      recipientName: addressForm.recipientName.trim(),
+      recipientPhone: addressForm.recipientPhone.trim(),
+      zipCode: addressForm.zipCode,
+      baseAddress: addressForm.baseAddress,
+      detailAddress: addressForm.detailAddress.trim(),
+      isDefault: addressForm.isDefault,
+    })
+      .then(() => {
+        loadAddresses();
+        setShowAddressForm(false);
+        setAddressForm({ recipientName: "", recipientPhone: "", zipCode: "", baseAddress: "", detailAddress: "", isDefault: false });
+      })
+      .catch(() => {});
+  };
+
+  const handleDeleteAddress = (e, id) => {
+    e.stopPropagation();
+    DeleteAddress(id)
+      .then(() => {
+        if (selectedAddressId === id) setSelectedAddressId(null);
+        loadAddresses();
+      })
+      .catch(() => {});
+  };
+
+  const handleSetDefault = (e, id) => {
+    e.stopPropagation();
+    SetDefaultAddress(id).then(() => loadAddresses()).catch(() => {});
+  };
+
   return (
     <>
       <div className="pd-overlay" onClick={onClose} />
@@ -159,6 +342,14 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
 
         {/* ── 헤더 ── */}
         <div className="pd-header">
+          {showOrderForm && (
+            <button className="pd-back" onClick={handleBackToProduct} aria-label="뒤로">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6"/>
+              </svg>
+              <span>상품 정보</span>
+            </button>
+          )}
           <button className="pd-close" onClick={onClose} aria-label="닫기">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -172,14 +363,179 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
             <div className="pd-empty">상품을 불러오는 중...</div>
           ) : !product ? (
             <div className="pd-empty">상품을 찾을 수 없습니다.</div>
+          ) : showOrderForm ? (
+
+            /* ════════════ 주문 폼 뷰 ════════════ */
+            <div className="pd-order-view">
+              {/* 상품 요약 */}
+              <div className="order-product-summary">
+                <div className="order-product-thumb">
+                  {product.images?.length > 0
+                    ? <img src={product.images[0].imgPath} alt={product.productNm} />
+                    : <div className="order-product-thumb-empty" />}
+                </div>
+                <div className="order-product-info">
+                  <span className="order-product-brand">{product.brandNm}</span>
+                  <span className="order-product-name">{product.productNm}</span>
+                  {product.productEnNm && <span className="order-product-name-en">{product.productEnNm}</span>}
+                  {selectedSize && <span className="order-product-size">사이즈: {selectedSize.sizeNm}</span>}
+                  <span className="order-product-price">{product.productPrice?.toLocaleString()}원</span>
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmit} className="order-form">
+                {/* 수량 */}
+                <div className="order-field">
+                  <label className="order-label">수량</label>
+                  <div className="order-quantity">
+                    <button type="button" className="order-qty-btn" onClick={() => handleQuantityChange(-1)}>−</button>
+                    <span className="order-qty-value">{orderForm.quantity}</span>
+                    <button type="button" className="order-qty-btn" onClick={() => handleQuantityChange(1)}>+</button>
+                    <span className="order-qty-stock">재고 {maxQuantity}개</span>
+                  </div>
+                </div>
+
+                {/* 배송지 */}
+                <div className="order-section">
+                  <div className="order-section-header">
+                    <span className="order-section-title">배송지</span>
+                    <button type="button" className="order-addr-add-btn" onClick={() => setShowAddressForm(v => !v)}>
+                      {showAddressForm ? "닫기" : "+ 배송지 추가"}
+                    </button>
+                  </div>
+
+                  {/* 배송지 추가 인라인 폼 */}
+                  {showAddressForm && (
+                    <div className="pd-addr-form">
+                      <div className="order-field">
+                        <label className="order-label">수령인</label>
+                        <input className="order-input" type="text" name="recipientName" placeholder="수령인 이름" value={addressForm.recipientName} onChange={handleAddressFormChange} />
+                      </div>
+                      <div className="order-field">
+                        <label className="order-label">연락처</label>
+                        <input className="order-input" type="text" name="recipientPhone" placeholder="010-0000-0000" value={addressForm.recipientPhone} onChange={handleAddressFormChange} />
+                      </div>
+                      <div className="order-field order-field-address">
+                        <label className="order-label">주소</label>
+                        <div className="order-address-wrap">
+                          <div className="order-address-zip-row">
+                            <input className="order-input order-input-zip" type="text" value={addressForm.zipCode} readOnly placeholder="우편번호" />
+                            <button type="button" className="order-address-search-btn" onClick={() => setShowPostcode(true)}>주소 검색</button>
+                          </div>
+                          <input className="order-input" type="text" value={addressForm.baseAddress} readOnly placeholder="기본 주소" />
+                          <input className="order-input" type="text" name="detailAddress" placeholder="상세 주소 (동, 호수 등)" value={addressForm.detailAddress} onChange={handleAddressFormChange} ref={detailRef} />
+                        </div>
+                      </div>
+                      <label className="order-addr-default-check">
+                        <input type="checkbox" name="isDefault" checked={addressForm.isDefault} onChange={handleAddressFormChange} />
+                        기본 배송지로 설정
+                      </label>
+                      <button type="button" className="pd-addr-save-btn" onClick={handleAddressSubmit}>저장</button>
+                    </div>
+                  )}
+
+                  {addresses.length === 0 ? (
+                    <p className="order-addr-empty">등록된 배송지가 없습니다. 배송지를 추가해주세요.</p>
+                  ) : (
+                    <div className="order-addr-list">
+                      {addresses.map(addr => (
+                        <div
+                          key={addr.id}
+                          className={`order-addr-card ${selectedAddressId === addr.id ? 'selected' : ''}`}
+                          onClick={() => setSelectedAddressId(addr.id)}
+                        >
+                          <div className="order-addr-card-radio">
+                            <div className={`order-addr-radio-dot ${selectedAddressId === addr.id ? 'on' : ''}`} />
+                          </div>
+                          <div className="order-addr-card-info">
+                            <div className="order-addr-card-top">
+                              <span className="order-addr-card-name">{addr.recipientName}</span>
+                              <span className="order-addr-card-phone">{addr.recipientPhone}</span>
+                              {addr.isDefault && <span className="order-addr-default-badge">기본</span>}
+                            </div>
+                            <p className="order-addr-card-address">[{addr.zipCode}] {addr.baseAddress} {addr.detailAddress}</p>
+                            <div className="order-addr-card-actions">
+                              {!addr.isDefault && (
+                                <button type="button" className="order-addr-action-btn" onClick={(e) => handleSetDefault(e, addr.id)}>기본 설정</button>
+                              )}
+                              <button type="button" className="order-addr-action-btn order-addr-delete-btn" onClick={(e) => handleDeleteAddress(e, addr.id)}>삭제</button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* 쿠폰 */}
+                <div className="order-field">
+                  <label className="order-label">쿠폰</label>
+                  <div className="order-coupon-wrap">
+                    {(() => {
+                      const productCoupons = coupons.filter(isCouponApplicable);
+                      if (coupons.length === 0) return <span className="order-point-available">사용 가능한 쿠폰이 없습니다</span>;
+                      if (productCoupons.length === 0) return <span className="order-point-available">이 상품에 적용 가능한 쿠폰이 없습니다</span>;
+                      return (
+                        <>
+                          <select
+                            className="order-input order-coupon-select"
+                            value={selectedCoupon?.userCouponId || ''}
+                            onChange={(e) => {
+                              const c = productCoupons.find(c => String(c.userCouponId) === e.target.value);
+                              setSelectedCoupon(c || null);
+                            }}
+                          >
+                            <option value="">쿠폰 선택 안함</option>
+                            {productCoupons.map(c => {
+                              const meetsMin = totalPrice >= (c.minOrderPrice || 0);
+                              return (
+                                <option key={c.userCouponId} value={c.userCouponId} disabled={!meetsMin}>
+                                  {formatCouponLabel(c)}{!meetsMin ? ` (${c.minOrderPrice.toLocaleString()}원 이상)` : ''}
+                                </option>
+                              );
+                            })}
+                          </select>
+                          {selectedCoupon && totalPrice < (selectedCoupon.minOrderPrice || 0) && (
+                            <p className="order-coupon-warn">최소 주문금액 {selectedCoupon.minOrderPrice.toLocaleString()}원 이상 구매 시 사용 가능합니다.</p>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </div>
+                </div>
+
+                {/* 포인트 */}
+                <div className="order-field">
+                  <label className="order-label">포인트</label>
+                  <div className="order-point-wrap">
+                    <input className="order-input order-point-input" type="number" name="usePoint" value={orderForm.usePoint} onChange={handleOrderFormChange} min={0} max={availablePoint} placeholder="0" />
+                    <span className="order-point-available">보유 {availablePoint.toLocaleString()} P</span>
+                  </div>
+                </div>
+
+                {/* 결제 요약 */}
+                <div className="order-summary">
+                  <div className="order-summary-row"><span>상품금액</span><span>{totalPrice.toLocaleString()}원</span></div>
+                  {couponDiscount > 0 && <div className="order-summary-row discount"><span>쿠폰 할인</span><span>− {couponDiscount.toLocaleString()}원</span></div>}
+                  {usePoint > 0 && <div className="order-summary-row discount"><span>포인트 할인</span><span>− {usePoint.toLocaleString()}P</span></div>}
+                  <div className="order-summary-row total"><span>최종 결제금액</span><strong>{finalPrice.toLocaleString()}원</strong></div>
+                </div>
+
+                {orderError && <p className="order-error">{orderError}</p>}
+                <button type="submit" className="order-submit-btn" disabled={submitting}>
+                  {submitting ? "처리 중..." : `${finalPrice.toLocaleString()}원 결제하기`}
+                </button>
+              </form>
+            </div>
+
           ) : (
+
+            /* ════════════ 상품 상세 뷰 ════════════ */
             <>
-              {/* 상단: 이미지 + 정보 */}
               <div className="pd-top">
 
                 {/* 이미지 영역 */}
                 <div className="pd-img-area">
-                  {/* 메인 이미지 */}
                   <div className="pd-img-main">
                     {currentImg
                       ? <img src={currentImg} alt={product.productNm} />
@@ -187,28 +543,17 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
                     }
                     {images.length > 1 && (
                       <>
-                        <button
-                          className="pd-img-arrow left"
-                          onClick={() => setImgIndex(p => p === 0 ? images.length - 1 : p - 1)}
-                        >‹</button>
-                        <button
-                          className="pd-img-arrow right"
-                          onClick={() => setImgIndex(p => p === images.length - 1 ? 0 : p + 1)}
-                        >›</button>
+                        <button className="pd-img-arrow left" onClick={() => setImgIndex(p => p === 0 ? images.length - 1 : p - 1)}>‹</button>
+                        <button className="pd-img-arrow right" onClick={() => setImgIndex(p => p === images.length - 1 ? 0 : p + 1)}>›</button>
                         <div className="pd-img-counter">{imgIndex + 1} / {images.length}</div>
                       </>
                     )}
                   </div>
 
-                  {/* 썸네일 스트립 */}
                   {images.length > 1 && (
                     <div className="pd-thumbs">
                       {images.map((img, i) => (
-                        <button
-                          key={i}
-                          className={`pd-thumb ${i === imgIndex ? "active" : ""}`}
-                          onClick={() => setImgIndex(i)}
-                        >
+                        <button key={i} className={`pd-thumb ${i === imgIndex ? "active" : ""}`} onClick={() => setImgIndex(i)}>
                           <img src={img.imgPath} alt={`${i + 1}`} />
                         </button>
                       ))}
@@ -279,32 +624,30 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
 
                   {/* 액션 */}
                   <div className="pd-actions">
-                    <div className="pd-icon-btns">
-                      <button className={`pd-icon-btn${wishlisted ? " on" : ""}`} onClick={handleWishlistClick}>
+                    <div className="pd-buy-row">
+                      <button
+                        className="pd-buy-btn"
+                        onClick={handleBuyClick}
+                        disabled={isDiscontinued || isSoldOut || (hasSizes && !selectedSize)}
+                      >
+                        {isDiscontinued ? "판매 중단"
+                          : isSoldOut ? "품절"
+                          : hasSizes && !selectedSize ? "사이즈를 선택해주세요"
+                          : "구매하기"}
+                      </button>
+                      <button className={`pd-icon-btn${wishlisted ? " on" : ""}`} onClick={handleWishlistClick} title={wishlisted ? "저장됨" : "저장"}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill={wishlisted ? "#222" : "none"} stroke="#222" strokeWidth="1.8">
                           <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
                         </svg>
-                        <span>{wishlisted ? "저장됨" : "저장"}</span>
                       </button>
-                      <button className="pd-icon-btn" onClick={handleCopyLink}>
+                      <button className="pd-icon-btn" onClick={handleCopyLink} title="공유">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#222" strokeWidth="1.8">
                           <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
                           <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
                           <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
                         </svg>
-                        <span>공유</span>
                       </button>
                     </div>
-                    <button
-                      className="pd-buy-btn"
-                      onClick={handleBuyClick}
-                      disabled={isDiscontinued || isSoldOut || (hasSizes && !selectedSize)}
-                    >
-                      {isDiscontinued ? "판매 중단"
-                        : isSoldOut ? "품절"
-                        : hasSizes && !selectedSize ? "사이즈를 선택해주세요"
-                        : "구매하기"}
-                    </button>
                   </div>
                 </div>
               </div>
@@ -367,9 +710,7 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
                         }}
                       >
                         <div className="pd-similar-img">
-                          {p.image
-                            ? <img src={p.image} alt={p.name} />
-                            : <div className="pd-similar-img-empty" />}
+                          {p.image ? <img src={p.image} alt={p.name} /> : <div className="pd-similar-img-empty" />}
                         </div>
                         <div className="pd-similar-body">
                           <p className="pd-similar-brand">{p.brand}</p>
@@ -415,11 +756,21 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
       </div>
 
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
-      {showOrderModal && (
-        <OrderModal product={product} selectedSize={selectedSize} onClose={() => setShowOrderModal(false)} />
-      )}
       {selectedPost && (
         <PostDetailPanel post={selectedPost} onClose={() => setSelectedPost(null)} />
+      )}
+
+      {/* 우편번호 검색 팝업 */}
+      {showPostcode && (
+        <div className="order-postcode-overlay" onClick={() => setShowPostcode(false)}>
+          <div className="order-postcode-popup" onClick={e => e.stopPropagation()}>
+            <div className="order-postcode-header">
+              <span>주소 검색</span>
+              <button onClick={() => setShowPostcode(false)}>✕</button>
+            </div>
+            <DaumPostcode onComplete={handlePostcodeComplete} autoClose={false} />
+          </div>
+        </div>
       )}
     </>
   );
