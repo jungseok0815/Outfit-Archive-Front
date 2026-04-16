@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import BrandAccordion from "../../../components/admin/brand/BrandAccordion";
@@ -7,23 +7,17 @@ import Pagination from "../../../components/common/Pagination/Pagination";
 import { DeleteBrand } from "../../../api/admin/brand";
 import "./BrandManagementContent.css";
 
-const PAGE_SIZE = 10;
-
-const BrandManagementContent = ({ brands, loading, registerTrigger, onRefresh }) => {
+const BrandManagementContent = ({
+    brands, loading, registerTrigger, onRefresh,
+    currentPage, totalPages, totalCount, pageSize, onPageChange,
+}) => {
     const [modalOpen, setModalOpen] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
     const [selectedIds, setSelectedIds] = useState(new Set());
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [deleting, setDeleting] = useState(false);
     const isMounted = useRef(false);
 
-    const totalPages = Math.max(1, Math.ceil(brands.length / PAGE_SIZE));
-    const pagedBrands = useMemo(
-        () => brands.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
-        [brands, currentPage]
-    );
-
-    const allPageSelected = pagedBrands.length > 0 && pagedBrands.every(b => selectedIds.has(b.id));
+    const allPageSelected = brands.length > 0 && brands.every(b => selectedIds.has(b.id));
     const someSelected = selectedIds.size > 0;
 
     useEffect(() => {
@@ -31,7 +25,7 @@ const BrandManagementContent = ({ brands, loading, registerTrigger, onRefresh })
         if (registerTrigger > 0) setModalOpen(true);
     }, [registerTrigger]);
 
-    // 페이지 바뀌면 현재 페이지 선택 해제
+    // 페이지 이동 시 선택 초기화
     useEffect(() => {
         setSelectedIds(new Set());
     }, [currentPage]);
@@ -48,9 +42,9 @@ const BrandManagementContent = ({ brands, loading, registerTrigger, onRefresh })
         setSelectedIds(prev => {
             const next = new Set(prev);
             if (allPageSelected) {
-                pagedBrands.forEach(b => next.delete(b.id));
+                brands.forEach(b => next.delete(b.id));
             } else {
-                pagedBrands.forEach(b => next.add(b.id));
+                brands.forEach(b => next.add(b.id));
             }
             return next;
         });
@@ -71,12 +65,6 @@ const BrandManagementContent = ({ brands, loading, registerTrigger, onRefresh })
         }
     };
 
-    const handleSuccess = () => {
-        setModalOpen(false);
-        onRefresh();
-    };
-
-    // 삭제 대상 브랜드 이름 목록
     const selectedBrands = brands.filter(b => selectedIds.has(b.id));
     const totalProductCount = selectedBrands.reduce((sum, b) => sum + (b.products?.length || 0), 0);
 
@@ -126,7 +114,7 @@ const BrandManagementContent = ({ brands, loading, registerTrigger, onRefresh })
                             등록된 브랜드가 없습니다.
                         </div>
                     ) : (
-                        pagedBrands.map((brand) => (
+                        brands.map((brand) => (
                             <BrandAccordion
                                 brand={brand}
                                 id={brand.id}
@@ -137,13 +125,14 @@ const BrandManagementContent = ({ brands, loading, registerTrigger, onRefresh })
                             />
                         ))
                     )}
-                    {brands.length > 0 && (
+
+                    {totalPages > 1 && (
                         <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages}
-                            totalCount={brands.length}
-                            pageSize={PAGE_SIZE}
-                            onPageChange={setCurrentPage}
+                            totalCount={totalCount}
+                            pageSize={pageSize}
+                            onPageChange={onPageChange}
                         />
                     )}
                 </div>
@@ -160,7 +149,7 @@ const BrandManagementContent = ({ brands, loading, registerTrigger, onRefresh })
                             </button>
                         </div>
                         <div className="brand-modal-body">
-                            <BrandItemCard onSuccess={handleSuccess} />
+                            <BrandItemCard onSuccess={() => { setModalOpen(false); onRefresh(); }} />
                         </div>
                     </div>
                 </div>
