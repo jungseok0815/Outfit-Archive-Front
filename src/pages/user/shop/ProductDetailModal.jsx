@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import DaumPostcode from "react-daum-postcode";
-import { loadTossPayments } from "@tosspayments/payment-sdk";
+import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
 import PostDetailPanel from "../mypage/PostDetailPanel";
 import AuthModal from "../auth/AuthPage";
 import { GetProduct, ListProductReview } from "../../../api/user/product";
@@ -277,8 +277,10 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
         userCouponId: selectedCoupon?.userCouponId || null,
       });
       const tossPayments = await loadTossPayments(process.env.REACT_APP_TOSS_CLIENT_KEY);
-      await tossPayments.requestPayment("카드", {
-        amount: finalPrice,
+      const payment = tossPayments.payment({ customerKey: String(user.id) });
+      await payment.requestPayment({
+        method: "CARD",
+        amount: { currency: "KRW", value: finalPrice },
         orderId: res.data.tossOrderId,
         orderName: product.productNm,
         customerName: addr.recipientName,
