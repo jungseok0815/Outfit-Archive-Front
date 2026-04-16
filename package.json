@@ -5,6 +5,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.5.1",
     "@tosspayments/payment-sdk": "^1.9.2",
+    "@tosspayments/tosspayments-sdk": "^2.6.0",
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "cra-template": "1.2.0",

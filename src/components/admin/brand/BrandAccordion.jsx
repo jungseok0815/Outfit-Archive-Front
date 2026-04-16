@@ -9,7 +9,7 @@ const CATEGORY_KOR = {
     DRESS: '원피스/세트', SHOES: '신발', BAG: '가방',
 };
 
-const BrandAccordion = ({ brand, id, onRefresh }) => {
+const BrandAccordion = ({ brand, id, onRefresh, isSelected, onToggleSelect }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false);
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -19,38 +19,50 @@ const BrandAccordion = ({ brand, id, onRefresh }) => {
 
     const totalStock = brand.products?.reduce((sum, p) => sum + p.productQuantity, 0) || 0;
     const productCount = brand.products?.length || 0;
-
     const imgUrl = brand.imgPath || null;
 
     return (
-        <div className="border rounded-lg overflow-hidden shadow-sm">
+        <div className={`border rounded-lg overflow-hidden shadow-sm ${isSelected ? 'ring-2 ring-red-400' : ''}`}>
             {/* 브랜드 헤더 */}
-            <button
-                className="w-full flex items-center justify-between p-4 bg-white hover:bg-gray-50 transition-colors"
-                onClick={() => setIsOpen(!isOpen)}
-            >
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-800 font-bold text-sm flex-shrink-0 overflow-hidden border border-gray-200">
-                        {imgUrl
-                            ? <img src={imgUrl} alt={brand.brandNm} className="w-full h-full object-contain p-1" />
-                            : brand.brandNm?.charAt(0)
-                        }
-                    </div>
-                    <div className="text-left">
-                        <span className="font-semibold text-gray-800 block">{brand.brandNm}</span>
-                        <span className="text-xs text-gray-400">{brand.brandDc}</span>
-                    </div>
-                </div>
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1 text-xs text-gray-500">
-                        <Package className="w-3.5 h-3.5" />
-                        <span>{productCount}개 상품</span>
-                    </div>
-                    <ChevronDown
-                        className={`w-5 h-5 text-gray-400 transform transition-transform ${isOpen ? 'rotate-180' : ''}`}
+            <div className="w-full flex items-center bg-white hover:bg-gray-50 transition-colors">
+                {/* 체크박스 */}
+                <div className="pl-4 pr-2 flex items-center" onClick={e => e.stopPropagation()}>
+                    <input
+                        type="checkbox"
+                        checked={!!isSelected}
+                        onChange={() => onToggleSelect(id)}
+                        className="w-4 h-4 rounded accent-gray-800 cursor-pointer"
                     />
                 </div>
-            </button>
+
+                {/* 아코디언 토글 버튼 */}
+                <button
+                    className="flex-1 flex items-center justify-between p-4 pl-1"
+                    onClick={() => setIsOpen(!isOpen)}
+                >
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-800 font-bold text-sm flex-shrink-0 overflow-hidden border border-gray-200">
+                            {imgUrl
+                                ? <img src={imgUrl} alt={brand.brandNm} className="w-full h-full object-contain p-1" />
+                                : brand.brandNm?.charAt(0)
+                            }
+                        </div>
+                        <div className="text-left">
+                            <span className="font-semibold text-gray-800 block">{brand.brandNm}</span>
+                            <span className="text-xs text-gray-400">{brand.brandDc}</span>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <Package className="w-3.5 h-3.5" />
+                            <span>{productCount}개 상품</span>
+                        </div>
+                        <ChevronDown
+                            className={`w-5 h-5 text-gray-400 transform transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                        />
+                    </div>
+                </button>
+            </div>
 
             {/* 확장 영역 */}
             <div className={`overflow-hidden transition-all duration-500 ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
