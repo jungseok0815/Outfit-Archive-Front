@@ -36,6 +36,7 @@ const ReviewPanel = ({ productId, canDelete }) => {
   const [totalElements, setTotalElements] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [confirmTarget, setConfirmTarget] = useState(null);
+  const [lightboxSrc, setLightboxSrc] = useState(null);
 
   const load = useCallback((p) => {
     setLoading(true);
@@ -101,6 +102,16 @@ const ReviewPanel = ({ productId, canDelete }) => {
         onConfirm={handleConfirmDelete}
         onCancel={() => setConfirmTarget(null)}
       />
+
+      {/* 이미지 라이트박스 */}
+      {lightboxSrc && (
+        <div className="review-lightbox-overlay" onClick={() => setLightboxSrc(null)}>
+          <div className="review-lightbox-box" onClick={e => e.stopPropagation()}>
+            <button className="review-lightbox-close" onClick={() => setLightboxSrc(null)}>×</button>
+            <img src={lightboxSrc} alt="리뷰 이미지" className="review-lightbox-img" />
+          </div>
+        </div>
+      )}
       {/* 요약 */}
       <div className="review-panel-summary">
         <div className="review-panel-avg-box">
@@ -146,6 +157,19 @@ const ReviewPanel = ({ productId, canDelete }) => {
               )}
             </div>
             <p className="review-panel-item-content">{review.content}</p>
+            {review.imgPaths?.length > 0 && (
+              <div className="review-panel-item-images">
+                {review.imgPaths.map((src, i) => (
+                  <img
+                    key={i}
+                    src={src}
+                    alt={`리뷰 이미지 ${i + 1}`}
+                    className="review-panel-item-thumb"
+                    onClick={() => setLightboxSrc(src)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>
