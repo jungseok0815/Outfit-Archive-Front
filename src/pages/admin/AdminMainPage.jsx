@@ -130,13 +130,14 @@ function Admin() {
 
   const [activePage, setActivePage] = useState(menuItems[0]?.key || "");
   const [registerTrigger, setRegisterTrigger] = useState(0);
+  const [autoCollectTrigger, setAutoCollectTrigger] = useState(0);
 
   const handleRegisterClick = () => setRegisterTrigger((prev) => prev + 1);
 
   const renderContent = () => {
     switch (activePage) {
       case "브랜드 관리":
-        return <BrandManagement registerTrigger={registerTrigger} />;
+        return <BrandManagement registerTrigger={registerTrigger} autoCollectTrigger={autoCollectTrigger} />;
       case "상품 관리":
         return <ProductManagement registerTrigger={registerTrigger} user={adminUser} />;
       case "주문 관리":
@@ -226,7 +227,16 @@ function Admin() {
               <span className="admin-breadcrumb-current">{activePage}</span>
             </div>
           </div>
-          {registerLabels[activePage] && (
+          <div className="admin-header-actions">
+            {activePage === "브랜드 관리" && (
+              <button className="admin-autocollect-btn" onClick={() => setAutoCollectTrigger(p => p + 1)}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+                자동 상품
+              </button>
+            )}
+            {registerLabels[activePage] && (
             <button className="admin-register-btn" onClick={handleRegisterClick}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -234,7 +244,8 @@ function Admin() {
               </svg>
               {registerLabels[activePage]}
             </button>
-          )}
+            )}
+          </div>
         </header>
 
         {/* 콘텐츠 */}
