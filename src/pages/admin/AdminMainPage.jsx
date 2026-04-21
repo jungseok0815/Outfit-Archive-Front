@@ -9,6 +9,7 @@ import AdminManagement from "../admin/adminManagement/AdminManagement";
 import ReviewManagement from "../admin/reviewManagement/ReviewManagement";
 import BannerManagement from "../admin/bannerManagement/BannerManagement";
 import CouponManagement from "../admin/couponManagement/CouponManagement";
+import CategoryManagement from "../admin/categoryManagement/CategoryManagement";
 
 const ALL_MENU_ITEMS = [
   {
@@ -84,6 +85,18 @@ const ALL_MENU_ITEMS = [
     ),
   },
   {
+    key: "카테고리 관리",
+    roles: ["SUPER_ADMIN"],
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1" />
+        <rect x="14" y="3" width="7" height="7" rx="1" />
+        <rect x="3" y="14" width="7" height="7" rx="1" />
+        <rect x="14" y="14" width="7" height="7" rx="1" />
+      </svg>
+    ),
+  },
+  {
     key: "관리자 관리",
     roles: ["SUPER_ADMIN"],
     icon: (
@@ -136,6 +149,8 @@ function Admin() {
         return <BannerManagement registerTrigger={registerTrigger} />;
       case "쿠폰 관리":
         return <CouponManagement registerTrigger={registerTrigger} />;
+      case "카테고리 관리":
+        return <CategoryManagement />;
       case "관리자 관리":
         return <AdminManagement />;
       default:

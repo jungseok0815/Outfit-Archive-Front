@@ -1,0 +1,293 @@
+.catmgmt {
+    padding: 4px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ===== 등록 폼 카드 ===== */
+.catmgmt-add-card {
+    background: #fff;
+    border: 1px solid #ebebeb;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.catmgmt-add-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 18px;
+}
+
+.catmgmt-field-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1.5fr;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.catmgmt-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.catmgmt-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+}
+
+.catmgmt-required {
+    color: #ef4444;
+    margin-left: 2px;
+}
+
+.catmgmt-hint {
+    font-size: 11px;
+    color: #aaa;
+}
+
+.catmgmt-input {
+    padding: 9px 12px;
+    font-size: 13px;
+    font-family: inherit;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.catmgmt-input:focus {
+    border-color: #222;
+}
+
+.catmgmt-submit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    color: #fff;
+    background: #111827;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.catmgmt-submit-btn:hover:not(:disabled) {
+    background: #374151;
+}
+
+.catmgmt-submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ===== 목록 헤더 ===== */
+.catmgmt-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.catmgmt-list-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.catmgmt-list-count {
+    font-size: 13px;
+    color: #999;
+}
+
+.catmgmt-list-count strong {
+    color: #333;
+}
+
+/* ===== 테이블 ===== */
+.catmgmt-table-wrap {
+    background: #fff;
+    border: 1px solid #ebebeb;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.catmgmt-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.catmgmt-table thead tr {
+    background: #fafafa;
+    border-bottom: 1px solid #ebebeb;
+}
+
+.catmgmt-table th {
+    padding: 12px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #999;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.catmgmt-table td {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #444;
+    vertical-align: middle;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.catmgmt-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.catmgmt-empty {
+    text-align: center;
+    padding: 48px 0 !important;
+    color: #999;
+    font-size: 14px;
+}
+
+.catmgmt-row-inactive td {
+    opacity: 0.45;
+}
+
+/* 식별자 뱃지 */
+.catmgmt-name-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #374151;
+    background: #f3f4f6;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+}
+
+/* 사이즈 칩 */
+.catmgmt-size-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.catmgmt-size-chip {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #2563eb;
+    background: #eff6ff;
+    border-radius: 8px;
+}
+
+.catmgmt-no-size {
+    color: #ccc;
+    font-size: 13px;
+}
+
+/* 상태 뱃지 */
+.catmgmt-status {
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 10px;
+}
+
+.catmgmt-status.active {
+    color: #059669;
+    background: #d1fae5;
+}
+
+.catmgmt-status.inactive {
+    color: #9ca3af;
+    background: #f3f4f6;
+}
+
+/* 인라인 편집 입력 */
+.catmgmt-edit-input {
+    padding: 6px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    outline: none;
+    width: 100%;
+    min-width: 80px;
+    transition: border-color 0.15s;
+}
+
+.catmgmt-edit-input:focus {
+    border-color: #222;
+}
+
+/* 액션 버튼 */
+.catmgmt-action-wrap {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.catmgmt-edit-btn,
+.catmgmt-delete-btn,
+.catmgmt-save-btn,
+.catmgmt-cancel-btn {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.catmgmt-edit-btn {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.catmgmt-edit-btn:hover {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+.catmgmt-delete-btn {
+    background: #fff0f0;
+    color: #f87171;
+}
+
+.catmgmt-delete-btn:hover {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.catmgmt-save-btn {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.catmgmt-save-btn:hover {
+    background: #a7f3d0;
+    color: #047857;
+}
+
+.catmgmt-cancel-btn {
+    background: #f3f4f6;
+    color: #9ca3af;
+}
+
+.catmgmt-cancel-btn:hover {
+    background: #e5e7eb;
+    color: #374151;
+}
