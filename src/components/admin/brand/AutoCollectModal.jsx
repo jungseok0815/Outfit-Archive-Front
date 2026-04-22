@@ -1,9 +1,8 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { X, Search, Zap, CheckSquare, Square } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { ListBrand } from '../../../api/admin/brand';
 import { ListKeyword } from '../../../api/admin/keyword';
-import { CollectProducts } from '../../../api/admin/product';
 import './AutoCollectModal.css';
 
 const AutoCollectModal = ({ onClose }) => {
@@ -15,6 +14,8 @@ const AutoCollectModal = ({ onClose }) => {
     const [selectedBrandIds, setSelectedBrandIds] = useState(new Set());
     const [selectedKeywordIds, setSelectedKeywordIds] = useState(new Set());
     const [collecting, setCollecting] = useState(false);
+    const [progress, setProgress] = useState(null); // { message, saved, skipped, current, total }
+    const esRef = useRef(null);
 
     useEffect(() => {
         ListBrand('', 0, 10000)
@@ -73,28 +74,51 @@ const AutoCollectModal = ({ onClose }) => {
         }
     };
 
-    const handleCollect = async () => {
+    const handleCollect = () => {
         if (selectedBrandIds.size === 0) {
             toast.warn('수집할 브랜드를 선택해주세요.');
             return;
         }
+
+        const params = new URLSearchParams();
+        [...selectedBrandIds].forEach(id => params.append('brandIds', id));
+        [...selectedKeywordIds].forEach(id => params.append('keywordIds', id));
+        const baseUrl = process.env.REACT_APP_API_URL || '';
+        const url = `${baseUrl}/api/admin/product/collect/stream?${params.toString()}`;
+
+        const es = new EventSource(url, { withCredentials: true });
+        esRef.current = es;
         setCollecting(true);
-        try {
-            await CollectProducts([...selectedBrandIds], [...selectedKeywordIds]);
-            const keywordMsg = selectedKeywordIds.size > 0
-                ? `, 키워드 ${selectedKeywordIds.size}개`
-                : ' (카테고리 기반)';
-            toast.success(`브랜드 ${selectedBrandIds.size}개${keywordMsg} 수집이 시작되었습니다.`);
-            onClose();
-        } catch {
-            toast.error('수집 요청 중 오류가 발생했습니다.');
-        } finally {
+        setProgress({ message: '수집을 시작합니다...', saved: 0, skipped: 0, current: 0, total: 0 });
+
+        es.addEventListener('progress', (e) => {
+            setProgress(JSON.parse(e.data));
+        });
+
+        es.addEventListener('complete', (e) => {
+            es.close();
+            esRef.current = null;
+            const { saved, skipped } = JSON.parse(e.data);
             setCollecting(false);
-        }
+            toast.success(`수집 완료 — 신규 ${saved}개 등록, 중복 ${skipped}개 스킵`);
+            onClose();
+        });
+
+        es.addEventListener('error', (e) => {
+            es.close();
+            esRef.current = null;
+            setCollecting(false);
+            setProgress(null);
+            toast.error('수집 중 오류가 발생했습니다.');
+        });
     };
 
+    useEffect(() => {
+        return () => { esRef.current?.close(); };
+    }, []);
+
     return (
-        <div className="acm-overlay" onClick={onClose}>
+        <div className="acm-overlay" onClick={collecting ? undefined : onClose}>
             <div className="acm-modal" onClick={e => e.stopPropagation()}>
                 {/* 헤더 */}
                 <div className="acm-header">
@@ -107,8 +131,32 @@ const AutoCollectModal = ({ onClose }) => {
                             <p className="acm-subtitle">브랜드와 키워드를 선택하면 네이버 쇼핑 데이터 기반으로 상품이 자동 등록됩니다.</p>
                         </div>
                     </div>
-                    <button className="acm-close" onClick={onClose}><X size={16} /></button>
+                    <button className="acm-close" onClick={onClose} disabled={collecting}><X size={16} /></button>
                 </div>
+
+                {/* 수집 진행 상황 배너 */}
+                {collecting && progress && (
+                    <div className="acm-collecting-banner">
+                        <div className="acm-collecting-spinner" />
+                        <div className="acm-collecting-info">
+                            <span className="acm-collecting-msg">{progress.message}</span>
+                            <div className="acm-collecting-stats">
+                                {progress.total > 0 && (
+                                    <>
+                                        <div className="acm-progress-bar-wrap">
+                                            <div
+                                                className="acm-progress-bar"
+                                                style={{ width: `${Math.round((progress.current / progress.total) * 100)}%` }}
+                                            />
+                                        </div>
+                                        <span className="acm-progress-ratio">{progress.current}/{progress.total}</span>
+                                    </>
+                                )}
+                                <span className="acm-collecting-saved">저장 {progress.saved}개</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* 브랜드 섹션 */}
                 <div className="acm-section">
