@@ -149,6 +149,54 @@
 .acm-check-icon { color: #9ca3af; }
 .acm-check-icon.checked { color: #1a1a2e; }
 
+/* ===== 섹션 구조 ===== */
+.acm-section {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.acm-keyword-section {
+    flex: 0 0 auto;
+}
+
+.acm-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px 4px;
+    flex-shrink: 0;
+}
+
+.acm-section-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.acm-section-count {
+    font-size: 11px;
+    color: #9ca3af;
+    flex: 1;
+}
+
+.acm-keyword-toggle {
+    margin-left: auto;
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+}
+
+.acm-divider {
+    height: 1px;
+    background: #f3f4f6;
+    margin: 0 20px;
+    flex-shrink: 0;
+}
+
 /* ===== 브랜드 목록 ===== */
 .acm-list {
     flex: 1;
@@ -245,6 +293,61 @@
 .acm-item-checkbox.checked {
     background: #1a1a2e;
     border-color: #1a1a2e;
+}
+
+/* ===== 키워드 목록 ===== */
+.acm-keyword-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 20px 12px;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.acm-keyword-empty {
+    font-size: 12px;
+    color: #9ca3af;
+    padding: 4px 0;
+}
+
+.acm-keyword-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: inherit;
+    color: #374151;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.acm-keyword-chip:hover {
+    background: #e5e7eb;
+}
+
+.acm-keyword-chip.selected {
+    background: #1a1a2e;
+    border-color: #1a1a2e;
+    color: #fff;
+}
+
+.acm-keyword-cat {
+    font-size: 10px;
+    opacity: 0.65;
+    padding-left: 2px;
+}
+
+.acm-keyword-hint {
+    font-size: 11px;
+    color: #d1d5db;
+    padding: 0 20px 10px;
+    margin: 0;
 }
 
 /* ===== 푸터 ===== */
