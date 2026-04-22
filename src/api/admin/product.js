@@ -36,3 +36,8 @@ export const BulkInsertProduct = (zipFile, brandId = null) => {
         params,
     });
 }
+
+// POST /api/admin/product/collect → { brandIds: number[], keywordIds: number[] }
+export const CollectProducts = (brandIds, keywordIds) => {
+    return api.post('/api/admin/product/collect', { brandIds, keywordIds });
+}

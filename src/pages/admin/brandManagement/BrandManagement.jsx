@@ -1,12 +1,13 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import BrandManagementSearchbar from "./BrandManagementSearchbar";
 import BrandManagementContent from './BrandManagementContent';
+import AutoCollectModal from '../../../components/admin/brand/AutoCollectModal';
 import { ListBrand } from '../../../api/admin/brand';
 import { ListProduct } from '../../../api/admin/product';
 
 const PAGE_SIZE = 10;
 
-const BrandManagement = ({ registerTrigger }) => {
+const BrandManagement = ({ registerTrigger, autoCollectTrigger }) => {
     const [brands, setBrands] = useState([]);
     const [products, setProducts] = useState([]);
     const [keyword, setKeyword] = useState('');
@@ -14,6 +15,8 @@ const BrandManagement = ({ registerTrigger }) => {
     const [totalPages, setTotalPages] = useState(0);
     const [totalCount, setTotalCount] = useState(0);
     const [initialLoading, setInitialLoading] = useState(true);
+    const [autoCollectOpen, setAutoCollectOpen] = useState(false);
+    const isMountedAC = useRef(false);
 
     // 브랜드만 로드 (페이지·키워드 이동 시)
     const loadBrands = async (isRefresh = false) => {
@@ -58,6 +61,12 @@ const BrandManagement = ({ registerTrigger }) => {
         loadProducts();
     }, []);
 
+    // autoCollectTrigger 변경 시 모달 오픈 (최초 마운트 제외)
+    useEffect(() => {
+        if (!isMountedAC.current) { isMountedAC.current = true; return; }
+        if (autoCollectTrigger > 0) setAutoCollectOpen(true);
+    }, [autoCollectTrigger]);
+
     // 브랜드별 상품 그룹핑
     const brandsWithProducts = useMemo(() => {
         const productMap = products.reduce((acc, product) => {
@@ -74,6 +83,9 @@ const BrandManagement = ({ registerTrigger }) => {
 
     return (
         <div>
+            {autoCollectOpen && (
+                <AutoCollectModal onClose={() => setAutoCollectOpen(false)} />
+            )}
             <BrandManagementSearchbar keyword={keyword} setKeyword={setKeyword} />
             <BrandManagementContent
                 brands={brandsWithProducts}
