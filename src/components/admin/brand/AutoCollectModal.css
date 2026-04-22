@@ -14,7 +14,7 @@
     border-radius: 16px;
     width: 100%;
     max-width: 520px;
-    max-height: 80vh;
+    height: 80vh;
     display: flex;
     flex-direction: column;
     box-shadow: 0 16px 56px rgba(0, 0, 0, 0.18);
@@ -42,8 +42,8 @@
     width: 36px;
     height: 36px;
     border-radius: 10px;
-    background: #fef3c7;
-    color: #d97706;
+    background: #1a1a2e;
+    color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -147,7 +147,7 @@
 }
 
 .acm-check-icon { color: #9ca3af; }
-.acm-check-icon.checked { color: #f59e0b; }
+.acm-check-icon.checked { color: #1a1a2e; }
 
 /* ===== 브랜드 목록 ===== */
 .acm-list {
@@ -178,7 +178,7 @@
 }
 
 .acm-item.selected {
-    background: #fffbeb;
+    background: #f1f2f8;
 }
 
 .acm-item-thumb {
@@ -243,8 +243,8 @@
 }
 
 .acm-item-checkbox.checked {
-    background: #f59e0b;
-    border-color: #f59e0b;
+    background: #1a1a2e;
+    border-color: #1a1a2e;
 }
 
 /* ===== 푸터 ===== */
@@ -264,7 +264,7 @@
 }
 
 .acm-footer-count strong {
-    color: #f59e0b;
+    color: #1a1a2e;
     font-weight: 700;
 }
 
@@ -305,7 +305,7 @@
     font-weight: 600;
     font-family: inherit;
     color: #fff;
-    background: #f59e0b;
+    background: #1a1a2e;
     border: none;
     border-radius: 9px;
     cursor: pointer;
@@ -313,7 +313,7 @@
 }
 
 .acm-collect-btn:hover:not(:disabled) {
-    background: #d97706;
+    background: #2d2d4e;
 }
 
 .acm-collect-btn:disabled {
