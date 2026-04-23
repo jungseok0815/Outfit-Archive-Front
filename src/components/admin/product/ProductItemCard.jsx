@@ -57,7 +57,9 @@ const ProductList = ({ product, openModal, id, selected, onToggleSelect, onHideT
           {product.productNm}
         </h3>
         <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-500">{product.category}</span>
+          <span className="text-xs text-gray-500">
+            {typeof product.category === 'object' ? (product.category?.korName || product.category?.name) : product.category}
+          </span>
           <span className="text-sm font-bold text-blue-400">
             ₩{product.productPrice?.toLocaleString()}
           </span>
