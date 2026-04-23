@@ -423,7 +423,7 @@ function ProductDetailModal({ productId, product: initialProduct, onClose }) {
 
                   <div className="pd-meta-row">
                     <span className="pd-meta-label">카테고리</span>
-                    <span className="pd-meta-val">{CATEGORY_KOR[product.category] || product.category}</span>
+                    <span className="pd-meta-val">{typeof product.category === 'object' ? (product.category?.korName || product.category?.name) : (CATEGORY_KOR[product.category] || product.category)}</span>
                   </div>
                   <div className="pd-meta-row">
                     <span className="pd-meta-label">상품코드</span>

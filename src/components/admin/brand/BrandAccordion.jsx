@@ -197,7 +197,7 @@ const BrandAccordion = ({ brand, id, onRefresh, isSelected, onToggleSelect }) =>
                                                         className="w-full h-full object-cover"
                                                     />
                                                     <span className="absolute top-2 left-2 bg-gray-800 text-white text-[10px] px-2 py-0.5 rounded-full">
-                                                        {CATEGORY_KOR[product.category] || product.category}
+                                                        {typeof product.category === 'object' ? (product.category?.korName || product.category?.name) : (CATEGORY_KOR[product.category] || product.category)}
                                                     </span>
                                                 </div>
                                                 <div className="p-2.5">

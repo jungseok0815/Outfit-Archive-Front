@@ -41,7 +41,7 @@ const ProductModal = ({ isOpen, onClose, updateProduct, product, user }) => {
         productPrice: product.productPrice || "",
         brandId: product.brandId || autoBrandId,
         productCode: product.productCode || "",
-        category: product.category || "",
+        category: typeof product.category === 'object' ? (product.category?.name || '') : (product.category || ''),
       });
       setExistingImages(
         product.images?.map(img => ({ id: img.id, imgPath: img.imgPath })) || []

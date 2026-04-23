@@ -230,7 +230,7 @@ function ProductDetailPage() {
 
             {/* 카테고리 태그 */}
             <div className="detail-tags">
-              <span className="detail-tag">{CATEGORY_KOR[product.category] || product.category}</span>
+              <span className="detail-tag">{typeof product.category === 'object' ? (product.category?.korName || product.category?.name) : (CATEGORY_KOR[product.category] || product.category)}</span>
             </div>
 
             <div className="detail-divider" />

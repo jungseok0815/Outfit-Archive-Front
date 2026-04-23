@@ -317,7 +317,7 @@ const ReviewManagement = ({ user }) => {
                     <td>{product.brandNm}</td>
                     <td>
                       <span className="review-mgmt-badge">
-                        {CATEGORY_KOR[product.category] || product.category}
+                        {typeof product.category === 'object' ? (product.category?.korName || product.category?.name) : (CATEGORY_KOR[product.category] || product.category)}
                       </span>
                     </td>
                     <td>{product.productPrice?.toLocaleString()}원</td>
